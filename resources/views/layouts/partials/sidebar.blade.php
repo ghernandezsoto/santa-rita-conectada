@@ -6,7 +6,7 @@
         </a>
     </div>
     <nav class="mt-10">
-        <a href="{{ route('dashboard') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+        <a href="{{ route('dashboard') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('dashboard') ? 'bg-gray-900' : '' }}">
             Dashboard (Inicio)
         </a>
         <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
