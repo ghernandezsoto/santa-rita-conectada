@@ -10,12 +10,18 @@ class SocioController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request) // Añadimos Request para la búsqueda
     {
-        // 1. Busca TODOS los socios en la base de datos.
-        $socios = Socio::orderBy('nombre')->get(); // Los ordenamos por nombre
+        $searchTerm = $request->input('search');
+        $query = Socio::query();
 
-        // 2. Envía la variable $socios a la vista.
+        if ($searchTerm) {
+            $query->where('nombre', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('rut', 'like', '%' . $searchTerm . '%');
+        }
+
+        $socios = $query->orderBy('nombre')->paginate(10);
+
         return view('socios.index', compact('socios'));
     }
 
@@ -24,7 +30,6 @@ class SocioController extends Controller
      */
     public function create()
     {
-        // Muestra la vista que contendrá el formulario de creación.
         return view('socios.create');
     }
 
@@ -33,7 +38,6 @@ class SocioController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validar los datos del formulario que se envía.
         $request->validate([
             'rut' => 'required|string|unique:socios,rut',
             'nombre' => 'required|string|max:255',
@@ -47,10 +51,8 @@ class SocioController extends Controller
             'observaciones' => 'nullable|string',
         ]);
 
-        // 2. Si la validación pasa, crea el nuevo socio en la base de datos.
         Socio::create($request->all());
 
-        // 3. Redirige al usuario de vuelta a la lista de socios con un mensaje de éxito.
         return redirect()->route('socios.index')
                          ->with('success', '¡Socio agregado exitosamente!');
     }
@@ -68,7 +70,6 @@ class SocioController extends Controller
      */
     public function edit(Socio $socio)
     {
-        // Muestra la vista de edición y le pasa el socio específico que se quiere editar.
         return view('socios.edit', compact('socio'));
     }
 
@@ -77,7 +78,6 @@ class SocioController extends Controller
      */
     public function update(Request $request, Socio $socio)
     {
-        // 1. Validar los datos (similar a store, pero permitiendo que el RUT y email actuales no den error de "único")
         $request->validate([
             'rut' => 'required|string|unique:socios,rut,' . $socio->id,
             'nombre' => 'required|string|max:255',
@@ -88,16 +88,14 @@ class SocioController extends Controller
             'estado_civil' => 'nullable|string|max:255',
             'telefono' => 'nullable|string|max:20',
             'email' => 'nullable|email|unique:socios,email,' . $socio->id,
+            'estado' => 'required|string',
             'observaciones' => 'nullable|string',
-            'estado' => 'required|string', // Añadimos la validación para el estado
         ]);
 
-        // 2. Actualiza el socio en la base de datos con los nuevos datos.
         $socio->update($request->all());
 
-        // 3. Redirige a la lista con un mensaje de éxito.
         return redirect()->route('socios.index')
-                        ->with('success', '¡Socio actualizado exitosamente!');
+                         ->with('success', '¡Socio actualizado exitosamente!');
     }
 
     /**
@@ -105,11 +103,10 @@ class SocioController extends Controller
      */
     public function destroy(Socio $socio)
     {
-        // Elimina el socio de la base de datos.
+        // Lógica para eliminar añadida aquí
         $socio->delete();
 
-        // Redirige a la lista con un mensaje de éxito.
         return redirect()->route('socios.index')
-                        ->with('success', 'Socio eliminado exitosamente.');
+                         ->with('success', 'Socio eliminado exitosamente.');
     }
 }

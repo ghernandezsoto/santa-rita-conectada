@@ -23,6 +23,16 @@
                         </div>
                     @endif
 
+                    {{-- Formulario de Búsqueda --}}
+                    <div class="mb-4">
+                        <form action="{{ route('socios.index') }}" method="GET">
+                            <div class="flex items-center">
+                                <input type="text" name="search" placeholder="Buscar por nombre o RUT..." class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full sm:w-1/3" value="{{ request('search') }}">
+                                <button type="submit" class="ml-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">Buscar</button>
+                            </div>
+                        </form>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white">
                             <thead class="bg-gray-800 text-white">
@@ -38,7 +48,7 @@
                                 @if ($socios->isEmpty())
                                     <tr>
                                         <td colspan="5" class="py-6 text-center text-gray-500">
-                                            No hay socios registrados aún.
+                                            No hay socios que coincidan con la búsqueda o no hay socios registrados.
                                         </td>
                                     </tr>
                                 @else
@@ -52,12 +62,11 @@
                                                     {{ $socio->estado }}
                                                 </span>
                                             </td>
-                                            {{-- CELDA DE ACCIONES (LA PARTE MODIFICADA) --}}
                                             <td class="py-3 px-4 flex items-center gap-2">
+                                                {{-- Enlace funcional para Editar --}}
                                                 <a href="{{ route('socios.edit', $socio->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Editar</a>
-                                                
                                                 <span class="text-gray-300">|</span>
-
+                                                {{-- Formulario funcional para Eliminar --}}
                                                 <form action="{{ route('socios.destroy', $socio->id) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -71,6 +80,11 @@
                                 @endif
                             </tbody>
                         </table>
+
+                        {{-- Enlaces de Paginación --}}
+                        <div class="mt-4">
+                            {{ $socios->appends(request()->query())->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
