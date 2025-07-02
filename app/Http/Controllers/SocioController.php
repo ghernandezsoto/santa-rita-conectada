@@ -12,8 +12,11 @@ class SocioController extends Controller
      */
     public function index()
     {
-        // Por ahora, solo muestra la vista. Más adelante aquí listaremos los socios.
-        return view('socios.index');
+        // 1. Busca TODOS los socios en la base de datos.
+        $socios = Socio::orderBy('nombre')->get(); // Los ordenamos por nombre
+
+        // 2. Envía la variable $socios a la vista.
+        return view('socios.index', compact('socios'));
     }
 
     /**
@@ -65,7 +68,8 @@ class SocioController extends Controller
      */
     public function edit(Socio $socio)
     {
-        //
+        // Muestra la vista de edición y le pasa el socio específico que se quiere editar.
+        return view('socios.edit', compact('socio'));
     }
 
     /**
@@ -73,7 +77,27 @@ class SocioController extends Controller
      */
     public function update(Request $request, Socio $socio)
     {
-        //
+        // 1. Validar los datos (similar a store, pero permitiendo que el RUT y email actuales no den error de "único")
+        $request->validate([
+            'rut' => 'required|string|unique:socios,rut,' . $socio->id,
+            'nombre' => 'required|string|max:255',
+            'domicilio' => 'required|string|max:255',
+            'fecha_ingreso' => 'required|date',
+            'profesion' => 'nullable|string|max:255',
+            'edad' => 'nullable|integer|min:0',
+            'estado_civil' => 'nullable|string|max:255',
+            'telefono' => 'nullable|string|max:20',
+            'email' => 'nullable|email|unique:socios,email,' . $socio->id,
+            'observaciones' => 'nullable|string',
+            'estado' => 'required|string', // Añadimos la validación para el estado
+        ]);
+
+        // 2. Actualiza el socio en la base de datos con los nuevos datos.
+        $socio->update($request->all());
+
+        // 3. Redirige a la lista con un mensaje de éxito.
+        return redirect()->route('socios.index')
+                        ->with('success', '¡Socio actualizado exitosamente!');
     }
 
     /**
@@ -81,6 +105,11 @@ class SocioController extends Controller
      */
     public function destroy(Socio $socio)
     {
-        //
+        // Elimina el socio de la base de datos.
+        $socio->delete();
+
+        // Redirige a la lista con un mensaje de éxito.
+        return redirect()->route('socios.index')
+                        ->with('success', 'Socio eliminado exitosamente.');
     }
 }
