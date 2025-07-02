@@ -6,22 +6,29 @@
         </a>
     </div>
     <nav class="mt-10">
+        {{-- Enlace a Dashboard --}}
         <a href="{{ route('dashboard') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('dashboard') ? 'bg-gray-900' : '' }}">
             Dashboard (Inicio)
         </a>
-        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+
+        {{-- Enlace a Gestión de Socios --}}
+        <a href="{{ route('socios.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('socios.*') ? 'bg-gray-900' : '' }}">
             Gestión de Socios
         </a>
-        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+
+        {{-- Enlaces para futuros módulos --}}
+        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
             Actas y Documentos
         </a>
-        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
             Tesorería
         </a>
-        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
             Comunicados
         </a>
-        <a href="{{ route('profile.edit') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+
+        {{-- Enlace a Mi Perfil --}}
+        <a href="{{ route('profile.edit') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('profile.edit') ? 'bg-gray-900' : '' }}">
             Mi Perfil
         </a>
     </nav>
