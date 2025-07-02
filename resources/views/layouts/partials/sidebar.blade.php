@@ -15,9 +15,8 @@
         <a href="{{ route('socios.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('socios.*') ? 'bg-gray-900' : '' }}">
             Gestión de Socios
         </a>
-
-        {{-- Enlaces para futuros módulos --}}
-        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
+        {{-- Enlace a Gestión de Actas --}}
+        <a href="{{ route('actas.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('actas.*') ? 'bg-gray-900' : '' }}">
             Actas y Documentos
         </a>
         <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
