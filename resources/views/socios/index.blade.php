@@ -54,7 +54,11 @@
                                 @else
                                     @foreach ($socios as $socio)
                                         <tr class="border-b hover:bg-gray-50">
-                                            <td class="py-3 px-4">{{ $socio->nombre }}</td>
+                                            <td class="py-3 px-4">
+                                                <a href="{{ route('socios.show', $socio->id) }}" class="font-medium text-blue-600 hover:underline">
+                                                    {{ $socio->nombre }}
+                                                </a>
+                                            </td>
                                             <td class="py-3 px-4">{{ $socio->rut }}</td>
                                             <td class="py-3 px-4">{{ $socio->email ?: $socio->telefono }}</td>
                                             <td class="py-3 px-4">

@@ -62,7 +62,8 @@ class SocioController extends Controller
      */
     public function show(Socio $socio)
     {
-        //
+        // Pasa el socio específico a una nueva vista llamada 'socios.show'
+        return view('socios.show', compact('socio'));
     }
 
     /**
