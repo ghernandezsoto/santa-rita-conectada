@@ -24,7 +24,8 @@ class ActaController extends Controller
      */
     public function create()
     {
-        //
+        // Muestra la vista con el formulario para subir una nueva acta.
+        return view('actas.create');
     }
 
     /**
@@ -32,7 +33,29 @@ class ActaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // 1. Validar los datos del formulario, incluyendo el archivo.
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'fecha' => 'required|date',
+            'contenido' => 'required|string',
+            'archivo' => 'required|file|mimes:pdf|max:2048', // Requerido, debe ser PDF, máx 2MB
+        ]);
+
+        // 2. Manejar la subida del archivo PDF.
+        $filePath = $request->file('archivo')->store('actas', 'public');
+
+        // 3. Crear el registro en la base de datos.
+        Acta::create([
+            'titulo' => $request->titulo,
+            'fecha' => $request->fecha,
+            'contenido' => $request->contenido,
+            'archivo_path' => $filePath,
+            'user_id' => auth()->id(), // Asigna el ID del usuario autenticado
+        ]);
+
+        // 4. Redirigir a la lista de actas con un mensaje de éxito.
+        return redirect()->route('actas.index')
+                        ->with('success', '¡Acta subida y registrada exitosamente!');
     }
 
     /**
