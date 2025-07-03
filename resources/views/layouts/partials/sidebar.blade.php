@@ -22,7 +22,7 @@
         <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
             Tesorería
         </a>
-        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
+        <a href="{{ route('comunicados.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('comunicados.*') ? 'bg-gray-900' : '' }}">
             Comunicados
         </a>
 

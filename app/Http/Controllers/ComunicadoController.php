@@ -12,7 +12,9 @@ class ComunicadoController extends Controller
      */
     public function index()
     {
-        //
+        $comunicados = Comunicado::with('user')->orderBy('created_at', 'desc')->get();
+
+        return view('comunicados.index', compact('comunicados'));
     }
 
     /**
