@@ -79,7 +79,8 @@ class ActaController extends Controller
      */
     public function edit(Acta $acta)
     {
-        //
+        // Muestra el formulario de edición con los datos del acta seleccionada.
+        return view('actas.edit', compact('acta'));
     }
 
     /**
@@ -87,7 +88,34 @@ class ActaController extends Controller
      */
     public function update(Request $request, Acta $acta)
     {
-        //
+        // 1. Validamos los datos. El título es único pero ignorando el acta actual.
+        // El archivo es opcional, solo se valida si se sube uno nuevo.
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'fecha' => 'required|date',
+            'contenido' => 'required|string',
+            'archivo' => 'nullable|file|mimes:pdf|max:2048', // El archivo es opcional al editar
+        ]);
+
+        // 2. Preparamos los datos para actualizar.
+        $data = $request->only(['titulo', 'fecha', 'contenido']);
+
+        // 3. Si se subió un nuevo archivo...
+        if ($request->hasFile('archivo')) {
+            // ...borramos el archivo antiguo.
+            if (Storage::disk('public')->exists($acta->archivo_path)) {
+                Storage::disk('public')->delete($acta->archivo_path);
+            }
+            // ...guardamos el nuevo y actualizamos la ruta en los datos.
+            $data['archivo_path'] = $request->file('archivo')->store('actas', 'public');
+        }
+
+        // 4. Actualizamos el registro en la base de datos.
+        $acta->update($data);
+
+        // 5. Redirigimos con un mensaje de éxito.
+        return redirect()->route('actas.index')
+                        ->with('success', '¡Acta actualizada exitosamente!');
     }
 
     /**

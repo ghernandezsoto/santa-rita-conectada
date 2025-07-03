@@ -56,6 +56,8 @@
                                             <td class="py-3 px-4 flex items-center gap-2">
                                                 <a href="{{ route('actas.show', $acta->id) }}" target="_blank" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
                                                 <span class="text-gray-300">|</span>
+                                                <a href="{{ route('actas.edit', $acta->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Editar</a>
+                                                <span class="text-gray-300">|</span>
                                                 <form action="{{ route('actas.destroy', $acta->id) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
