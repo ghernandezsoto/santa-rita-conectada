@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Acta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ActaController extends Controller
 {
@@ -63,7 +64,14 @@ class ActaController extends Controller
      */
     public function show(Acta $acta)
     {
-        //
+        // Verifica si el archivo existe en el almacenamiento
+        if (!Storage::disk('public')->exists($acta->archivo_path)) {
+            // Si no existe, redirige de vuelta con un mensaje de error.
+            return redirect()->route('actas.index')->with('error', 'El archivo del acta no fue encontrado.');
+        }
+
+        // Si existe, devuelve el archivo para que el navegador lo muestre.
+        return Storage::disk('public')->response($acta->archivo_path);
     }
 
     /**
@@ -87,6 +95,16 @@ class ActaController extends Controller
      */
     public function destroy(Acta $acta)
     {
-        //
+        // 1. Eliminar el archivo físico del almacenamiento.
+        if (Storage::disk('public')->exists($acta->archivo_path)) {
+            Storage::disk('public')->delete($acta->archivo_path);
+        }
+
+        // 2. Eliminar el registro del acta de la base de datos.
+        $acta->delete();
+
+        // 3. Redirigir con un mensaje de éxito.
+        return redirect()->route('actas.index')
+                        ->with('success', 'Acta eliminada exitosamente.');
     }
 }

@@ -14,6 +14,22 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+
+                    {{-- Bloque para mostrar mensajes de éxito o error --}}
+                    @if (session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <strong class="font-bold">¡Éxito!</strong>
+                            <span class="block sm:inline">{{ session('success') }}</span>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <strong class="font-bold">¡Error!</strong>
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                    @endif
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white">
                             <thead class="bg-gray-800 text-white">
@@ -36,11 +52,17 @@
                                         <tr class="border-b hover:bg-gray-50">
                                             <td class="py-3 px-4">{{ $acta->titulo }}</td>
                                             <td class="py-3 px-4">{{ \Carbon\Carbon::parse($acta->fecha)->format('d/m/Y') }}</td>
-                                            <td class="py-3 px-4">{{-- Aquí irá el nombre del usuario --}}</td>
+                                            <td class="py-3 px-4">{{ $acta->user->name ?? 'Usuario no encontrado' }}</td>
                                             <td class="py-3 px-4 flex items-center gap-2">
-                                                <a href="#" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
+                                                <a href="{{ route('actas.show', $acta->id) }}" target="_blank" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
                                                 <span class="text-gray-300">|</span>
-                                                <a href="#" class="text-red-600 hover:text-red-900 font-medium">Eliminar</a>
+                                                <form action="{{ route('actas.destroy', $acta->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 hover:text-red-900 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar esta acta?')">
+                                                        Eliminar
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach
