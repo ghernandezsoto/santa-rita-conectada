@@ -22,7 +22,8 @@ class ComunicadoController extends Controller
      */
     public function create()
     {
-        //
+        // Muestra la vista con el formulario para crear un nuevo comunicado.
+        return view('comunicados.create');
     }
 
     /**
@@ -30,7 +31,22 @@ class ComunicadoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // 1. Validar los datos del formulario.
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'contenido' => 'required|string',
+        ]);
+
+        // 2. Crear el registro en la base de datos.
+        Comunicado::create([
+            'titulo' => $request->titulo,
+            'contenido' => $request->contenido,
+            'user_id' => auth()->id(), // Asigna el ID del usuario que está creando el comunicado.
+        ]);
+
+        // 3. Redirigir a la lista de comunicados con un mensaje de éxito.
+        return redirect()->route('comunicados.index')
+                        ->with('success', '¡Comunicado creado exitosamente!');
     }
 
     /**
