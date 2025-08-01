@@ -17,6 +17,7 @@ class ComunicadoController extends Controller
         return view('comunicados.index', compact('comunicados'));
     }
 
+    
     /**
      * Show the form for creating a new resource.
      */
@@ -25,6 +26,7 @@ class ComunicadoController extends Controller
         // Muestra la vista con el formulario para crear un nuevo comunicado.
         return view('comunicados.create');
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -49,35 +51,55 @@ class ComunicadoController extends Controller
                         ->with('success', '¡Comunicado creado exitosamente!');
     }
 
+
     /**
      * Display the specified resource.
      */
     public function show(Comunicado $comunicado)
     {
-        //
+        // Pasa el comunicado específico a una nueva vista llamada 'comunicados.show'.
+        return view('comunicados.show', compact('comunicado'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Comunicado $comunicado)
     {
-        //
+        // Muestra el formulario de edición con los datos del comunicado seleccionado.
+        return view('comunicados.edit', compact('comunicado'));
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Comunicado $comunicado)
     {
-        //
+        // 1. Validamos los datos.
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'contenido' => 'required|string',
+        ]);
+
+        // 2. Actualizamos el registro en la base de datos.
+        $comunicado->update($request->all());
+
+        // 3. Redirigimos a la lista con un mensaje de éxito.
+        return redirect()->route('comunicados.index')
+                        ->with('success', '¡Comunicado actualizado exitosamente!');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Comunicado $comunicado)
     {
-        //
+        $comunicado->delete();
+
+        return redirect()->route('comunicados.index')
+                        ->with('success', 'Comunicado eliminado exitosamente.');
     }
 }

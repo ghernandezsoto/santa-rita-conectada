@@ -14,6 +14,15 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+
+                    {{-- Mensaje de éxito --}}
+                    @if (session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <strong class="font-bold">¡Éxito!</strong>
+                            <span class="block sm:inline">{{ session('success') }}</span>
+                        </div>
+                    @endif
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white">
                             <thead class="bg-gray-800 text-white">
@@ -30,10 +39,23 @@
                                         <td class="py-3 px-4">{{ $comunicado->titulo }}</td>
                                         <td class="py-3 px-4">{{ $comunicado->created_at->format('d/m/Y H:i') }}</td>
                                         <td class="py-3 px-4">{{ $comunicado->user->name }}</td>
+                                        
+                                        {{-- CELDA DE ACCIONES COMPLETA Y CORREGIDA --}}
                                         <td class="py-3 px-4 flex items-center gap-2">
-                                            <a href="#" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
+                                            <a href="{{ route('comunicados.show', $comunicado->id) }}" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
                                             <span class="text-gray-300">|</span>
-                                            <a href="#" class="text-red-600 hover:text-red-900 font-medium">Eliminar</a>
+                                            
+                                            {{-- Enlace para Editar añadido aquí --}}
+                                            <a href="{{ route('comunicados.edit', $comunicado->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Editar</a>
+                                            <span class="text-gray-300">|</span>
+                                            
+                                            <form action="{{ route('comunicados.destroy', $comunicado->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-900 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar este comunicado?')">
+                                                    Eliminar
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
