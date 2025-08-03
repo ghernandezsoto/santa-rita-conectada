@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Socio;
+use App\Notifications\NuevoComunicadoNotification;
+use Illuminate\Support\Facades\Notification;
+
 use App\Models\Comunicado;
 use Illuminate\Http\Request;
 
@@ -17,7 +21,7 @@ class ComunicadoController extends Controller
         return view('comunicados.index', compact('comunicados'));
     }
 
-    
+
     /**
      * Show the form for creating a new resource.
      */
@@ -101,5 +105,30 @@ class ComunicadoController extends Controller
 
         return redirect()->route('comunicados.index')
                         ->with('success', 'Comunicado eliminado exitosamente.');
+    }
+
+    public function enviar(Comunicado $comunicado)
+    {
+    // 1. Verificar si ya fue enviado.
+    if ($comunicado->fecha_envio) {
+        return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
+    }
+
+    // 2. Obtener todos los socios activos que tengan un email registrado.
+    $sociosActivos = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
+
+    // 3. ¡CAMBIO CLAVE! Marcar el comunicado como enviado AHORA.
+    // Esto actualiza la interfaz de inmediato.
+    $comunicado->update(['fecha_envio' => now()]);
+
+    // 4. Si hay socios a quienes notificar, enviar el trabajo a la cola.
+    // Esto ocurrirá en segundo plano.
+    if ($sociosActivos->isNotEmpty()) {
+        Notification::send($sociosActivos, new NuevoComunicadoNotification($comunicado));
+    }
+
+    // 5. Redirigir con un mensaje de éxito.
+    return redirect()->route('comunicados.index')
+                     ->with('success', '¡El comunicado ha sido puesto en la cola para ser enviado a ' . $sociosActivos->count() . ' socios activos!');
     }
 }

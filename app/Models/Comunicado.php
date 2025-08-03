@@ -16,6 +16,7 @@ class Comunicado extends Model
         'titulo',
         'contenido',
         'user_id',
+        'fecha_envio', // <-- AÑADIMOS ESTA LÍNEA
     ];
 
     /**

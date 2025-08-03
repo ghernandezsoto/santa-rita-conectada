@@ -15,11 +15,16 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    {{-- Mensaje de éxito --}}
                     @if (session('success'))
                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <strong class="font-bold">¡Éxito!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <strong class="font-bold">¡Error!</strong>
+                            <span class="block sm:inline">{{ session('error') }}</span>
                         </div>
                     @endif
 
@@ -28,7 +33,7 @@
                             <thead class="bg-gray-800 text-white">
                                 <tr>
                                     <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Título</th>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Fecha de Creación</th>
+                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Estado</th>
                                     <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Enviado por</th>
                                     <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Acciones</th>
                                 </tr>
@@ -37,18 +42,34 @@
                                 @forelse ($comunicados as $comunicado)
                                     <tr class="border-b hover:bg-gray-50">
                                         <td class="py-3 px-4">{{ $comunicado->titulo }}</td>
-                                        <td class="py-3 px-4">{{ $comunicado->created_at->format('d/m/Y H:i') }}</td>
+                                        <td class="py-3 px-4">
+                                            @if ($comunicado->fecha_envio)
+                                                <span class="bg-green-200 text-green-700 py-1 px-3 rounded-full text-xs">
+                                                    Enviado el {{ \Carbon\Carbon::parse($comunicado->fecha_envio)->format('d/m/Y') }}
+                                                </span>
+                                            @else
+                                                <span class="bg-yellow-200 text-yellow-700 py-1 px-3 rounded-full text-xs">
+                                                    Borrador
+                                                </span>
+                                            @endif
+                                        </td>
                                         <td class="py-3 px-4">{{ $comunicado->user->name }}</td>
-                                        
-                                        {{-- CELDA DE ACCIONES COMPLETA Y CORREGIDA --}}
-                                        <td class="py-3 px-4 flex items-center gap-2">
+                                        <td class="py-3 px-4 flex items-center gap-2 flex-wrap">
                                             <a href="{{ route('comunicados.show', $comunicado->id) }}" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
                                             <span class="text-gray-300">|</span>
-                                            
-                                            {{-- Enlace para Editar añadido aquí --}}
-                                            <a href="{{ route('comunicados.edit', $comunicado->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Editar</a>
-                                            <span class="text-gray-300">|</span>
-                                            
+
+                                            @if (!$comunicado->fecha_envio)
+                                                <a href="{{ route('comunicados.edit', $comunicado->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Editar</a>
+                                                <span class="text-gray-300">|</span>
+                                                <form action="{{ route('comunicados.enviar', $comunicado->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <button type="submit" class="text-purple-600 hover:text-purple-900 font-medium" onclick="return confirm('¿Estás seguro de que quieres enviar este comunicado a todos los socios activos?')">
+                                                        Enviar
+                                                    </button>
+                                                </form>
+                                                <span class="text-gray-300">|</span>
+                                            @endif
+
                                             <form action="{{ route('comunicados.destroy', $comunicado->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')

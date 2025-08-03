@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable; // <-- 1. AÑADE ESTA LÍNEA
 
 class Socio extends Model
 {
-        use HasFactory;
+    use HasFactory, Notifiable; // <-- 2. AÑADE , Notifiable AQUÍ
 
     /**
      * The attributes that are mass assignable.
