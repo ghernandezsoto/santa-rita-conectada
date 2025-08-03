@@ -12,7 +12,16 @@ class TransaccionController extends Controller
      */
     public function index()
     {
-        //
+        // Obtener todas las transacciones ordenadas por fecha reciente
+        $transacciones = Transaccion::with('user')->orderBy('fecha', 'desc')->paginate(15);
+
+        // Calcular totales
+        $ingresos = Transaccion::where('tipo', 'Ingreso')->sum('monto');
+        $egresos = Transaccion::where('tipo', 'Egreso')->sum('monto');
+        $balance = $ingresos - $egresos;
+
+        // Pasar todas las variables a la vista
+        return view('transacciones.index', compact('transacciones', 'ingresos', 'egresos', 'balance'));
     }
 
     /**

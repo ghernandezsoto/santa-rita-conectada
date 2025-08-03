@@ -19,7 +19,7 @@
         <a href="{{ route('actas.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('actas.*') ? 'bg-gray-900' : '' }}">
             Actas y Documentos
         </a>
-        <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 opacity-50 cursor-not-allowed">
+        <a href="{{ route('transacciones.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('transacciones.*') ? 'bg-gray-900' : '' }}">
             Tesorería
         </a>
         <a href="{{ route('comunicados.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('comunicados.*') ? 'bg-gray-900' : '' }}">
