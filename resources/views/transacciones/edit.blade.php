@@ -1,0 +1,49 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Editar ') . $tipo }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <form method="POST" action="{{ route('transacciones.update', $transaccion->id) }}">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="space-y-6">
+                            <div>
+                                <x-input-label for="descripcion" :value="__('Descripción')" />
+                                <x-text-input id="descripcion" class="block mt-1 w-full" type="text" name="descripcion" :value="old('descripcion', $transaccion->descripcion)" required autofocus />
+                                <x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="monto" :value="__('Monto ($)')" />
+                                    <x-text-input id="monto" class="block mt-1 w-full" type="number" name="monto" :value="old('monto', $transaccion->monto)" required step="0.01" />
+                                    <x-input-error :messages="$errors->get('monto')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="fecha" :value="__('Fecha de la Transacción')" />
+                                    <x-text-input id="fecha" class="block mt-1 w-full" type="date" name="fecha" :value="old('fecha', $transaccion->fecha)" required />
+                                    <x-input-error :messages="$errors->get('fecha')" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end mt-6">
+                            <a href="{{ route('transacciones.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">Cancelar</a>
+                            <x-primary-button>
+                                {{ __('Actualizar Transacción') }}
+                            </x-primary-button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

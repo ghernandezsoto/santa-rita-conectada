@@ -77,15 +77,27 @@ class TransaccionController extends Controller
      */
     public function edit(Transaccion $transaccion)
     {
-        //
+        // Pasamos la transacción y el tipo a la vista de edición.
+        $tipo = $transaccion->tipo;
+        return view('transacciones.edit', compact('transaccion', 'tipo'));
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Transaccion $transaccion)
     {
-        //
+        $request->validate([
+            'fecha' => 'required|date',
+            'monto' => 'required|numeric|min:0',
+            'descripcion' => 'required|string|max:255',
+        ]);
+
+        $transaccion->update($request->only(['fecha', 'monto', 'descripcion']));
+
+        return redirect()->route('transacciones.index')
+                        ->with('success', '¡Transacción actualizada exitosamente!');
     }
 
     /**
@@ -93,6 +105,9 @@ class TransaccionController extends Controller
      */
     public function destroy(Transaccion $transaccion)
     {
-        //
+        $transaccion->delete();
+
+        return redirect()->route('transacciones.index')
+                        ->with('success', 'Transacción eliminada exitosamente.');
     }
 }
