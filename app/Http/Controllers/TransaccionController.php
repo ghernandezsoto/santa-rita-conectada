@@ -27,9 +27,17 @@ class TransaccionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        // Pasamos el 'tipo' de transacción a la vista para saber qué formulario mostrar.
+        $tipo = $request->query('tipo');
+
+        // Validamos que el tipo sea 'Ingreso' o 'Egreso'.
+        if (!in_array($tipo, ['Ingreso', 'Egreso'])) {
+            return redirect()->route('transacciones.index')->with('error', 'Tipo de transacción no válido.');
+        }
+
+        return view('transacciones.create', compact('tipo'));
     }
 
     /**
@@ -37,7 +45,23 @@ class TransaccionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'fecha' => 'required|date',
+            'tipo' => 'required|in:Ingreso,Egreso',
+            'monto' => 'required|numeric|min:0',
+            'descripcion' => 'required|string|max:255',
+        ]);
+
+        Transaccion::create([
+            'fecha' => $request->fecha,
+            'tipo' => $request->tipo,
+            'monto' => $request->monto,
+            'descripcion' => $request->descripcion,
+            'user_id' => auth()->id(),
+        ]);
+
+        return redirect()->route('transacciones.index')
+                        ->with('success', '¡Transacción registrada exitosamente!');
     }
 
     /**

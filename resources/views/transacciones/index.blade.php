@@ -23,11 +23,11 @@
                 </div>
             </div>
 
-            <div class="mb-4 flex gap-4">
-                <a href="#" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            <div class="mb-6 flex flex-col sm:flex-row gap-4">
+                <a href="{{ route('transacciones.create', ['tipo' => 'Ingreso']) }}" class="px-5 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-center">
                     Registrar Ingreso
                 </a>
-                <a href="#" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                <a href="{{ route('transacciones.create', ['tipo' => 'Egreso']) }}" class="px-5 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 rounded-lg text-center">
                     Registrar Egreso
                 </a>
             </div>
