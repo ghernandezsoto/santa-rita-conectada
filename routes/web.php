@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('actas', App\Http\Controllers\ActaController::class);
     Route::resource('comunicados', App\Http\Controllers\ComunicadoController::class);
     Route::post('/comunicados/{comunicado}/enviar', [App\Http\Controllers\ComunicadoController::class, 'enviar'])->name('comunicados.enviar');
+    Route::resource('transacciones', App\Http-Controllers\TransaccionController::class);
 });
 
 require __DIR__.'/auth.php';
