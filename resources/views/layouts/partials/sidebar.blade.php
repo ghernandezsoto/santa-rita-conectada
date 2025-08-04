@@ -6,14 +6,18 @@
         </a>
     </div>
     <nav class="mt-10">
-        {{-- Enlaces visibles para todos los usuarios autenticados --}}
+        {{-- Enlace a Dashboard --}}
         <a href="{{ route('dashboard') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('dashboard') ? 'bg-gray-900' : '' }}">
             Dashboard (Inicio)
         </a>
-        <a href="{{ route('socios.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('socios.*') ? 'bg-gray-900' : '' }}">
-            Gestión de Socios
-        </a>
 
+        {{-- Enlace a Gestión de Socios (AHORA PROTEGIDO) --}}
+        @role('Secretario|Presidente')
+            <a href="{{ route('socios.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('socios.*') ? 'bg-gray-900' : '' }}">
+                Gestión de Socios
+            </a>
+        @endrole
+        
         {{-- Enlaces solo para Secretario o Presidente --}}
         @role('Secretario|Presidente')
             <a href="{{ route('actas.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('actas.*') ? 'bg-gray-900' : '' }}">

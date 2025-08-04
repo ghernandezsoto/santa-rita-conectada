@@ -7,9 +7,52 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            {{-- Mensaje de Bienvenida --}}
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900">
-                    ¡Bienvenido al Panel de Administración!
+                    ¡Bienvenido de nuevo, {{ Auth::user()->name }}!
+                </div>
+            </div>
+
+            {{-- Rejilla de Tarjetas de Resumen --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-500">Total de Socios</h3>
+                    <p class="text-3xl font-bold mt-2 text-gray-800">{{ $totalSocios }}</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-500">Balance de Tesorería</h3>
+                    <p class="text-3xl font-bold mt-2 {{ $balance >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                        ${{ number_format($balance, 0, ',', '.') }}
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-500">Próximos Eventos</h3>
+                    <p class="text-3xl font-bold mt-2 text-gray-800">0</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-500">Comunicados Recientes</h3>
+                    <p class="text-3xl font-bold mt-2 text-gray-800">0</p>
+                </div>
+            </div>
+
+            {{-- Sección de Actividad Reciente --}}
+            <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-semibold mb-4">Últimos Socios Registrados</h3>
+                    <ul class="divide-y divide-gray-200">
+                        @forelse ($ultimosSocios as $socio)
+                            <li class="py-3 flex justify-between items-center">
+                                <span>{{ $socio->nombre }}</span>
+                                <span class="text-sm text-gray-500">{{ $socio->created_at->diffForHumans() }}</span>
+                            </li>
+                        @empty
+                            <li class="py-3 text-center text-gray-500">Aún no hay socios registrados.</li>
+                        @endforelse
+                    </ul>
                 </div>
             </div>
         </div>
