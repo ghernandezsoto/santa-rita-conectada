@@ -41,6 +41,10 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // <-- LÍNEA AÑADIDA -->
+        // Asigna automáticamente el rol de "Socio" a cada nuevo usuario.
+        $user->assignRole('Socio');
+
         event(new Registered($user));
 
         Auth::login($user);
