@@ -11,10 +11,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -44,6 +40,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('transacciones', TransaccionController::class)
          ->parameters(['transacciones' => 'transaccion'])
          ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Tesorero|Presidente');
+     
+     // Módulo de Subsidios (solo para la directiva)
+     Route::resource('subsidios', App\Http\Controllers\SubsidioController::class)->middleware('role:Presidente|Secretario|Tesorero');
 });
 
 require __DIR__.'/auth.php';
