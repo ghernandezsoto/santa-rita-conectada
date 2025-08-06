@@ -71,7 +71,8 @@ class SubsidioController extends Controller
      */
     public function edit(Subsidio $subsidio)
     {
-        //
+        // Pasamos el subsidio específico a la vista de edición/gestión.
+        return view('subsidios.edit', compact('subsidio'));
     }
 
     /**
@@ -79,7 +80,21 @@ class SubsidioController extends Controller
      */
     public function update(Request $request, Subsidio $subsidio)
     {
-        //
+        // 1. Validamos los datos que vienen del formulario de gestión.
+        $request->validate([
+            'estado' => 'required|in:Postulando,Aprobado,Rechazado,Finalizado',
+            'observaciones_directiva' => 'nullable|string',
+        ]);
+
+        // 2. Actualizamos solo los campos de gestión en la base de datos.
+        $subsidio->update([
+            'estado' => $request->estado,
+            'observaciones_directiva' => $request->observaciones_directiva,
+        ]);
+
+        // 3. Redirigimos a la lista con un mensaje de éxito.
+        return redirect()->route('subsidios.index')
+                        ->with('success', 'El estado de la postulación ha sido actualizado.');
     }
 
     /**
@@ -87,6 +102,11 @@ class SubsidioController extends Controller
      */
     public function destroy(Subsidio $subsidio)
     {
-        //
+        // Elimina la postulación de la base de datos.
+        $subsidio->delete();
+
+        // Redirige a la lista con un mensaje de éxito.
+        return redirect()->route('subsidios.index')
+                        ->with('success', 'Postulación a subsidio eliminada exitosamente.');
     }
 }

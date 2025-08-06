@@ -50,7 +50,7 @@
                                             </span>
                                         </td>
                                         <td class="py-3 px-4 flex items-center gap-2">
-                                            <a href="#" class="text-blue-600 hover:text-blue-900 font-medium">Gestionar</a>
+                                            <a href="{{ route('subsidios.edit', $subsidio->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Gestionar</a>
                                         </td>
                                     </tr>
                                 @empty
