@@ -33,6 +33,10 @@
             <a href="{{ route('transacciones.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('transacciones.*') ? 'bg-gray-900' : '' }}">
                 Tesorería
             </a>
+            {{-- ENLACE NUEVO AÑADIDO AQUÍ --}}
+            <a href="{{ route('subsidios.index') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 {{ request()->routeIs('subsidios.*') ? 'bg-gray-900' : '' }}">
+                Gestión de Subsidios
+            </a>
         @endrole
         
         {{-- Enlace de perfil, visible para todos --}}

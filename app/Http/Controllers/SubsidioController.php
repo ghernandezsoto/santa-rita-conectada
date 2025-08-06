@@ -12,7 +12,12 @@ class SubsidioController extends Controller
      */
     public function index()
     {
-        //
+        // Usamos with() para cargar las relaciones y evitar consultas N+1 (más eficiente).
+        $subsidios = Subsidio::with('socio', 'user')
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(10);
+
+        return view('subsidios.index', compact('subsidios'));
     }
 
     /**
