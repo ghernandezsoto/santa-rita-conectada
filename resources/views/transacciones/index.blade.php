@@ -30,6 +30,14 @@
                 <a href="{{ route('transacciones.create', ['tipo' => 'Egreso']) }}" class="px-5 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 rounded-lg text-center">
                     Registrar Egreso
                 </a>
+                {{-- BOTÓN NUEVO AÑADIDO AQUÍ --}}
+                <a href="{{ route('transacciones.exportar') }}" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-center">
+                    {{-- Ícono SVG añadido aquí --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Exportar a Excel
+                </a>
             </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">

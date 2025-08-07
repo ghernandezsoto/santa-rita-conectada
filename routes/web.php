@@ -1,50 +1,56 @@
 <?php
 
+use App\Exports\TransaccionesExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\ActaController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\SubsidioController;
 use App\Http\Controllers\TransaccionController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
 // --- GRUPO DE RUTAS PROTEGIDAS POR AUTENTICACIÓN ---
 Route::middleware('auth')->group(function () {
-     // Rutas de Perfil
-     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Rutas de Perfil
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-     // Módulo de Socios (AHORA PROTEGIDO CON EL NOMBRE COMPLETO)
-     Route::resource('socios', SocioController::class)
-          ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+    // Módulos protegidos
+    Route::resource('socios', SocioController::class)
+         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
 
-     // Módulo de Actas
-     Route::resource('actas', ActaController::class)
-          ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+    Route::resource('actas', ActaController::class)
+         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
 
-     // Módulo de Comunicados
-     Route::resource('comunicados', ComunicadoController::class)
-          ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
-     Route::post('/comunicados/{comunicado}/enviar', [ComunicadoController::class, 'enviar'])
-          ->name('comunicados.enviar')
-          ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+    Route::resource('comunicados', ComunicadoController::class)
+         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+    Route::post('/comunicados/{comunicado}/enviar', [ComunicadoController::class, 'enviar'])
+         ->name('comunicados.enviar')
+         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
 
-     // Módulo de Tesorería
-     Route::resource('transacciones', TransaccionController::class)
-          ->parameters(['transacciones' => 'transaccion'])
-          ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Tesorero|Presidente');
+    // --- MÓDULO DE TESORERÍA CORREGIDO ---
+    // 1. Ruta específica para exportar
+    Route::get('/transacciones/exportar', function () {
+        return Excel::download(new TransaccionesExport, 'balance-tesoreria.xlsx');
+    })->name('transacciones.exportar')->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Tesorero|Presidente');
 
-     // Ruta de Subsidios (CORREGIDA)
-     Route::resource('subsidios', SubsidioController::class)
-          ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Presidente|Secretario|Tesorero');
+    // 2. Ruta resource general (después de la específica)
+    Route::resource('transacciones', TransaccionController::class)
+         ->parameters(['transacciones' => 'transaccion'])
+         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Tesorero|Presidente');
+
+    Route::resource('subsidios', SubsidioController::class)
+         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Presidente|Secretario|Tesorero');
 });
 
 require __DIR__.'/auth.php';
