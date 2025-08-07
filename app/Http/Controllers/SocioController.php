@@ -30,7 +30,10 @@ class SocioController extends Controller
      */
     public function create()
     {
-        return view('socios.create');
+        $estadosCiviles = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Conviviente Civil'];
+        $profesiones = ['Dueña de Casa', 'Estudiante', 'Jubilado/a', 'Obrero/a', 'Técnico/a', 'Profesional', 'Agricultor/a', 'Otro'];
+
+        return view('socios.create', compact('estadosCiviles', 'profesiones'));
     }
 
     /**
@@ -71,7 +74,10 @@ class SocioController extends Controller
      */
     public function edit(Socio $socio)
     {
-        return view('socios.edit', compact('socio'));
+        $estadosCiviles = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Conviviente Civil'];
+        $profesiones = ['Dueña de Casa', 'Estudiante', 'Jubilado/a', 'Obrero/a', 'Técnico/a', 'Profesional', 'Agricultor/a', 'Otro'];
+
+        return view('socios.edit', compact('socio', 'estadosCiviles', 'profesiones'));
     }
 
     /**
