@@ -9,13 +9,14 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('subsidios.store') }}">
+                    {{-- IMPORTANTE: Añadir enctype para permitir la subida de archivos --}}
+                    <form method="POST" action="{{ route('subsidios.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="space-y-6">
 
                             <div>
                                 <x-input-label for="socio_id" :value="__('Socio Postulante')" />
-                                <select id="socio_id" name="socio_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                                <select id="socio_id" name="socio_id" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm" required>
                                     <option value="">Seleccione un socio</option>
                                     @foreach ($socios as $socio)
                                         <option value="{{ $socio->id }}" {{ old('socio_id') == $socio->id ? 'selected' : '' }}>
@@ -34,14 +35,21 @@
 
                             <div>
                                 <x-input-label for="monto_solicitado" :value="__('Monto Solicitado ($)')" />
-                                <x-text-input id="monto_solicitado" class="block mt-1 w-full" type="number" name="monto_solicitado" :value="old('monto_solicitado')" required step="0.01" />
+                                <x-text-input id="monto_solicitado" class="block mt-1 w-full" type="number" name="monto_solicitado" :value="old('monto_solicitado')" required step="1" />
                                 <x-input-error :messages="$errors->get('monto_solicitado')" class="mt-2" />
                             </div>
 
                             <div>
                                 <x-input-label for="descripcion" :value="__('Descripción del Proyecto o Necesidad')" />
-                                <textarea id="descripcion" name="descripcion" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" rows="5">{{ old('descripcion') }}</textarea>
+                                <textarea id="descripcion" name="descripcion" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm" rows="5">{{ old('descripcion') }}</textarea>
                                 <x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
+                            </div>
+
+                            {{-- CAMPO NUEVO PARA SUBIR ARCHIVO --}}
+                            <div>
+                                <x-input-label for="archivo" :value="__('Adjuntar Archivo (Opcional)')" />
+                                <input id="archivo" name="archivo" type="file" class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"/>
+                                <x-input-error :messages="$errors->get('archivo')" class="mt-2" />
                             </div>
                         </div>
 

@@ -5,108 +5,99 @@ namespace App\Http\Controllers;
 use App\Models\Socio;
 use App\Models\Subsidio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // <-- IMPORTANTE: Añadir Storage
 
 class SubsidioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        // Usamos with() para cargar las relaciones y evitar consultas N+1 (más eficiente).
         $subsidios = Subsidio::with('socio', 'user')
                             ->orderBy('created_at', 'desc')
                             ->paginate(10);
 
         return view('subsidios.index', compact('subsidios'));
     }
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        // Obtenemos todos los socios para poder seleccionarlos en un dropdown.
         $socios = Socio::orderBy('nombre')->get();
-
         return view('subsidios.create', compact('socios'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // 1. Validamos los datos del formulario.
         $request->validate([
             'socio_id' => 'required|exists:socios,id',
             'nombre_subsidio' => 'required|string|max:255',
             'monto_solicitado' => 'required|numeric|min:0',
             'descripcion' => 'required|string',
+            'archivo' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Validación del archivo
         ]);
 
-        // 2. Creamos la postulación en la base de datos.
+        $filePath = null;
+        if ($request->hasFile('archivo')) {
+            // Guarda el archivo en storage/app/public/subsidios y obtiene la ruta
+            $filePath = $request->file('archivo')->store('subsidios', 'public');
+        }
+
         Subsidio::create([
             'socio_id' => $request->socio_id,
             'nombre_subsidio' => $request->nombre_subsidio,
             'monto_solicitado' => $request->monto_solicitado,
             'descripcion' => $request->descripcion,
-            'user_id' => auth()->id(), // Asigna el ID del miembro de la directiva que la registra.
+            'archivo_path' => $filePath, // Guarda la ruta en la BD
+            'user_id' => auth()->id(),
         ]);
 
-        // 3. Redirigimos a la lista con un mensaje de éxito.
         return redirect()->route('subsidios.index')
-                        ->with('success', '¡Postulación a subsidio registrada exitosamente!');
+                         ->with('success', '¡Postulación a subsidio registrada exitosamente!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Subsidio $subsidio)
     {
-        //
+        // Este método puede usarse en el futuro si se necesita una vista de solo lectura.
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Subsidio $subsidio)
     {
-        // Pasamos el subsidio específico a la vista de edición/gestión.
         return view('subsidios.edit', compact('subsidio'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Subsidio $subsidio)
     {
-        // 1. Validamos los datos que vienen del formulario de gestión.
         $request->validate([
             'estado' => 'required|in:Postulando,Aprobado,Rechazado,Finalizado',
             'observaciones_directiva' => 'nullable|string',
+            'archivo' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048', // Validación para el nuevo archivo
         ]);
 
-        // 2. Actualizamos solo los campos de gestión en la base de datos.
-        $subsidio->update([
-            'estado' => $request->estado,
-            'observaciones_directiva' => $request->observaciones_directiva,
-        ]);
+        $data = $request->only(['estado', 'observaciones_directiva']);
 
-        // 3. Redirigimos a la lista con un mensaje de éxito.
+        if ($request->hasFile('archivo')) {
+            // Borra el archivo antiguo si existe
+            if ($subsidio->archivo_path) {
+                Storage::disk('public')->delete($subsidio->archivo_path);
+            }
+            // Guarda el nuevo archivo y actualiza la ruta
+            $data['archivo_path'] = $request->file('archivo')->store('subsidios', 'public');
+        }
+
+        $subsidio->update($data);
+
         return redirect()->route('subsidios.index')
-                        ->with('success', 'El estado de la postulación ha sido actualizado.');
+                         ->with('success', 'El estado de la postulación ha sido actualizado.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Subsidio $subsidio)
     {
-        // Elimina la postulación de la base de datos.
+        // Borra el archivo asociado del almacenamiento si existe
+        if ($subsidio->archivo_path) {
+            Storage::disk('public')->delete($subsidio->archivo_path);
+        }
+
         $subsidio->delete();
 
-        // Redirige a la lista con un mensaje de éxito.
         return redirect()->route('subsidios.index')
-                        ->with('success', 'Postulación a subsidio eliminada exitosamente.');
+                         ->with('success', 'Postulación a subsidio eliminada exitosamente.');
     }
 }

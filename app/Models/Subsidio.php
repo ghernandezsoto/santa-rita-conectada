@@ -12,6 +12,7 @@ class Subsidio extends Model
     protected $fillable = [
         'nombre_subsidio',
         'descripcion',
+        'archivo_path', // <-- AÑADE ESTA LÍNEA
         'monto_solicitado',
         'estado',
         'socio_id',

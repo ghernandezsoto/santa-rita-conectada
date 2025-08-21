@@ -16,15 +16,24 @@
                         <p><strong>Monto Solicitado:</strong> ${{ number_format($subsidio->monto_solicitado, 0, ',', '.') }}</p>
                         <p class="mt-2"><strong>Descripción de la Solicitud:</strong></p>
                         <p class="text-gray-600">{{ $subsidio->descripcion }}</p>
+
+                        {{-- MUESTRA EL ARCHIVO ACTUAL SI EXISTE --}}
+                        @if ($subsidio->archivo_path)
+                            <p class="mt-2"><strong>Archivo Adjunto:</strong> 
+                                <a href="{{ asset('storage/' . $subsidio->archivo_path) }}" target="_blank" class="text-blue-600 hover:underline">Ver Documento</a>
+                            </p>
+                        @endif
                     </div>
 
-                    <form method="POST" action="{{ route('subsidios.update', $subsidio->id) }}">
+                    {{-- IMPORTANTE: Añadir enctype para permitir la subida de archivos --}}
+                    <form method="POST" action="{{ route('subsidios.update', $subsidio->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="space-y-6">
+
                             <div>
                                 <x-input-label for="estado" :value="__('Cambiar Estado de la Postulación')" />
-                                <select id="estado" name="estado" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="estado" name="estado" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
                                     <option value="Postulando" {{ old('estado', $subsidio->estado) == 'Postulando' ? 'selected' : '' }}>Postulando</option>
                                     <option value="Aprobado" {{ old('estado', $subsidio->estado) == 'Aprobado' ? 'selected' : '' }}>Aprobado</option>
                                     <option value="Rechazado" {{ old('estado', $subsidio->estado) == 'Rechazado' ? 'selected' : '' }}>Rechazado</option>
@@ -35,19 +44,26 @@
 
                             <div>
                                 <x-input-label for="observaciones_directiva" :value="__('Observaciones de la Directiva (Opcional)')" />
-                                <textarea id="observaciones_directiva" name="observaciones_directiva" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" rows="4">{{ old('observaciones_directiva', $subsidio->observaciones_directiva) }}</textarea>
+                                <textarea id="observaciones_directiva" name="observaciones_directiva" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm" rows="4">{{ old('observaciones_directiva', $subsidio->observaciones_directiva) }}</textarea>
                                 <x-input-error :messages="$errors->get('observaciones_directiva')" class="mt-2" />
+                            </div>
+
+                            {{-- CAMPO NUEVO PARA REEMPLAZAR EL ARCHIVO --}}
+                            <div>
+                                <x-input-label for="archivo" :value="__('Reemplazar Archivo Adjunto (Opcional)')" />
+                                <input id="archivo" name="archivo" type="file" class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"/>
+                                <x-input-error :messages="$errors->get('archivo')" class="mt-2" />
                             </div>
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
                             <a href="{{ route('subsidios.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">Cancelar</a>
                             <x-primary-button>
-                                {{ __('Actualizar Estado') }}
+                                {{ __('Actualizar Postulación') }}
                             </x-primary-button>
                         </div>
                     </form>
-                    {{-- Formulario para Eliminar --}}
+
                     <div class="mt-6 border-t pt-4">
                          <form action="{{ route('subsidios.destroy', $subsidio->id) }}" method="POST">
                             @csrf
