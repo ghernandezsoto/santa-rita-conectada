@@ -17,27 +17,35 @@
                             <div>
                                 <x-input-label for="descripcion" :value="__('Descripción')" />
                                 <x-text-input id="descripcion" class="block mt-1 w-full" type="text" name="descripcion" :value="old('descripcion')" required autofocus />
-                                <x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="monto" :value="__('Monto ($)')" />
                                     <x-text-input id="monto" class="block mt-1 w-full" type="number" name="monto" :value="old('monto')" required step="1" />
-                                    <x-input-error :messages="$errors->get('monto')" class="mt-2" />
                                 </div>
                                 <div>
                                     <x-input-label for="fecha" :value="__('Fecha de la Transacción')" />
                                     <x-text-input id="fecha" class="block mt-1 w-full" type="date" name="fecha" :value="old('fecha', date('Y-m-d'))" required />
-                                    <x-input-error :messages="$errors->get('fecha')" class="mt-2" />
                                 </div>
                             </div>
 
-                            {{-- CAMPO NUEVO PARA SUBIR COMPROBANTE --}}
+                            {{-- CAMPO NUEVO PARA VINCULAR SOCIO --}}
+                            <div>
+                                <x-input-label for="socio_id" :value="__('Asociar a Socio (Opcional)')" />
+                                <select id="socio_id" name="socio_id" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
+                                    <option value="">Ninguno</option>
+                                    @foreach ($socios as $socio)
+                                        <option value="{{ $socio->id }}" {{ old('socio_id') == $socio->id ? 'selected' : '' }}>
+                                            {{ $socio->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <div>
                                 <x-input-label for="comprobante" :value="__('Adjuntar Comprobante (Opcional)')" />
                                 <input id="comprobante" name="comprobante" type="file" class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"/>
-                                <x-input-error :messages="$errors->get('comprobante')" class="mt-2" />
                             </div>
                         </div>
 

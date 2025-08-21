@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Socio; // <-- AÑADIR Socio
 use App\Models\Transaccion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // <-- IMPORTANTE: Añadir Storage
+use Illuminate\Support\Facades\Storage;
 
 class TransaccionController extends Controller
 {
     public function index()
     {
-        $transacciones = Transaccion::with('user')->orderBy('fecha', 'desc')->paginate(15);
+        // Añadimos la relación 'socio' para mostrar el nombre en la tabla
+        $transacciones = Transaccion::with('user', 'socio')->orderBy('fecha', 'desc')->paginate(15);
         $ingresos = Transaccion::where('tipo', 'Ingreso')->sum('monto');
         $egresos = Transaccion::where('tipo', 'Egreso')->sum('monto');
         $balance = $ingresos - $egresos;
@@ -23,7 +25,9 @@ class TransaccionController extends Controller
         if (!in_array($tipo, ['Ingreso', 'Egreso'])) {
             return redirect()->route('transacciones.index')->with('error', 'Tipo de transacción no válido.');
         }
-        return view('transacciones.create', compact('tipo'));
+        // Pasamos la lista de socios a la vista
+        $socios = Socio::orderBy('nombre')->get();
+        return view('transacciones.create', compact('tipo', 'socios'));
     }
 
     public function store(Request $request)
@@ -34,6 +38,7 @@ class TransaccionController extends Controller
             'monto' => 'required|numeric|min:0',
             'descripcion' => 'required|string|max:255',
             'comprobante' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'socio_id' => 'nullable|exists:socios,id', // <-- AÑADIR VALIDACIÓN
         ]);
 
         $filePath = null;
@@ -48,21 +53,19 @@ class TransaccionController extends Controller
             'descripcion' => $request->descripcion,
             'comprobante_path' => $filePath,
             'user_id' => auth()->id(),
+            'socio_id' => $request->socio_id, // <-- AÑADIR CAMPO
         ]);
 
         return redirect()->route('transacciones.index')
                          ->with('success', '¡Transacción registrada exitosamente!');
     }
 
-    public function show(Transaccion $transaccion)
-    {
-        //
-    }
-
     public function edit(Transaccion $transaccion)
     {
         $tipo = $transaccion->tipo;
-        return view('transacciones.edit', compact('transaccion', 'tipo'));
+        // Pasamos la lista de socios a la vista de edición
+        $socios = Socio::orderBy('nombre')->get();
+        return view('transacciones.edit', compact('transaccion', 'tipo', 'socios'));
     }
 
     public function update(Request $request, Transaccion $transaccion)
@@ -72,9 +75,10 @@ class TransaccionController extends Controller
             'monto' => 'required|numeric|min:0',
             'descripcion' => 'required|string|max:255',
             'comprobante' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'socio_id' => 'nullable|exists:socios,id', // <-- AÑADIR VALIDACIÓN
         ]);
 
-        $data = $request->only(['fecha', 'monto', 'descripcion']);
+        $data = $request->only(['fecha', 'monto', 'descripcion', 'socio_id']); // <-- AÑADIR CAMPO
 
         if ($request->hasFile('comprobante')) {
             if ($transaccion->comprobante_path) {

@@ -23,7 +23,14 @@ class Transaccion extends Model
         'descripcion',
         'comprobante_path', // <-- AÑADE ESTA LÍNEA
         'user_id',
+        'socio_id', // <-- AÑADE ESTA LÍNEA
     ];
+
+    // Nueva relación: Una transacción puede pertenecer a un socio.
+    public function socio()
+    {
+        return $this->belongsTo(Socio::class);
+    }
 
     public function user()
     {

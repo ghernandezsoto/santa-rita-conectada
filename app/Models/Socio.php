@@ -28,4 +28,10 @@ class Socio extends Model
         'estado',
         'observaciones',
     ];
+
+    // Nueva relación: Un socio puede tener muchas transacciones.
+    public function transacciones()
+    {
+        return $this->hasMany(Transaccion::class);
+    }
 }
