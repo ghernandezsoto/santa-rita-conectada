@@ -4,19 +4,19 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Gestión de Comunicados') }}
             </h2>
-            <a href="{{ route('comunicados.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <a href="{{ route('comunicados.create') }}" class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600">
                 Nuevo Comunicado
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 bg-slate-100">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
                     @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <strong class="font-bold">¡Éxito!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
                         </div>
@@ -29,41 +29,48 @@
                     @endif
 
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white">
-                            <thead class="bg-gray-800 text-white">
+                        <table class="min-w-full bg-white table-fixed">
+                            <thead class="bg-emerald-800 text-white">
                                 <tr>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Título</th>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Estado</th>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Enviado por</th>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Acciones</th>
+                                    <th class="w-2/5 py-3 px-4 font-semibold text-sm text-left">Título</th>
+                                    <th class="w-1/5 py-3 px-4 font-semibold text-sm text-left">Estado</th>
+                                    <th class="w-1/5 py-3 px-4 font-semibold text-sm text-left">Enviado por</th>
+                                    <th class="w-1/5 py-3 px-4 font-semibold text-sm text-left">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700">
                                 @forelse ($comunicados as $comunicado)
-                                    <tr class="border-b hover:bg-gray-50">
-                                        <td class="py-3 px-4">{{ $comunicado->titulo }}</td>
+                                    <tr class="border-b hover:bg-slate-50">
+                                        
+                                        {{-- CELDA DEL TÍTULO CORREGIDA CON max-w-0 --}}
+                                        <td class="py-3 px-4 max-w-0">
+                                            <div class="truncate" title="{{ $comunicado->titulo }}">
+                                                {{ $comunicado->titulo }}
+                                            </div>
+                                        </td>
+                                        
                                         <td class="py-3 px-4">
                                             @if ($comunicado->fecha_envio)
-                                                <span class="bg-green-200 text-green-700 py-1 px-3 rounded-full text-xs">
+                                                <span class="bg-emerald-200 text-emerald-700 py-1 px-3 rounded-full text-xs">
                                                     Enviado el {{ \Carbon\Carbon::parse($comunicado->fecha_envio)->format('d/m/Y') }}
                                                 </span>
                                             @else
-                                                <span class="bg-yellow-200 text-yellow-700 py-1 px-3 rounded-full text-xs">
+                                                <span class="bg-amber-100 text-amber-700 py-1 px-3 rounded-full text-xs">
                                                     Borrador
                                                 </span>
                                             @endif
                                         </td>
                                         <td class="py-3 px-4">{{ $comunicado->user->name }}</td>
-                                        <td class="py-3 px-4 flex items-center gap-2 flex-wrap">
-                                            <a href="{{ route('comunicados.show', $comunicado->id) }}" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
+                                        <td class="py-3 px-4 flex items-center gap-2 whitespace-nowrap">
+                                            <a href="{{ route('comunicados.show', $comunicado->id) }}" class="text-emerald-600 hover:text-emerald-900 font-medium">Ver</a>
                                             <span class="text-gray-300">|</span>
 
                                             @if (!$comunicado->fecha_envio)
-                                                <a href="{{ route('comunicados.edit', $comunicado->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Editar</a>
+                                                <a href="{{ route('comunicados.edit', $comunicado->id) }}" class="text-amber-600 hover:text-amber-700 font-medium">Editar</a>
                                                 <span class="text-gray-300">|</span>
                                                 <form action="{{ route('comunicados.enviar', $comunicado->id) }}" method="POST" class="inline">
                                                     @csrf
-                                                    <button type="submit" class="text-purple-600 hover:text-purple-900 font-medium" onclick="return confirm('¿Estás seguro de que quieres enviar este comunicado a todos los socios activos?')">
+                                                    <button type="submit" class="text-amber-600 hover:text-amber-700 font-medium" onclick="return confirm('¿Estás seguro de que quieres enviar este comunicado a todos los socios activos?')">
                                                         Enviar
                                                     </button>
                                                 </form>
@@ -73,7 +80,7 @@
                                             <form action="{{ route('comunicados.destroy', $comunicado->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar este comunicado?')">
+                                                <button type="submit" class="text-red-600 hover:text-red-700 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar este comunicado?')">
                                                     Eliminar
                                                 </button>
                                             </form>

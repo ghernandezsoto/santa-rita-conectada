@@ -4,20 +4,20 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Gestión de Actas y Documentos') }}
             </h2>
-            <a href="{{ route('actas.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <a href="{{ route('actas.create') }}" class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600">
                 Subir Nueva Acta
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12 bg-slate-100">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
                     {{-- Bloque para mostrar mensajes de éxito o error --}}
                     @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <strong class="font-bold">¡Éxito!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
                         </div>
@@ -32,12 +32,12 @@
 
                     <div class="overflow-x-auto">
                         <table class="min-w-full bg-white">
-                            <thead class="bg-gray-800 text-white">
+                            <thead class="bg-emerald-800 text-white">
                                 <tr>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Título del Acta</th>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Fecha</th>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Subida por</th>
-                                    <th class="py-3 px-4 uppercase font-semibold text-sm text-left">Acciones</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left">Título del Acta</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left">Fecha</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left">Subida por</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700">
@@ -49,19 +49,19 @@
                                     </tr>
                                 @else
                                     @foreach ($actas as $acta)
-                                        <tr class="border-b hover:bg-gray-50">
+                                        <tr class="border-b hover:bg-slate-50">
                                             <td class="py-3 px-4">{{ $acta->titulo }}</td>
                                             <td class="py-3 px-4">{{ \Carbon\Carbon::parse($acta->fecha)->format('d/m/Y') }}</td>
                                             <td class="py-3 px-4">{{ $acta->user->name ?? 'Usuario no encontrado' }}</td>
                                             <td class="py-3 px-4 flex items-center gap-2">
-                                                <a href="{{ route('actas.show', $acta->id) }}" target="_blank" class="text-green-600 hover:text-green-900 font-medium">Ver</a>
+                                                <a href="{{ route('actas.show', $acta->id) }}" target="_blank" class="text-emerald-600 hover:text-emerald-900 font-medium">Ver</a>
                                                 <span class="text-gray-300">|</span>
-                                                <a href="{{ route('actas.edit', $acta->id) }}" class="text-blue-600 hover:text-blue-900 font-medium">Editar</a>
+                                                <a href="{{ route('actas.edit', $acta->id) }}" class="text-amber-600 hover:text-amber-700 font-medium">Editar</a>
                                                 <span class="text-gray-300">|</span>
                                                 <form action="{{ route('actas.destroy', $acta->id) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar esta acta?')">
+                                                    <button type="submit" class="text-red-600 hover:text-red-700 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar esta acta?')">
                                                         Eliminar
                                                     </button>
                                                 </form>

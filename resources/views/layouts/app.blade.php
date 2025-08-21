@@ -13,8 +13,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 flex">
-
+        <div class="min-h-screen bg-slate-100 flex"> {{-- <-- CAMBIO AQUÍ --}}
+        
             @include('layouts.partials.sidebar')
 
             <div class="flex-1 flex flex-col">
