@@ -21,6 +21,7 @@ class Transaccion extends Model
         'tipo',
         'monto',
         'descripcion',
+        'comprobante_path', // <-- AÑADE ESTA LÍNEA
         'user_id',
     ];
 

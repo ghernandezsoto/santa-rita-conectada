@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('transacciones.update', $transaccion->id) }}">
+                    <form method="POST" action="{{ route('transacciones.update', $transaccion->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -23,15 +23,27 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="monto" :value="__('Monto ($)')" />
-                                    <x-text-input id="monto" class="block mt-1 w-full" type="number" name="monto" :value="old('monto', $transaccion->monto)" required step="0.01" />
+                                    <x-text-input id="monto" class="block mt-1 w-full" type="number" name="monto" :value="old('monto', $transaccion->monto)" required step="1" />
                                     <x-input-error :messages="$errors->get('monto')" class="mt-2" />
                                 </div>
-
                                 <div>
                                     <x-input-label for="fecha" :value="__('Fecha de la Transacción')" />
                                     <x-text-input id="fecha" class="block mt-1 w-full" type="date" name="fecha" :value="old('fecha', $transaccion->fecha)" required />
                                     <x-input-error :messages="$errors->get('fecha')" class="mt-2" />
                                 </div>
+                            </div>
+
+                            {{-- CAMPO PARA VER Y REEMPLAZAR COMPROBANTE --}}
+                            <div>
+                                <x-input-label for="comprobante" :value="__('Adjuntar Comprobante (Opcional)')" />
+                                @if ($transaccion->comprobante_path)
+                                    <p class="text-sm text-gray-500 mt-1 mb-2">
+                                        Comprobante actual: 
+                                        <a href="{{ asset('storage/' . $transaccion->comprobante_path) }}" target="_blank" class="text-blue-600 hover:underline">Ver Comprobante</a>
+                                    </p>
+                                @endif
+                                <input id="comprobante" name="comprobante" type="file" class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"/>
+                                <x-input-error :messages="$errors->get('comprobante')" class="mt-2" />
                             </div>
                         </div>
 
