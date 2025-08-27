@@ -5,32 +5,85 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <h3 class="text-2xl font-bold mb-4">{{ $socio->nombre }}</h3>
+    <div class="py-12 bg-slate-100">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <p><strong>RUT:</strong> {{ $socio->rut }}</p>
-                        <p><strong>Estado:</strong> <span class="py-1 px-2 rounded-full text-xs {{ $socio->estado === 'Activo' ? 'bg-green-200 text-green-700' : 'bg-red-200 text-red-700' }}">{{ $socio->estado }}</span></p>
-                        <p><strong>Fecha de Ingreso:</strong> {{ \Carbon\Carbon::parse($socio->fecha_ingreso)->format('d/m/Y') }}</p>
-                        <p><strong>Edad:</strong> {{ $socio->edad ?: 'No especificado' }}</p>
-                        <p><strong>Estado Civil:</strong> {{ $socio->estado_civil ?: 'No especificado' }}</p>
-                        <p><strong>Profesión:</strong> {{ $socio->profesion ?: 'No especificado' }}</p>
-                        <p class="md:col-span-2"><strong>Domicilio:</strong> {{ $socio->domicilio }}</p>
-                        <p><strong>Teléfono:</strong> {{ $socio->telefono ?: 'No especificado' }}</p>
-                        <p><strong>Correo Electrónico:</strong> {{ $socio->email ?: 'No especificado' }}</p>
-                        <div class="md:col-span-2">
-                            <p><strong>Observaciones:</strong></p>
-                            <p class="mt-1 text-gray-600">{{ $socio->observaciones ?: 'Sin observaciones.' }}</p>
+                {{-- Columna de Información Principal del Socio --}}
+                <div class="lg:col-span-1">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-gray-900">{{ $socio->nombre }}</h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ $socio->rut }}</p>
+
+                        <div class="mt-6 border-t border-gray-200 pt-6">
+                            <dl class="space-y-4">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Estado</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        <span class="py-1 px-3 rounded-full text-xs font-semibold {{ $socio->estado === 'Activo' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-200 text-red-700' }}">
+                                            {{ $socio->estado }}
+                                        </span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Correo Electrónico</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $socio->email ?? 'No registrado' }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Teléfono</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $socio->telefono ?? 'No registrado' }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Domicilio</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $socio->domicilio }}</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Fecha de Ingreso</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ \Carbon\Carbon::parse($socio->fecha_ingreso)->format('d/m/Y') }}</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <div class="mt-6 flex gap-2">
+                            <a href="{{ route('socios.edit', $socio->id) }}" class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-semibold">Editar Socio</a>
+                            <a href="{{ route('socios.index') }}" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-sm font-semibold">Volver a la Lista</a>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-6 flex justify-end">
-                        <a href="{{ route('socios.index') }}" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">
-                            Volver a la Lista
-                        </a>
+                {{-- Columna de Historial de Aportes --}}
+                <div class="lg:col-span-2">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6 text-gray-900">
+                            <h3 class="text-lg font-semibold mb-4">Historial de Aportes y Transacciones</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full bg-white">
+                                    <thead class="bg-emerald-800 text-white">
+                                        <tr>
+                                            <th class="py-3 px-4 font-semibold text-sm text-left">Fecha</th>
+                                            <th class="py-3 px-4 font-semibold text-sm text-left">Descripción</th>
+                                            <th class="py-3 px-4 font-semibold text-sm text-left">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-gray-700">
+                                        @forelse ($socio->transacciones as $transaccion)
+                                            <tr class="border-b hover:bg-slate-50">
+                                                <td class="py-3 px-4">{{ \Carbon\Carbon::parse($transaccion->fecha)->format('d/m/Y') }}</td>
+                                                <td class="py-3 px-4">{{ $transaccion->descripcion }}</td>
+                                                <td class="py-3 px-4 font-medium {{ $transaccion->tipo == 'Ingreso' ? 'text-emerald-600' : 'text-red-600' }}">
+                                                    {{ $transaccion->tipo == 'Ingreso' ? '+' : '-' }} ${{ number_format($transaccion->monto, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="py-6 text-center text-gray-500">
+                                                    Este socio no tiene transacciones registradas.
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

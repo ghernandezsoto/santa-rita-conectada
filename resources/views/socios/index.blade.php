@@ -36,51 +36,76 @@
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white">
+                        {{-- Usamos table-fixed para que respete los anchos definidos --}}
+                        <table class="min-w-full bg-white table-fixed">
                             <thead class="bg-emerald-800 text-white">
                                 <tr>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Nombre</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">RUT</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Contacto</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Estado</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Acciones</th>
+                                    {{-- CAMBIOS: Añadimos clases de ancho (w-x/12) a cada cabecera --}}
+                                    <th class="w-1/12 py-3 px-4 font-semibold text-sm text-left">N° Socio</th>
+                                    <th class="w-4/12 py-3 px-4 font-semibold text-sm text-left">Nombre</th>
+                                    <th class="w-2/12 py-3 px-4 font-semibold text-sm text-left">RUT</th>
+                                    <th class="w-2/12 py-3 px-4 font-semibold text-sm text-left">Contacto</th>
+                                    <th class="w-1/12 py-3 px-4 font-semibold text-sm text-left">Estado</th>
+                                    <th class="w-2/12 py-3 px-4 font-semibold text-sm text-left">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700">
                                 @if ($socios->isEmpty())
                                     <tr>
-                                        <td colspan="5" class="py-6 text-center text-gray-500">
+                                        <td colspan="6" class="py-6 text-center text-gray-500">
                                             No hay socios que coincidan con la búsqueda o no hay socios registrados.
                                         </td>
                                     </tr>
                                 @else
                                     @foreach ($socios as $socio)
                                         <tr class="border-b hover:bg-slate-50">
-                                            <td class="py-3 px-4">
-                                                <a href="{{ route('socios.show', $socio->id) }}" class="font-medium text-emerald-800 hover:underline hover:text-emerald-900">
+                                            <td class="py-3 px-4 min-w-0">{{ $socio->id }}</td>
+
+                                            {{-- Nombre: truncado con tooltip, responsive max-widths --}}
+                                            <td class="py-3 px-4 min-w-0">
+                                                <a href="{{ route('socios.show', $socio->id) }}"
+                                                   title="{{ $socio->nombre }}"
+                                                   class="inline-block font-medium text-emerald-800 hover:underline hover:text-emerald-900
+                                                          max-w-[160px] sm:max-w-[240px] md:max-w-[320px] truncate whitespace-nowrap overflow-hidden">
                                                     {{ $socio->nombre }}
                                                 </a>
                                             </td>
-                                            <td class="py-3 px-4">{{ $socio->rut }}</td>
-                                            <td class="py-3 px-4">{{ $socio->email ?: $socio->telefono }}</td>
-                                            <td class="py-3 px-4">
+
+                                            {{-- RUT: truncado para evitar salto de línea --}}
+                                            <td class="py-3 px-4 min-w-0">
+                                                <span class="inline-block max-w-[100px] sm:max-w-[140px] md:max-w-[160px] truncate whitespace-nowrap overflow-hidden">
+                                                    {{ $socio->rut }}
+                                                </span>
+                                            </td>
+
+                                            {{-- Contacto: email o teléfono, truncado --}}
+                                            <td class="py-3 px-4 min-w-0">
+                                                <span title="{{ $socio->email ?: $socio->telefono }}" class="inline-block max-w-[140px] sm:max-w-[180px] md:max-w-[220px] truncate whitespace-nowrap overflow-hidden">
+                                                    {{ $socio->email ?: $socio->telefono }}
+                                                </span>
+                                            </td>
+
+                                            {{-- Estado --}}
+                                            <td class="py-3 px-4 min-w-0">
                                                 <span class="py-1 px-3 rounded-full text-xs font-semibold
                                                     {{ $socio->estado === 'Activo' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-200 text-red-700' }}">
                                                     {{ $socio->estado }}
                                                 </span>
                                             </td>
-                                            <td class="py-3 px-4 flex items-center gap-2">
-                                                {{-- Enlace funcional para Editar --}}
-                                                <a href="{{ route('socios.edit', $socio->id) }}" class="text-amber-600 hover:text-amber-700 font-medium">Editar</a>
-                                                <span class="text-gray-300">|</span>
-                                                {{-- Formulario funcional para Eliminar --}}
-                                                <form action="{{ route('socios.destroy', $socio->id) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="text-red-600 hover:text-red-700 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar a este socio?')">
-                                                        Eliminar
-                                                    </button>
-                                                </form>
+
+                                            {{-- Acciones --}}
+                                            <td class="py-3 px-4 min-w-0">
+                                                <div class="flex items-center gap-2 whitespace-nowrap">
+                                                    <a href="{{ route('socios.edit', $socio->id) }}" class="text-amber-600 hover:text-amber-700 font-medium">Editar</a>
+                                                    <span class="text-gray-300">|</span>
+                                                    <form action="{{ route('socios.destroy', $socio->id) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-700 font-medium" onclick="return confirm('¿Estás seguro de que quieres eliminar a este socio?')">
+                                                            Eliminar
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

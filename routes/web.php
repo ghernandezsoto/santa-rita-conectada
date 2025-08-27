@@ -9,6 +9,8 @@ use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\SubsidioController;
 use App\Http\Controllers\TransaccionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EventoController;
+use App\Http\Controllers\DocumentoController; // <-- 1. IMPORTAR EL NUEVO CONTROLADOR
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,30 +29,34 @@ Route::middleware('auth')->group(function () {
 
     // Módulos protegidos
     Route::resource('socios', SocioController::class)
-         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
 
     Route::resource('actas', ActaController::class)
-         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
 
     Route::resource('comunicados', ComunicadoController::class)
-         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
     Route::post('/comunicados/{comunicado}/enviar', [ComunicadoController::class, 'enviar'])
-         ->name('comunicados.enviar')
-         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+        ->name('comunicados.enviar')
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
 
-    // --- MÓDULO DE TESORERÍA CORREGIDO ---
-    // 1. Ruta específica para exportar
     Route::get('/transacciones/exportar', function () {
         return Excel::download(new TransaccionesExport, 'balance-tesoreria.xlsx');
     })->name('transacciones.exportar')->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Tesorero|Presidente');
 
-    // 2. Ruta resource general (después de la específica)
     Route::resource('transacciones', TransaccionController::class)
-         ->parameters(['transacciones' => 'transaccion'])
-         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Tesorero|Presidente');
+        ->parameters(['transacciones' => 'transaccion'])
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Tesorero|Presidente');
 
     Route::resource('subsidios', SubsidioController::class)
-         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Presidente|Secretario|Tesorero');
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Presidente|Secretario|Tesorero');
+
+    Route::resource('eventos', EventoController::class)
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
+        
+    // --- NUEVA RUTA PARA ARCHIVO DIGITAL ---
+    Route::resource('documentos', DocumentoController::class) // <-- 2. AÑADIR LA RUTA RESOURCE
+        ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Presidente|Secretario|Tesorero');
 });
 
 require __DIR__.'/auth.php';

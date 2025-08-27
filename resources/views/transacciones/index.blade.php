@@ -42,7 +42,6 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    {{-- Mensajes de sesión (éxito / error) --}}
                     @if (session('success'))
                         <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4" role="status">
                             <strong class="font-bold">¡Éxito!</strong>
@@ -63,28 +62,27 @@
                         <table class="min-w-full bg-white table-fixed" role="table" aria-label="Tabla de transacciones">
                             <thead class="bg-emerald-800 text-white">
                                 <tr>
-                                    <th class="md:w-1/6 w-1/4 py-3 px-4 font-semibold text-sm text-left">Fecha</th>
-                                    <th class="md:w-2/6 w-1/2 py-3 px-4 font-semibold text-sm text-left">Descripción</th>
-                                    <th class="md:w-1/6 w-1/4 py-3 px-4 font-semibold text-sm text-left">Monto</th>
-                                    <th class="md:w-1/6 w-1/4 py-3 px-4 font-semibold text-sm text-left">Registrado por</th>
-                                    <th class="md:w-1/6 w-1/4 py-3 px-4 font-semibold text-sm text-left">Acciones</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left w-[15%]">Fecha</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left w-[30%]">Descripción</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left w-[20%]">Socio Aportante</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left w-[15%]">Monto</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left w-[10%]">Registrado por</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-left w-[10%]">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700">
                                 @forelse ($transacciones as $transaccion)
                                     <tr class="border-b hover:bg-slate-50">
                                         <td class="py-3 px-4">{{ \Carbon\Carbon::parse($transaccion->fecha)->format('d/m/Y') }}</td>
-
-                                        {{-- Descripción con truncado para mantener el layout --}}
                                         <td class="py-3 px-4 max-w-0">
                                             <div class="truncate" title="{{ $transaccion->descripcion }}">{{ $transaccion->descripcion }}</div>
                                         </td>
-
-                                        {{-- Monto sin salto de línea --}}
+                                        <td class="py-3 px-4 text-sm text-gray-600 truncate" title="{{ $transaccion->socio->nombre ?? '' }}">
+                                            {{ $transaccion->socio->nombre ?? 'N/A' }}
+                                        </td>
                                         <td class="py-3 px-4 font-medium whitespace-nowrap {{ $transaccion->tipo == 'Ingreso' ? 'text-emerald-600' : 'text-red-600' }}">
                                             {{ $transaccion->tipo == 'Ingreso' ? '+' : '-' }} ${{ number_format($transaccion->monto, 0, ',', '.') }}
                                         </td>
-
                                         <td class="py-3 px-4">{{ $transaccion->user->name }}</td>
                                         <td class="py-3 px-4 flex items-center gap-2">
                                             <a href="{{ route('transacciones.edit', $transaccion->id) }}" class="text-amber-600 hover:text-amber-700 font-medium">Editar</a>
@@ -100,7 +98,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="py-6 text-center text-gray-500">No hay transacciones registradas aún.</td>
+                                        <td colspan="6" class="py-6 text-center text-gray-500">No hay transacciones registradas aún.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -113,10 +111,16 @@
                             <article class="bg-white border rounded-lg p-4 shadow-sm">
                                 <div class="flex items-start justify-between">
                                     <div>
-                                        <p class="text-sm font-semibold">{{ \Carbon\Carbon::parse($transaccion->fecha)->format('d/m/Y') }} — <span class="text-xs text-gray-500">{{ $transaccion->user->name }}</span></p>
+                                        <p class="text-sm font-semibold">{{ \Carbon\Carbon::parse($transaccion->fecha)->format('d/m/Y') }}</p>
                                         <p class="mt-2 text-sm truncate" title="{{ $transaccion->descripcion }}">{{ $transaccion->descripcion }}</p>
+                                        <p class="mt-2 text-xs text-gray-500">
+                                            Aporte de: <span class="font-medium">{{ $transaccion->socio->nombre ?? 'N/A' }}</span>
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            Registrado por: <span class="font-medium">{{ $transaccion->user->name }}</span>
+                                        </p>
                                     </div>
-                                    <div class="text-right ml-4">
+                                    <div class="text-right ml-4 flex-shrink-0">
                                         <p class="font-medium {{ $transaccion->tipo == 'Ingreso' ? 'text-emerald-600' : 'text-red-600' }}">{{ $transaccion->tipo == 'Ingreso' ? '+' : '-' }} ${{ number_format($transaccion->monto, 0, ',', '.') }}</p>
                                         <div class="mt-2 flex items-center justify-end gap-2">
                                             <a href="{{ route('transacciones.edit', $transaccion->id) }}" class="text-amber-600 hover:text-amber-700 text-sm">Editar</a>

@@ -36,12 +36,12 @@
 
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold text-gray-500">Próximos Eventos</h3>
-                        <p class="text-3xl font-bold mt-2 text-gray-800">0</p>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">{{ $proximosEventos }}</p>
                     </div>
                     
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-semibold text-gray-500">Comunicados Recientes</h3>
-                        <p class="text-3xl font-bold mt-2 text-gray-800">0</p>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">{{ $comunicadosRecientes }}</p>
                     </div>
                 </div>
             @endrole

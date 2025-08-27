@@ -65,7 +65,13 @@ class SocioController extends Controller
      */
     public function show(Socio $socio)
     {
-        // Pasa el socio específico a una nueva vista llamada 'socios.show'
+        // Carga el socio específico junto con sus transacciones relacionadas,
+        // ordenadas por la fecha más reciente.
+        $socio->load(['transacciones' => function ($query) {
+            $query->orderBy('fecha', 'desc');
+        }]);
+
+        // Pasa el socio (con sus transacciones ya cargadas) a la nueva vista 'socios.show'
         return view('socios.show', compact('socio'));
     }
 
