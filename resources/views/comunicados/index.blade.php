@@ -31,8 +31,8 @@
                         </div>
                     @endif
 
-                    {{-- Tabla de comunicados --}}
-                    <div class="overflow-x-auto">
+                    {{-- Vista de tabla (pantallas medianas y grandes) --}}
+                    <div class="hidden md:block overflow-x-auto">
                         <table class="min-w-full bg-white table-fixed">
                             <thead class="bg-emerald-800 text-white">
                                 <tr>
@@ -118,7 +118,73 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
+                    {{-- Vista en tarjetas (solo móviles) --}}
+                    <div class="space-y-4 md:hidden">
+                        @forelse ($comunicados as $comunicado)
+                            <div class="bg-white border rounded-lg shadow-sm p-4">
+                                <h3 class="font-semibold text-lg truncate" title="{{ $comunicado->titulo }}">
+                                    {{ $comunicado->titulo }}
+                                </h3>
+
+                                <p class="text-sm mt-1">
+                                    <span class="font-medium">Estado:</span>
+                                    @if ($comunicado->fecha_envio)
+                                        <span class="bg-emerald-200 text-emerald-700 py-1 px-2 rounded-full text-xs">
+                                            Enviado el {{ \Carbon\Carbon::parse($comunicado->fecha_envio)->format('d/m/Y') }}
+                                        </span>
+                                    @else
+                                        <span class="bg-amber-100 text-amber-700 py-1 px-2 rounded-full text-xs">
+                                            Borrador
+                                        </span>
+                                    @endif
+                                </p>
+
+                                <p class="text-sm mt-1">
+                                    <span class="font-medium">Enviado por:</span> {{ $comunicado->user->name }}
+                                </p>
+
+                                {{-- Acciones --}}
+                                <div class="mt-3 flex flex-wrap gap-3">
+                                    <a href="{{ route('comunicados.show', $comunicado->id) }}" 
+                                       class="text-emerald-600 hover:text-emerald-900 font-medium">
+                                        Ver
+                                    </a>
+
+                                    @if (!$comunicado->fecha_envio)
+                                        <a href="{{ route('comunicados.edit', $comunicado->id) }}" 
+                                           class="text-amber-600 hover:text-amber-700 font-medium">
+                                            Editar
+                                        </a>
+
+                                        <form action="{{ route('comunicados.enviar', $comunicado->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" 
+                                                    class="text-amber-600 hover:text-amber-700 font-medium"
+                                                    onclick="return confirm('¿Estás seguro de que quieres enviar este comunicado a todos los socios activos?')">
+                                                Enviar
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    <form action="{{ route('comunicados.destroy', $comunicado->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="text-red-600 hover:text-red-700 font-medium"
+                                                onclick="return confirm('¿Estás seguro de que quieres eliminar este comunicado?')">
+                                            Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-center text-gray-500">
+                                No hay comunicados registrados aún.
+                            </p>
+                        @endforelse
+                    </div>
+
                 </div>
             </div>
         </div>

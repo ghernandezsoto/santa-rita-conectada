@@ -16,40 +16,50 @@
                 <div class="p-6 text-gray-900">
                     
                     @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <strong class="font-bold">¡Éxito!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
                         </div>
                     @endif
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white">
+                    {{-- VISTA DE ESCRITORIO (TABLA) --}}
+                    <div class="hidden md:block overflow-x-auto">
+                        <table class="min-w-full bg-white table-fixed">
                             <thead class="bg-emerald-800 text-white">
                                 <tr>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Socio Postulante</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Nombre del Subsidio</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Monto</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Estado</th>
-                                    <th class="py-3 px-4 font-semibold text-sm text-left">Acciones</th>
+                                    <th class="w-3/12 py-3 px-4 font-semibold text-sm text-left">Socio Postulante</th>
+                                    <th class="w-4/12 py-3 px-4 font-semibold text-sm text-left">Nombre del Subsidio</th>
+                                    <th class="w-2/12 py-3 px-4 font-semibold text-sm text-left">Monto</th>
+                                    <th class="w-2/12 py-3 px-4 font-semibold text-sm text-left">Estado</th>
+                                    <th class="w-1/12 py-3 px-4 font-semibold text-sm text-left">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700">
                                 @forelse ($subsidios as $subsidio)
                                     <tr class="border-b hover:bg-gray-50">
-                                        <td class="py-3 px-4">{{ $subsidio->socio->nombre }}</td>
-                                        <td class="py-3 px-4">{{ $subsidio->nombre_subsidio }}</td>
-                                        <td class="py-3 px-4">${{ number_format($subsidio->monto_solicitado, 0, ',', '.') }}</td>
-                                        <td class="py-3 px-4">
-                                            <span class="py-1 px-3 rounded-full text-xs font-semibold
+                                        <td class="py-3 px-4 truncate" title="{{ $subsidio->socio->nombre }}">{{ $subsidio->socio->nombre }}</td>
+                                        <td class="py-3 px-4 truncate" title="{{ $subsidio->nombre_subsidio }}">
+                                            {{ $subsidio->nombre_subsidio }}
+                                            {{-- Ícono de clip si hay archivo adjunto --}}
+                                            @if($subsidio->archivo_path)
+                                                <span class="text-gray-400 ml-1" title="Tiene archivo adjunto">📎</span>
+                                            @endif
+                                        </td>
+                                        <td class="py-3 px-4 whitespace-nowrap">${{ number_format($subsidio->monto_solicitado, 0, ',', '.') }}</td>
+
+                                        {{-- Estado: evitar que el badge expanda la celda --}}
+                                        <td class="py-3 px-4 max-w-0">
+                                            <span class="inline-block truncate py-1 px-3 rounded-full text-xs font-semibold
                                                 @if($subsidio->estado == 'Aprobado') bg-emerald-100 text-emerald-800 @endif
                                                 @if($subsidio->estado == 'Rechazado') bg-red-200 text-red-800 @endif
                                                 @if($subsidio->estado == 'Postulando') bg-amber-100 text-amber-800 @endif
-                                                @if($subsidio->estado == 'Finalizado') bg-emerald-900 text-white @endif
-                                            ">
+                                                @if($subsidio->estado == 'Finalizado') bg-blue-100 text-blue-800 @endif
+                                            " title="{{ $subsidio->estado }}">
                                                 {{ $subsidio->estado }}
                                             </span>
                                         </td>
-                                        <td class="py-3 px-4 flex items-center gap-2">
+
+                                        <td class="py-3 px-4">
                                             <a href="{{ route('subsidios.edit', $subsidio->id) }}" class="text-emerald-800 hover:text-emerald-900 font-medium">Gestionar</a>
                                         </td>
                                     </tr>
@@ -63,6 +73,46 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- VISTA MÓVIL (TARJETAS) --}}
+                    <div class="md:hidden space-y-4">
+                        @forelse ($subsidios as $subsidio)
+                            <div class="bg-white p-4 rounded-lg shadow border border-gray-200">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="font-bold text-emerald-800 truncate" title="{{ $subsidio->nombre_subsidio }}">{{ $subsidio->nombre_subsidio }}</h3>
+                                        <p class="text-sm text-gray-600 truncate" title="{{ $subsidio->socio->nombre }}">Postulante: {{ $subsidio->socio->nombre }}</p>
+                                    </div>
+
+                                    <span class="ml-2 flex-shrink-0 inline-block truncate py-1 px-2 rounded-full text-xs font-semibold
+                                        @if($subsidio->estado == 'Aprobado') bg-emerald-100 text-emerald-800 @endif
+                                        @if($subsidio->estado == 'Rechazado') bg-red-200 text-red-800 @endif
+                                        @if($subsidio->estado == 'Postulando') bg-amber-100 text-amber-800 @endif
+                                        @if($subsidio->estado == 'Finalizado') bg-blue-100 text-blue-800 @endif
+                                    " title="{{ $subsidio->estado }}">
+                                        {{ $subsidio->estado }}
+                                    </span>
+                                </div>
+                                <div class="text-sm text-gray-600 border-t pt-2 mt-2">
+                                    <p><span class="font-semibold">Monto Solicitado:</span> ${{ number_format($subsidio->monto_solicitado, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="mt-4 flex items-center justify-between">
+                                    <div>
+                                        @if($subsidio->archivo_path)
+                                            <span class="text-gray-500 text-sm flex items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a3 3 0 006 0V7a1 1 0 112 0v4a5 5 0 01-10 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" /></svg>
+                                                Archivo adjunto
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <a href="{{ route('subsidios.edit', $subsidio->id) }}" class="px-4 py-2 bg-emerald-700 text-white text-sm font-medium rounded-lg hover:bg-emerald-800">Gestionar</a>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="py-6 text-center text-gray-500">No hay postulaciones a subsidios registradas aún.</div>
+                        @endforelse
+                    </div>
+
                     <div class="mt-4">
                         {{ $subsidios->links() }}
                     </div>
