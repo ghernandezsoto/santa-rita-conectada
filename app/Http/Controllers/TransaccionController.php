@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Socio; // <-- AÑADIR Socio
+use App\Models\Socio;
 use App\Models\Transaccion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +11,6 @@ class TransaccionController extends Controller
 {
     public function index()
     {
-        // Añadimos la relación 'socio' para mostrar el nombre en la tabla
         $transacciones = Transaccion::with('user', 'socio')->orderBy('fecha', 'desc')->paginate(15);
         $ingresos = Transaccion::where('tipo', 'Ingreso')->sum('monto');
         $egresos = Transaccion::where('tipo', 'Egreso')->sum('monto');
@@ -25,20 +24,27 @@ class TransaccionController extends Controller
         if (!in_array($tipo, ['Ingreso', 'Egreso'])) {
             return redirect()->route('transacciones.index')->with('error', 'Tipo de transacción no válido.');
         }
-        // Pasamos la lista de socios a la vista
         $socios = Socio::orderBy('nombre')->get();
         return view('transacciones.create', compact('tipo', 'socios'));
     }
 
     public function store(Request $request)
     {
+        // --- INICIO DE LA CORRECCIÓN ---
+        // 1. Limpiamos el campo 'monto' quitándole los puntos.
+        if ($request->has('monto')) {
+            $cleanedMonto = preg_replace('/[^0-9]/', '', $request->input('monto'));
+            $request->merge(['monto' => $cleanedMonto]);
+        }
+        // --- FIN DE LA CORRECCIÓN ---
+
         $request->validate([
             'fecha' => 'required|date',
             'tipo' => 'required|in:Ingreso,Egreso',
-            'monto' => 'required|numeric|min:0',
+            'monto' => 'required|numeric|min:0', // La validación ahora se hace sobre el número limpio
             'descripcion' => 'required|string|max:255',
             'comprobante' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'socio_id' => 'nullable|exists:socios,id', // <-- AÑADIR VALIDACIÓN
+            'socio_id' => 'nullable|exists:socios,id',
         ]);
 
         $filePath = null;
@@ -49,11 +55,11 @@ class TransaccionController extends Controller
         Transaccion::create([
             'fecha' => $request->fecha,
             'tipo' => $request->tipo,
-            'monto' => $request->monto,
+            'monto' => $request->monto, // Se guarda el número limpio
             'descripcion' => $request->descripcion,
             'comprobante_path' => $filePath,
             'user_id' => auth()->id(),
-            'socio_id' => $request->socio_id, // <-- AÑADIR CAMPO
+            'socio_id' => $request->socio_id,
         ]);
 
         return redirect()->route('transacciones.index')
@@ -63,22 +69,30 @@ class TransaccionController extends Controller
     public function edit(Transaccion $transaccion)
     {
         $tipo = $transaccion->tipo;
-        // Pasamos la lista de socios a la vista de edición
         $socios = Socio::orderBy('nombre')->get();
         return view('transacciones.edit', compact('transaccion', 'tipo', 'socios'));
     }
 
     public function update(Request $request, Transaccion $transaccion)
     {
+        // --- INICIO DE LA CORRECCIÓN ---
+        // 1. Repetimos la misma limpieza para la actualización.
+        if ($request->has('monto')) {
+            $cleanedMonto = preg_replace('/[^0-9]/', '', $request->input('monto'));
+            $request->merge(['monto' => $cleanedMonto]);
+        }
+        // --- FIN DE LA CORRECCIÓN ---
+
         $request->validate([
             'fecha' => 'required|date',
             'monto' => 'required|numeric|min:0',
             'descripcion' => 'required|string|max:255',
             'comprobante' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            'socio_id' => 'nullable|exists:socios,id', // <-- AÑADIR VALIDACIÓN
+            'socio_id' => 'nullable|exists:socios,id',
         ]);
 
-        $data = $request->only(['fecha', 'monto', 'descripcion', 'socio_id']); // <-- AÑADIR CAMPO
+        // Usamos $request->all() para obtener todos los datos, incluido el monto ya limpio
+        $data = $request->all();
 
         if ($request->hasFile('comprobante')) {
             if ($transaccion->comprobante_path) {

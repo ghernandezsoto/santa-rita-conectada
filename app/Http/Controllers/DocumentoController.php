@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Documento;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // <-- Importar Storage
+use Illuminate\Support\Facades\Storage;
 
 class DocumentoController extends Controller
 {
@@ -14,27 +14,20 @@ class DocumentoController extends Controller
         return view('documentos.index', compact('documentos'));
     }
 
-    /**
-     * Muestra el formulario para subir un nuevo documento.
-     */
     public function create()
     {
         return view('documentos.create');
     }
 
-    /**
-     * Guarda el nuevo documento y su información.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'nombre_documento' => 'required|string|max:255',
             'fecha_documento' => 'required|date',
             'descripcion' => 'nullable|string',
-            'archivo' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,png|max:5120', // Máximo 5MB
+            'archivo' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,png|max:5120',
         ]);
 
-        // Guardar el archivo en storage/app/public/documentos_importantes
         $filePath = $request->file('archivo')->store('documentos_importantes', 'public');
 
         Documento::create([
@@ -49,9 +42,34 @@ class DocumentoController extends Controller
                          ->with('success', '¡Documento subido exitosamente!');
     }
 
-    // ... (los otros métodos los dejaremos para después)
-    public function show(Documento $documento){}
+    /**
+     * Permite la descarga del archivo asociado.
+     */
+    public function show(Documento $documento)
+    {
+        if (!Storage::disk('public')->exists($documento->archivo_path)) {
+            return redirect()->route('documentos.index')->with('error', 'El archivo no fue encontrado y no se puede descargar.');
+        }
+
+        return Storage::disk('public')->download($documento->archivo_path);
+    }
+
+    /**
+     * Elimina el documento y su archivo físico.
+     */
+    public function destroy(Documento $documento)
+    {
+        if (Storage::disk('public')->exists($documento->archivo_path)) {
+            Storage::disk('public')->delete($documento->archivo_path);
+        }
+
+        $documento->delete();
+
+        return redirect()->route('documentos.index')
+                         ->with('success', '¡Documento eliminado exitosamente!');
+    }
+    
+    // Dejamos estos métodos vacíos ya que no se usarán por ahora
     public function edit(Documento $documento){}
     public function update(Request $request, Documento $documento){}
-    public function destroy(Documento $documento){}
 }

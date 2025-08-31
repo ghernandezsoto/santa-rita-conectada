@@ -47,8 +47,10 @@
                                         <td class="py-3 px-4 truncate" title="{{ $documento->user->name ?? '' }}">{{ $documento->user->name ?? 'Usuario no encontrado' }}</td>
                                         <td class="py-3 px-4">
                                             <div class="flex items-center gap-2">
+                                                {{-- ENLACE DE DESCARGA FUNCIONAL --}}
                                                 <a href="{{ route('documentos.show', $documento) }}" class="text-emerald-600 hover:text-emerald-900 font-medium">Descargar</a>
                                                 <span class="text-gray-300">|</span>
+                                                {{-- FORMULARIO DE ELIMINACIÓN FUNCIONAL --}}
                                                 <form action="{{ route('documentos.destroy', $documento) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -80,7 +82,9 @@
                                     <p><span class="font-semibold">Subido por:</span> {{ $documento->user->name ?? 'N/A' }}</p>
                                 </div>
                                 <div class="mt-4 flex items-center gap-4 border-t pt-3">
+                                    {{-- ENLACE DE DESCARGA FUNCIONAL --}}
                                     <a href="{{ route('documentos.show', $documento) }}" class="text-emerald-600 hover:text-emerald-900 font-medium text-sm">Descargar</a>
+                                    {{-- FORMULARIO DE ELIMINACIÓN FUNCIONAL --}}
                                     <form action="{{ route('documentos.destroy', $documento) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
