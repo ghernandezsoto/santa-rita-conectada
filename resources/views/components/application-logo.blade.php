@@ -1,1 +1,1 @@
-<img src="{{ asset('images/logo.png') }}" alt="Logo de Santa Rita Conectada" {{ $attributes }}>
+<img src="{{ asset('images/Logo.png') }}" alt="Logo de Santa Rita Conectada" {{ $attributes }}>
