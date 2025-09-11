@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Socio;
+use App\Models\User;
 use App\Notifications\NuevoComunicadoNotification;
+use App\Notifications\PushComunicadoNotification;
 use Illuminate\Support\Facades\Notification;
 use App\Models\Comunicado;
 use Illuminate\Http\Request;
@@ -15,9 +17,7 @@ class ComunicadoController extends Controller
      */
     public function index()
     {
-        // CAMBIO AQUÍ: Reemplazamos get() por paginate()
         $comunicados = Comunicado::with('user')->orderBy('created_at', 'desc')->paginate(15);
-
         return view('comunicados.index', compact('comunicados'));
     }
 
@@ -87,7 +87,6 @@ class ComunicadoController extends Controller
     public function destroy(Comunicado $comunicado)
     {
         $comunicado->delete();
-
         return redirect()->route('comunicados.index')
                          ->with('success', 'Comunicado eliminado exitosamente.');
     }
@@ -98,15 +97,23 @@ class ComunicadoController extends Controller
             return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
         }
 
-        $sociosActivos = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
-        
+        // 1. Marcar como enviado
         $comunicado->update(['fecha_envio' => now()]);
 
-        if ($sociosActivos->isNotEmpty()) {
-            Notification::send($sociosActivos, new NuevoComunicadoNotification($comunicado));
+        // 2. Enviar por Email
+        $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
+        if ($sociosParaEmail->isNotEmpty()) {
+            Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
         }
 
+        // 3. Enviar Notificación Push
+        $usuariosParaPush = User::whereNotNull('fcm_token')->get();
+        if ($usuariosParaPush->isNotEmpty()) {
+            Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
+        }
+
+        // 4. Redirigir con mensaje de éxito
         return redirect()->route('comunicados.index')
-                         ->with('success', '¡El comunicado ha sido puesto en la cola para ser enviado a ' . $sociosActivos->count() . ' socios activos!');
+                         ->with('success', '¡El comunicado se ha enviado por correo y notificación push!');
     }
 }
