@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Socio;
 use Illuminate\Http\Request;
-use Freshwork\ChileanBundle\Rut; // <-- Importar la clase Rut
+use Freshwork\ChileanBundle\Rut;
 
 class SocioController extends Controller
 {
@@ -14,8 +14,9 @@ class SocioController extends Controller
         $query = Socio::query();
 
         if ($searchTerm) {
+            $cleanSearchTerm = preg_replace('/[^0-9Kk]/', '', $searchTerm);
             $query->where('nombre', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('rut', 'like', '%' . $searchTerm . '%');
+                  ->orWhere('rut', 'like', '%' . $cleanSearchTerm . '%');
         }
 
         $socios = $query->orderBy('nombre')->paginate(10);
@@ -31,27 +32,25 @@ class SocioController extends Controller
 
     public function store(Request $request)
     {
-        // Limpiamos los datos antes de validar
+        // --- CORRECCIÓN AQUÍ ---
         $request->merge([
-            'rut' => Rut::parse($request->rut)->format(Rut::FORMAT_WITH_VERIFIER),
+            'rut' => Rut::parse($request->rut)->normalize(), // Usamos normalize()
             'telefono' => preg_replace('/[^0-9]/', '', $request->telefono)
         ]);
 
         $request->validate([
-            'rut' => 'required|string|cl_rut|unique:socios,rut', // <-- Nueva regla de validación
+            'rut' => 'required|string|cl_rut|unique:socios,rut',
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            // Nueva regla para el teléfono: debe empezar con 569 y tener 11 dígitos en total
             'telefono' => 'nullable|string|regex:/^569\d{8}$/',
             'email' => 'nullable|email|unique:socios,email',
-            // ... otras reglas sin cambios ...
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
             'estado_civil' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string',
         ]);
-
+        
         Socio::create($request->all());
 
         return redirect()->route('socios.index')
@@ -75,21 +74,20 @@ class SocioController extends Controller
 
     public function update(Request $request, Socio $socio)
     {
-        // Limpiamos los datos antes de validar
+        // --- CORRECCIÓN AQUÍ ---
         $request->merge([
-            'rut' => Rut::parse($request->rut)->format(Rut::FORMAT_WITH_VERIFIER),
+            'rut' => Rut::parse($request->rut)->normalize(), // Usamos normalize()
             'telefono' => preg_replace('/[^0-9]/', '', $request->telefono)
         ]);
         
         $request->validate([
-            'rut' => 'required|string|cl_rut|unique:socios,rut,' . $socio->id, // <-- Nueva regla
+            'rut' => 'required|string|cl_rut|unique:socios,rut,' . $socio->id,
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            'telefono' => 'nullable|string|regex:/^569\d{8}$/', // <-- Nueva regla
+            'telefono' => 'nullable|string|regex:/^569\d{8}$/',
             'email' => 'nullable|email|unique:socios,email,' . $socio->id,
             'estado' => 'required|string',
-            // ... otras reglas sin cambios ...
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
             'estado_civil' => 'nullable|string|max:255',
