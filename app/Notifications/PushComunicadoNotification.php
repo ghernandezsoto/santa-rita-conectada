@@ -2,17 +2,18 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+// use Illuminate\Bus\Queueable;
+// use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Kreait\Firebase\Messaging\CloudMessage;
 use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use App\Models\Comunicado;
 
-class PushComunicadoNotification extends Notification implements ShouldQueue
+// class PushComunicadoNotification extends Notification implements ShouldQueue
+class PushComunicadoNotification extends Notification
 {
-    use Queueable;
+    // use Queueable;
 
     protected $comunicado;
 
