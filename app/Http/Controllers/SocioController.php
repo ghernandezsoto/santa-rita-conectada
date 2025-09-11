@@ -8,6 +8,9 @@ use Freshwork\ChileanBundle\Rut;
 
 class SocioController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(Request $request)
     {
         $searchTerm = $request->input('search');
@@ -23,6 +26,9 @@ class SocioController extends Controller
         return view('socios.index', compact('socios'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         $estadosCiviles = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Conviviente Civil'];
@@ -30,33 +36,40 @@ class SocioController extends Controller
         return view('socios.create', compact('estadosCiviles', 'profesiones'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        // --- CORRECCIÓN AQUÍ ---
-        $request->merge([
-            'rut' => Rut::parse($request->rut)->normalize(), // Usamos normalize()
-            'telefono' => preg_replace('/[^0-9]/', '', $request->telefono)
-        ]);
-
-        $request->validate([
+        $validated = $request->validate([
             'rut' => 'required|string|cl_rut|unique:socios,rut',
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            'telefono' => 'nullable|string|regex:/^569\d{8}$/',
+            'telefono' => ['nullable', 'string', 'regex:/^\+56\s?9\s?\d{4}\s?\d{4}$/'],
             'email' => 'nullable|email|unique:socios,email',
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
             'estado_civil' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string',
         ]);
+
+        // Después de validar, normalizamos los datos para guardarlos de forma limpia
+        $validated['rut'] = Rut::parse($validated['rut'])->normalize();
+        if (!empty($validated['telefono'])) {
+            // Guarda solo +569 y los 8 dígitos, sin espacios
+            $validated['telefono'] = '+569'.preg_replace('/[^0-9]/', '', substr($validated['telefono'], 4));
+        }
         
-        Socio::create($request->all());
+        Socio::create($validated);
 
         return redirect()->route('socios.index')
                          ->with('success', '¡Socio agregado exitosamente!');
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show(Socio $socio)
     {
         $socio->load(['transacciones' => function ($query) {
@@ -65,6 +78,9 @@ class SocioController extends Controller
         return view('socios.show', compact('socio'));
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(Socio $socio)
     {
         $estadosCiviles = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Conviviente Civil'];
@@ -72,20 +88,17 @@ class SocioController extends Controller
         return view('socios.edit', compact('socio', 'estadosCiviles', 'profesiones'));
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, Socio $socio)
     {
-        // --- CORRECCIÓN AQUÍ ---
-        $request->merge([
-            'rut' => Rut::parse($request->rut)->normalize(), // Usamos normalize()
-            'telefono' => preg_replace('/[^0-9]/', '', $request->telefono)
-        ]);
-        
-        $request->validate([
+        $validated = $request->validate([
             'rut' => 'required|string|cl_rut|unique:socios,rut,' . $socio->id,
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            'telefono' => 'nullable|string|regex:/^569\d{8}$/',
+            'telefono' => ['nullable', 'string', 'regex:/^\+56\s?9\s?\d{4}\s?\d{4}$/'],
             'email' => 'nullable|email|unique:socios,email,' . $socio->id,
             'estado' => 'required|string',
             'profesion' => 'nullable|string|max:255',
@@ -93,13 +106,22 @@ class SocioController extends Controller
             'estado_civil' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string',
         ]);
+        
+        // Después de validar, normalizamos los datos para guardarlos
+        $validated['rut'] = Rut::parse($validated['rut'])->normalize();
+        if (!empty($validated['telefono'])) {
+            $validated['telefono'] = '+569'.preg_replace('/[^0-9]/', '', substr($validated['telefono'], 4));
+        }
 
-        $socio->update($request->all());
+        $socio->update($validated);
 
         return redirect()->route('socios.index')
                          ->with('success', '¡Socio actualizado exitosamente!');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Socio $socio)
     {
         $socio->delete();

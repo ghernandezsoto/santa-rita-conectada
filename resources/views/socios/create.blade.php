@@ -29,7 +29,7 @@
                             </div>
                             <div>
                                 <x-input-label for="fecha_ingreso" :value="__('Fecha de Ingreso')" />
-                                <x-text-input id="fecha_ingreso" class="block mt-1 w-full" type="date" name="fecha_ingreso" :value="old('fecha_ingreso')" required />
+                                <x-text-input id="fecha_ingreso" class="block mt-1 w-full" type="date" name="fecha_ingreso" :value="old('fecha_ingreso', date('Y-m-d'))" required />
                                 <x-input-error :messages="$errors->get('fecha_ingreso')" class="mt-2" />
                             </div>
                             <div>
@@ -39,7 +39,7 @@
                             </div>
                             <div>
                                 <x-input-label for="estado_civil" :value="__('Estado Civil')" />
-                                <select id="estado_civil" name="estado_civil" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="estado_civil" name="estado_civil" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
                                     <option value="">Seleccione...</option>
                                     @foreach ($estadosCiviles as $estado)
                                         <option value="{{ $estado }}" {{ old('estado_civil') == $estado ? 'selected' : '' }}>{{ $estado }}</option>
@@ -49,7 +49,7 @@
                             </div>
                             <div>
                                 <x-input-label for="profesion" :value="__('Profesión / Oficio')" />
-                                <select id="profesion" name="profesion" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="profesion" name="profesion" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
                                     <option value="">Seleccione...</option>
                                     @foreach ($profesiones as $profesion)
                                         <option value="{{ $profesion }}" {{ old('profesion') == $profesion ? 'selected' : '' }}>{{ $profesion }}</option>
@@ -69,7 +69,7 @@
                             </div>
                             <div class="md:col-span-2">
                                 <x-input-label for="observaciones" :value="__('Observaciones')" />
-                                <textarea id="observaciones" name="observaciones" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" rows="3">{{ old('observaciones') }}</textarea>
+                                <textarea id="observaciones" name="observaciones" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm" rows="3">{{ old('observaciones') }}</textarea>
                                 <x-input-error :messages="$errors->get('observaciones')" class="mt-2" />
                             </div>
                         </div>
@@ -86,33 +86,37 @@
         </div>
     </div>
 
-    {{-- SCRIPT PARA EL FORMATEO AUTOMÁTICO --}}
+    @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Script de formato de RUT mejorado
             var rutInput = document.getElementById('rut');
             if (rutInput) {
-                new Cleave(rutInput, {
-                    delimiters: ['.', '.', '-'],
-                    blocks: [2, 3, 3, 1],
-                    numericOnly: true,
-                    onValueChanged: function (e) {
-                        // Mantener el dígito verificador en mayúscula
-                        if (e.target.rawValue.slice(-1).toLowerCase() === 'k') {
-                            e.target.setRawValue(e.target.rawValue.slice(0, -1) + 'K');
-                        }
+                rutInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/[^\dKk]/g, '');
+                    if (value.length > 9) value = value.slice(0, 9);
+                    let rut = value.slice(0, -1);
+                    let dv = value.slice(-1).toUpperCase();
+                    let formattedRut = '';
+                    while (rut.length > 3) {
+                        formattedRut = '.' + rut.slice(-3) + formattedRut;
+                        rut = rut.slice(0, -3);
                     }
+                    formattedRut = rut + formattedRut;
+                    e.target.value = value.length > 1 ? formattedRut + '-' + dv : formattedRut;
                 });
             }
 
+            // Script de formato de Teléfono mejorado
             var phoneInput = document.getElementById('telefono');
             if (phoneInput) {
                  new Cleave(phoneInput, {
-                    delimiters: [' ', ' ', ' '],
-                    blocks: [3, 4, 4],
-                    numericOnly: true,
-                    prefix: '+56'
+                    prefix: '+56 9 ',
+                    blocks: [4, 4],
+                    numericOnly: true
                 });
             }
         });
     </script>
+    @endpush
 </x-app-layout>
