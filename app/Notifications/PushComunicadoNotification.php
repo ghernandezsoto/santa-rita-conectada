@@ -9,6 +9,8 @@ use NotificationChannels\Fcm\FcmChannel;
 use NotificationChannels\Fcm\FcmMessage;
 use App\Models\Comunicado;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
+use Illuminate\Support\Facades\Log; // <-- AÑADIR
+use Throwable; // <-- AÑADIR
 
 class PushComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -28,13 +30,29 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
 
     public function toFcm($notifiable)
     {
-        return FcmMessage::create()
-            ->setNotification(FcmNotification::create()
-                ->setTitle($this->comunicado->titulo)
-                ->setBody(substr($this->comunicado->contenido, 0, 150) . '...'))
-            ->setData([
-                'comunicado_id' => (string) $this->comunicado->id,
-                'type' => 'comunicado',
-            ]);
+        Log::info('------------------');
+        Log::info('[PUSH] Intentando generar notificación push para User ID: ' . $notifiable->id);
+        Log::info('[PUSH] Para comunicado ID: ' . $this->comunicado->id);
+
+        try {
+            $fcmMessage = FcmMessage::create()
+                ->setNotification(FcmNotification::create()
+                    ->setTitle($this->comunicado->titulo)
+                    ->setBody(substr($this->comunicado->contenido, 0, 150) . '...'))
+                ->setData([
+                    'comunicado_id' => (string) $this->comunicado->id,
+                    'type' => 'comunicado',
+                ]);
+
+            Log::info('[PUSH] Notificación push generada exitosamente para User ID: ' . $notifiable->id);
+
+            return $fcmMessage;
+
+        } catch (Throwable $e) {
+            Log::error('[PUSH ERROR] Falló al generar la notificación push.');
+            Log::error('[PUSH ERROR] Mensaje: ' . $e->getMessage());
+            Log::error('[PUSH ERROR] Archivo: ' . $e->getFile() . ' en línea ' . $e->getLine());
+            throw $e;
+        }
     }
 }
