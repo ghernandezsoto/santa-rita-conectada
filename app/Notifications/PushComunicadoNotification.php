@@ -10,12 +10,9 @@ use NotificationChannels\Fcm\FcmMessage;
 use App\Models\Comunicado;
 use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 
-
-// class PushComunicadoNotification extends Notification implements ShouldQueue
-class PushComunicadoNotification extends Notification
-
+class PushComunicadoNotification extends Notification implements ShouldQueue
 {
-    // use Queueable;
+    use Queueable;
 
     protected $comunicado;
 
