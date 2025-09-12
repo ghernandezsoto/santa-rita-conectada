@@ -94,29 +94,49 @@ class ComunicadoController extends Controller
     /**
      * Envía el comunicado por correo y notificación push.
      */
+    // public function enviar(Comunicado $comunicado)
+    // {
+    //     if ($comunicado->fecha_envio) {
+    //         return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
+    //     }
+
+    //     // 1. Marcar como enviado
+    //     $comunicado->update(['fecha_envio' => now()]);
+
+    //     // 2. Enviar por Email a los socios
+    //     $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
+    //     if ($sociosParaEmail->isNotEmpty()) {
+    //         Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
+    //     }
+
+    //     // 3. Enviar Notificación Push a los usuarios de la app
+    //     $usuariosParaPush = User::whereNotNull('fcm_token')->get();
+    //     if ($usuariosParaPush->isNotEmpty()) {
+    //         Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
+    //     }
+
+    //     // 4. Redirigir con mensaje de éxito
+    //     return redirect()->route('comunicados.index')
+    //                      ->with('success', '¡El comunicado se ha enviado por correo y notificación push!');
+    // }
     public function enviar(Comunicado $comunicado)
     {
         if ($comunicado->fecha_envio) {
             return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
         }
 
-        // 1. Marcar como enviado
         $comunicado->update(['fecha_envio' => now()]);
 
-        // 2. Enviar por Email a los socios
-        $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
-        if ($sociosParaEmail->isNotEmpty()) {
-            Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
-        }
-
-        // 3. Enviar Notificación Push a los usuarios de la app
+        // --- INICIO DE LA PRUEBA DEFINITIVA ---
         $usuariosParaPush = User::whereNotNull('fcm_token')->get();
-        if ($usuariosParaPush->isNotEmpty()) {
-            Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
-        }
 
-        // 4. Redirigir con mensaje de éxito
+        if ($usuariosParaPush->isNotEmpty()) {
+            // Usamos sendNow para forzar el envío inmediato y ver cualquier error
+            Notification::sendNow($usuariosParaPush, new PushComunicadoNotification($comunicado));
+        }
+        // --- FIN DE LA PRUEBA DEFINITIVA ---
+
         return redirect()->route('comunicados.index')
-                         ->with('success', '¡El comunicado se ha enviado por correo y notificación push!');
+                         ->with('success', '¡Prueba de notificación push síncrona enviada!');
     }
 }
