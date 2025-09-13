@@ -101,12 +101,13 @@ class ComunicadoController extends Controller
 
         $comunicado->update(['fecha_envio' => now()]);
 
+        // Usamos el Log que ya tenías importado
         Log::info('=========================================');
-        Log::info('[CONTROLLER] Iniciando envío para comunicado ID: ' . $comunicado->id);
+        Log::info('[CONTROLLER] Iniciando envío para comunicado ID: '. $comunicado->id);
 
-        // 1. Enviar por Email (esto no cambia)
+        // 1. Enviar por Email (sin cambios)
         $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
-        Log::info('[CONTROLLER] Socios encontrados para email: ' . $sociosParaEmail->count());
+        Log::info('[CONTROLLER] Socios encontrados para email: '. $sociosParaEmail->count());
 
         if ($sociosParaEmail->isNotEmpty()) {
             Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
@@ -120,9 +121,11 @@ class ComunicadoController extends Controller
         $socioDePrueba = Socio::where('estado', 'Activo')->first();
 
         if ($socioDePrueba) {
-            Log::info('[CONTROLLER] Sujeto de prueba encontrado: SOCIO ID ' . $socioDePrueba->id);
+            Log::info('[CONTROLLER] Sujeto de prueba encontrado: SOCIO ID '. $socioDePrueba->id);
+            
             // Enviamos la notificación push al SOCIO en lugar del USER.
             Notification::send($socioDePrueba, new PushComunicadoNotification($comunicado));
+            
             Log::info('[CONTROLLER] Tarea de push para SOCIO encolada.');
         } else {
             Log::info('[CONTROLLER] No se encontraron socios activos para la prueba del "cambiazo".');
@@ -134,5 +137,5 @@ class ComunicadoController extends Controller
 
         return redirect()->route('comunicados.index')
                         ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
-    }   
+    }
 }
