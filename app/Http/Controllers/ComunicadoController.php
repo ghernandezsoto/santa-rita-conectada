@@ -129,14 +129,16 @@ class ComunicadoController extends Controller
         Log::info('=========================================');
         Log::info('[CONTROLLER] Iniciando envío para comunicado ID: ' . $comunicado->id);
 
-        // 1. Enviar por Email
+        // 1. Enviar por Email (usará la cola y la nueva API de Brevo)
         $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
         Log::info('[CONTROLLER] Socios encontrados para email: ' . $sociosParaEmail->count());
 
+        /*
         if ($sociosParaEmail->isNotEmpty()) {
             Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
             Log::info('[CONTROLLER] Tarea de email encolada.');
         }
+        */ // <-- COMENTADO TEMPORALMENTE
 
         // 2. Enviar Notificación Push
         $usuariosParaPush = User::whereNotNull('fcm_token')->get();
