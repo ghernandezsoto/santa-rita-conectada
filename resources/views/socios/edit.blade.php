@@ -99,30 +99,40 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Script de formato de RUT mejorado
+            // --- CONFIGURACIÓN DE CLEAVE.JS PARA RUT (CORREGIDO) ---
+            // Elimina el script manual anterior.
             var rutInput = document.getElementById('rut');
             if (rutInput) {
-                rutInput.addEventListener('input', function(e) {
-                    let value = e.target.value.replace(/[^\dKk]/g, '');
-                    if (value.length > 9) value = value.slice(0, 9);
-                    let rut = value.slice(0, -1);
-                    let dv = value.slice(-1).toUpperCase();
-                    let formattedRut = '';
-                    while (rut.length > 3) {
-                        formattedRut = '.' + rut.slice(-3) + formattedRut;
-                        rut = rut.slice(0, -3);
+                new Cleave(rutInput, {
+                    numericOnly: true,
+                    blocks: [2, 3, 3, 1],
+                    delimiters: ['.', '.', '-'],
+                    onValueChanged: function (e) {
+                        let value = e.target.rawValue;
+                        // Lógica para RUTs de 7 dígitos
+                        if (value.length > 7) {
+                            this.setBlocks([2, 3, 3, 1]);
+                        } else {
+                            this.setBlocks([1, 3, 3, 1]);
+                        }
+                        // Convierte la 'k' al final si es necesario
+                        if (value.length > 0) {
+                            let lastChar = value.charAt(value.length - 1);
+                            if (lastChar.toLowerCase() === 'k') {
+                                e.target.setRawValue(value.slice(0,-1) + 'K');
+                            }
+                        }
                     }
-                    formattedRut = rut + formattedRut;
-                    e.target.value = value.length > 1 ? formattedRut + '-' + dv : formattedRut;
                 });
             }
 
-            // Script de formato de Teléfono mejorado
+            // --- CONFIGURACIÓN DE CLEAVE.JS PARA TELÉFONO (CORREGIDO) ---
+            // Se elimina la opción 'prefix' para evitar que el campo se bloquee.
             var phoneInput = document.getElementById('telefono');
             if (phoneInput) {
-                 new Cleave(phoneInput, {
-                    prefix: '+56 9 ',
-                    blocks: [4, 4],
+                new Cleave(phoneInput, {
+                    delimiters: [' ', ' ', ' '],
+                    blocks: [3, 1, 4, 4], // +56 9 1234 5678
                     numericOnly: true
                 });
             }
