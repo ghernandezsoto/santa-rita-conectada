@@ -2,15 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Models\Comunicado;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Fcm\FcmChannel;
-use NotificationChannels\Fcm\FcmMessage;
-use App\Models\Comunicado;
-use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
-use Illuminate\Support\Facades\Log; // <-- AÑADIR
-use Throwable; // <-- AÑADIR
+use Illuminate\Support\Facades\Log;
+// ¡IMPORTANTE! Importamos nuestro nuevo canal personalizado que creamos antes.
+use App\Channels\FcmDirectChannel;
 
 class PushComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -23,36 +21,40 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
         $this->comunicado = $comunicado;
     }
 
+    /**
+     * Obtiene los canales de notificación.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
     public function via($notifiable)
     {
-        return [FcmChannel::class];
+        // Le decimos a Laravel que use nuestro nuevo canal en lugar del paquete externo.
+        return [FcmDirectChannel::class];
     }
 
-    public function toFcm($notifiable)
+    /**
+     * Obtiene la representación del mensaje para nuestro FcmDirectChannel.
+     * ¡IMPORTANTE! El método ahora se llama 'toFcmDirect' y devuelve un array.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toFcmDirect($notifiable)
     {
-        Log::info('------------------');
-        Log::info('[PUSH] Intentando generar notificación push para User ID: ' . $notifiable->id);
-        Log::info('[PUSH] Para comunicado ID: ' . $this->comunicado->id);
+        Log::info('[PUSH] Generando payload de notificación para FcmDirectChannel para User ID: ' . $notifiable->id);
 
-        try {
-            $fcmMessage = FcmMessage::create()
-                ->setNotification(FcmNotification::create()
-                    ->setTitle($this->comunicado->titulo)
-                    ->setBody(substr($this->comunicado->contenido, 0, 150) . '...'))
-                ->setData([
-                    'comunicado_id' => (string) $this->comunicado->id,
-                    'type' => 'comunicado',
-                ]);
-
-            Log::info('[PUSH] Notificación push generada exitosamente para User ID: ' . $notifiable->id);
-
-            return $fcmMessage;
-
-        } catch (Throwable $e) {
-            Log::error('[PUSH ERROR] Falló al generar la notificación push.');
-            Log::error('[PUSH ERROR] Mensaje: ' . $e->getMessage());
-            Log::error('[PUSH ERROR] Archivo: ' . $e->getFile() . ' en línea ' . $e->getLine());
-            throw $e;
-        }
+        // Ya no construimos un objeto FcmMessage.
+        // Simplemente devolvemos un array con la estructura que nuestro canal espera.
+        return [
+            'notification' => [
+                'title' => $this->comunicado->titulo,
+                'body' => substr($this->comunicado->contenido, 0, 150) . '...',
+            ],
+            'data' => [
+                'comunicado_id' => (string) $this->comunicado->id,
+                'type' => 'comunicado',
+            ]
+        ];
     }
 }
