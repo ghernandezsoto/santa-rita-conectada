@@ -93,30 +93,6 @@ class ComunicadoController extends Controller
     }
 
 
-    // public function enviar(Comunicado $comunicado)
-    // {
-    //     if ($comunicado->fecha_envio) {
-    //         return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
-    //     }
-
-    //     $comunicado->update(['fecha_envio' => now()]);
-
-    //     // 1. Enviar por Email (usará la cola y la nueva API de Brevo)
-    //     $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
-    //     if ($sociosParaEmail->isNotEmpty()) {
-    //         Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
-    //     }
-
-    //     // 2. Enviar Notificación Push (usará la cola)
-    //     $usuariosParaPush = User::whereNotNull('fcm_token')->get();
-    //     if ($usuariosParaPush->isNotEmpty()) {
-    //         Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
-    //     }
-
-    //     return redirect()->route('comunicados.index')
-    //                      ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
-    // }
-
     public function enviar(Comunicado $comunicado)
     {
         if ($comunicado->fecha_envio) {
@@ -125,38 +101,38 @@ class ComunicadoController extends Controller
 
         $comunicado->update(['fecha_envio' => now()]);
 
-        // --- INICIO DE LOGGING ---
         Log::info('=========================================');
         Log::info('[CONTROLLER] Iniciando envío para comunicado ID: ' . $comunicado->id);
 
-        // 1. Enviar por Email (usará la cola y la nueva API de Brevo)
+        // 1. Enviar por Email (esto no cambia)
         $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
         Log::info('[CONTROLLER] Socios encontrados para email: ' . $sociosParaEmail->count());
 
-        /*
         if ($sociosParaEmail->isNotEmpty()) {
             Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
             Log::info('[CONTROLLER] Tarea de email encolada.');
         }
-        */ // <-- COMENTADO TEMPORALMENTE
 
-        // 2. Enviar Notificación Push
-        $usuariosParaPush = User::whereNotNull('fcm_token')->get();
-        Log::info('[CONTROLLER] Usuarios encontrados para push: ' . $usuariosParaPush->count());
-        // Vamos a registrar los IDs para estar seguros
-        Log::info('[CONTROLLER] IDs de usuarios para push: ' . $usuariosParaPush->pluck('id')->toJson());
+        // --- INICIO DE LA PRUEBA DEL "CAMBIAZO" ---
+        Log::info('[CONTROLLER] PRUEBA FINAL: Intentando encolar PUSH para un modelo SOCIO.');
+        
+        // Buscamos un único socio activo para usarlo como sujeto de prueba.
+        $socioDePrueba = Socio::where('estado', 'Activo')->first();
 
-
-        if ($usuariosParaPush->isNotEmpty()) {
-            Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
-            Log::info('[CONTROLLER] Tarea de push encolada.');
+        if ($socioDePrueba) {
+            Log::info('[CONTROLLER] Sujeto de prueba encontrado: SOCIO ID ' . $socioDePrueba->id);
+            // Enviamos la notificación push al SOCIO en lugar del USER.
+            Notification::send($socioDePrueba, new PushComunicadoNotification($comunicado));
+            Log::info('[CONTROLLER] Tarea de push para SOCIO encolada.');
+        } else {
+            Log::info('[CONTROLLER] No se encontraron socios activos para la prueba del "cambiazo".');
         }
+        // --- FIN DE LA PRUEBA DEL "CAMBIAZO" ---
 
         Log::info('[CONTROLLER] Proceso de envío finalizado en controlador.');
         Log::info('=========================================');
-        // --- FIN DE LOGGING ---
 
         return redirect()->route('comunicados.index')
                         ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
-    }
+    }   
 }
