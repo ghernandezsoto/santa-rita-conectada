@@ -42,7 +42,6 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
      */
     public function toFcmDirect($notifiable)
     {
-        Log::info('[PUSH] Generando payload de notificación para FcmDirectChannel para User ID: ' . $notifiable->id);
 
         // Ya no construimos un objeto FcmMessage.
         // Simplemente devolvemos un array con la estructura que nuestro canal espera.
