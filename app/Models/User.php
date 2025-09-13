@@ -47,4 +47,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Define la ruta para las notificaciones de Firebase Cloud Messaging.
+     * Este método le dice a Laravel explícitamente dónde encontrar el token.
+     *
+     * @return string|null
+     */
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;
+    }
 }
