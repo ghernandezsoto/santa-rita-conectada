@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Socio;
 use Illuminate\Http\Request;
-// Usaremos la regla de validación de RUT del paquete
-use Freshwork\ChileanBundle\Laravel\Validations\Rut;
+// La clase Rut solo se usa aquí para la búsqueda, así que el 'use' está bien.
+use Freshwork\ChileanBundle\Rut;
 
 class SocioController extends Controller
 {
@@ -15,9 +15,8 @@ class SocioController extends Controller
         $query = Socio::query();
 
         if ($searchTerm) {
-            // La búsqueda ahora funciona con RUTs formateados o sin formatear
             $query->where('nombre', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('rut', 'like', '%' . \Freshwork\ChileanBundle\Rut::parse($searchTerm)->normalize() . '%');
+                  ->orWhere('rut', 'like', '%' . Rut::parse($searchTerm)->normalize() . '%');
         }
 
         $socios = $query->orderBy('nombre')->paginate(10);
@@ -33,13 +32,14 @@ class SocioController extends Controller
 
     public function store(Request $request)
     {
-        // El validador ahora se encarga de todo. No necesitamos limpiar datos aquí.
         $validated = $request->validate([
-            'rut' => ['required', 'string', new Rut(), 'unique:socios,rut'],
+            // --- CORRECCIÓN AQUÍ ---
+            // Usamos el alias 'cl_rut' en lugar de 'new Rut()'
+            'rut' => 'required|string|cl_rut|unique:socios,rut',
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            'telefono' => ['nullable', 'string', 'cl_phone'], // Regla de validación de teléfono chileno
+            'telefono' => ['nullable', 'string', 'cl_phone'],
             'email' => 'nullable|email|unique:socios,email',
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
@@ -71,12 +71,13 @@ class SocioController extends Controller
     public function update(Request $request, Socio $socio)
     {
         $validated = $request->validate([
-            'rut' => ['required', 'string', new Rut(), 'unique:socios,rut,' . $socio->id],
+            // --- CORRECCIÓN AQUÍ ---
+            // Usamos el alias 'cl_rut' en lugar de 'new Rut()'
+            'rut' => 'required|string|cl_rut|unique:socios,rut,' . $socio->id,
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            'telefono' => ['nullable', 'string', 'cl_phone'], // Regla de validación de teléfono chileno
-            'email' => 'nullable|email|unique:socios,email,' . $socio->id,
+            'telefono' => ['nullable', 'string', 'cl_phone'],
             'estado' => 'required|string',
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
