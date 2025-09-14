@@ -20,7 +20,7 @@
                 {{-- Logo: oculto en móviles para dar espacio --}}
                 <div class="hidden md:flex shrink-0 items-center">
                     <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                        <x-application-logo class="block h-16 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
             </div>
