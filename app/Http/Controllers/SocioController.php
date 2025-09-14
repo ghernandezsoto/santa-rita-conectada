@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Socio;
 use Illuminate\Http\Request;
-// La clase Rut solo se usa aquí para la búsqueda, así que el 'use' está bien.
 use Freshwork\ChileanBundle\Rut;
+// --- IMPORTANTE: Importamos nuestra nueva regla de validación ---
+use App\Rules\ChileanPhone;
 
 class SocioController extends Controller
 {
@@ -33,13 +34,12 @@ class SocioController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // --- CORRECCIÓN AQUÍ ---
-            // Usamos el alias 'cl_rut' en lugar de 'new Rut()'
             'rut' => 'required|string|cl_rut|unique:socios,rut',
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            'telefono' => ['nullable', 'string', 'cl_phone'],
+            // --- CORRECCIÓN AQUÍ: Usamos nuestra nueva regla personalizada ---
+            'telefono' => ['nullable', 'string', new ChileanPhone()],
             'email' => 'nullable|email|unique:socios,email',
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
@@ -53,31 +53,18 @@ class SocioController extends Controller
                          ->with('success', '¡Socio agregado exitosamente!');
     }
 
-    public function show(Socio $socio)
-    {
-        $socio->load(['transacciones' => function ($query) {
-            $query->orderBy('fecha', 'desc');
-        }]);
-        return view('socios.show', compact('socio'));
-    }
-
-    public function edit(Socio $socio)
-    {
-        $estadosCiviles = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Conviviente Civil'];
-        $profesiones = ['Dueña de Casa', 'Estudiante', 'Jubilado/a', 'Obrero/a', 'Técnico/a', 'Profesional', 'Agricultor/a', 'Otro'];
-        return view('socios.edit', compact('socio', 'estadosCiviles', 'profesiones'));
-    }
+    // ... (El resto de los métodos show, edit, etc. no necesitan cambios) ...
 
     public function update(Request $request, Socio $socio)
     {
         $validated = $request->validate([
-            // --- CORRECCIÓN AQUÍ ---
-            // Usamos el alias 'cl_rut' en lugar de 'new Rut()'
             'rut' => 'required|string|cl_rut|unique:socios,rut,' . $socio->id,
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            'telefono' => ['nullable', 'string', 'cl_phone'],
+             // --- CORRECCIÓN AQUÍ: Usamos nuestra nueva regla personalizada ---
+            'telefono' => ['nullable', 'string', new ChileanPhone()],
+            'email' => 'nullable|email|unique:socios,email,' . $socio->id,
             'estado' => 'required|string',
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
