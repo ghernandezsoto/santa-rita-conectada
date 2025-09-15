@@ -12,7 +12,7 @@
                     <form method="POST" action="{{ route('socios.store') }}">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            
+
                             <div>
                                 <x-input-label for="rut_visible" :value="__('RUT')" />
 
@@ -94,16 +94,17 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // === SCRIPT DE RUT DEFINITIVO (con campo oculto) ===
             var rutVisibleInput = document.getElementById('rut_visible');
             var rutHiddenInput = document.getElementById('rut');
 
             if (rutVisibleInput && rutHiddenInput) {
                 var cleaveRut = new Cleave(rutVisibleInput, {
                     onValueChanged: function (e) {
-                        // CADA VEZ QUE EL USUARIO ESCRIBE, ACTUALIZA EL CAMPO OCULTO CON EL VALOR CRUDO
+                        // El puente: actualiza el campo oculto con el valor limpio (rawValue)
                         rutHiddenInput.value = e.target.rawValue;
 
-                        // Lógica para el formato dinámico de 7 u 8 dígitos
+                        // Lógica de formato dinámico para 7 u 8 dígitos
                         var body = e.target.rawValue.slice(0, -1);
                         if (body.length <= 7) {
                             this.setBlocks([1, 3, 3, 1]);
@@ -114,7 +115,7 @@
                 });
             }
 
-            // Script del teléfono
+            // === SCRIPT DE TELÉFONO DEFINITIVO ===
             var phoneInput = document.getElementById('telefono');
             if (phoneInput) {
                 new Cleave(phoneInput, {
