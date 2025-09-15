@@ -12,11 +12,16 @@
                     <form method="POST" action="{{ route('socios.update', $socio->id) }}">
                         @csrf
                         @method('PUT')
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                             <div>
-                                <x-input-label for="rut" :value="__('RUT')" />
-                                <x-text-input id="rut" class="block mt-1 w-full" type="text" name="rut" :value="old('rut', Rut::parse($socio->rut)->format())" required autofocus />
+                                <x-input-label for="rut_visible" :value="__('RUT')" />
+
+                                <x-text-input id="rut_visible" class="block mt-1 w-full" type="text" :value="old('rut', $socio->rut)" required autofocus />
+                                
+                                <input type="hidden" name="rut" id="rut" value="{{ old('rut', $socio->getRawOriginal('rut')) }}">
+
                                 <x-input-error :messages="$errors->get('rut')" class="mt-2" />
                             </div>
                             <div>
@@ -69,7 +74,7 @@
                                 <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $socio->email)" />
                                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
                             </div>
-                            <div>
+                             <div>
                                 <x-input-label for="estado" :value="__('Estado del Socio')" />
                                 <select id="estado" name="estado" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
                                     <option value="Activo" {{ old('estado', $socio->estado) == 'Activo' ? 'selected' : '' }}>Activo</option>
@@ -99,35 +104,33 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // --- CONFIGURACIÓN DE CLEAVE.JS PARA RUT (CORREGIDO) ---
-            // Elimina el script manual anterior.
-            var rutInput = document.getElementById('rut');
-            if (rutInput) {
-                new Cleave(rutInput, {
-                    numericOnly: true,
-                    blocks: [2, 3, 3, 1],
-                    delimiters: ['.', '.', '-'],
+            var rutVisibleInput = document.getElementById('rut_visible');
+            var rutHiddenInput = document.getElementById('rut');
+
+            if (rutVisibleInput && rutHiddenInput) {
+                var cleaveRut = new Cleave(rutVisibleInput, {
                     onValueChanged: function (e) {
-                        let value = e.target.rawValue;
-                        // Lógica para RUTs de 7 dígitos
-                        if (value.length > 7) {
-                            this.setBlocks([2, 3, 3, 1]);
-                        } else {
+                        // CADA VEZ QUE EL USUARIO ESCRIBE, ACTUALIZA EL CAMPO OCULTO CON EL VALOR CRUDO
+                        rutHiddenInput.value = e.target.rawValue;
+
+                        // Lógica para el formato dinámico de 7 u 8 dígitos
+                        var body = e.target.rawValue.slice(0, -1);
+                        if (body.length <= 7) {
                             this.setBlocks([1, 3, 3, 1]);
-                        }
-                        // Convierte la 'k' al final si es necesario
-                        if (value.length > 0) {
-                            let lastChar = value.charAt(value.length - 1);
-                            if (lastChar.toLowerCase() === 'k') {
-                                e.target.setRawValue(value.slice(0,-1) + 'K');
-                            }
+                        } else {
+                            this.setBlocks([2, 3, 3, 1]);
                         }
                     }
                 });
+
+                // Si hay un valor inicial en el campo oculto (desde el controlador),
+                // lo usamos para establecer el valor formateado inicial del campo visible.
+                if (rutHiddenInput.value) {
+                    cleaveRut.setRawValue(rutHiddenInput.value);
+                }
             }
 
-            // --- CONFIGURACIÓN DE CLEAVE.JS PARA TELÉFONO (CORREGIDO) ---
-            // Se elimina la opción 'prefix' para evitar que el campo se bloquee.
+            // Script del teléfono
             var phoneInput = document.getElementById('telefono');
             if (phoneInput) {
                 new Cleave(phoneInput, {

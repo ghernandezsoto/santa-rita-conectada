@@ -12,9 +12,14 @@
                     <form method="POST" action="{{ route('socios.store') }}">
                         @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            
                             <div>
-                                <x-input-label for="rut" :value="__('RUT')" />
-                                <x-text-input id="rut" class="block mt-1 w-full" type="text" name="rut" :value="old('rut')" required autofocus placeholder="12.345.678-9" />
+                                <x-input-label for="rut_visible" :value="__('RUT')" />
+
+                                <x-text-input id="rut_visible" class="block mt-1 w-full" type="text" :value="old('rut')" required autofocus placeholder="12.345.678-9" />
+                                
+                                <input type="hidden" name="rut" id="rut" value="{{ old('rut') }}">
+
                                 <x-input-error :messages="$errors->get('rut')" class="mt-2" />
                             </div>
                             <div>
@@ -89,35 +94,27 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // --- CONFIGURACIÓN DE CLEAVE.JS PARA RUT (CORREGIDO) ---
-            // Elimina el script manual anterior.
-            var rutInput = document.getElementById('rut');
-            if (rutInput) {
-                new Cleave(rutInput, {
-                    numericOnly: true,
-                    blocks: [2, 3, 3, 1],
-                    delimiters: ['.', '.', '-'],
+            var rutVisibleInput = document.getElementById('rut_visible');
+            var rutHiddenInput = document.getElementById('rut');
+
+            if (rutVisibleInput && rutHiddenInput) {
+                var cleaveRut = new Cleave(rutVisibleInput, {
                     onValueChanged: function (e) {
-                        let value = e.target.rawValue;
-                        // Lógica para RUTs de 7 dígitos
-                        if (value.length > 7) {
-                            this.setBlocks([2, 3, 3, 1]);
-                        } else {
+                        // CADA VEZ QUE EL USUARIO ESCRIBE, ACTUALIZA EL CAMPO OCULTO CON EL VALOR CRUDO
+                        rutHiddenInput.value = e.target.rawValue;
+
+                        // Lógica para el formato dinámico de 7 u 8 dígitos
+                        var body = e.target.rawValue.slice(0, -1);
+                        if (body.length <= 7) {
                             this.setBlocks([1, 3, 3, 1]);
-                        }
-                        // Convierte la 'k' al final si es necesario
-                        if (value.length > 0) {
-                            let lastChar = value.charAt(value.length - 1);
-                            if (lastChar.toLowerCase() === 'k') {
-                                e.target.setRawValue(value.slice(0,-1) + 'K');
-                            }
+                        } else {
+                            this.setBlocks([2, 3, 3, 1]);
                         }
                     }
                 });
             }
 
-            // --- CONFIGURACIÓN DE CLEAVE.JS PARA TELÉFONO (CORREGIDO) ---
-            // Se elimina la opción 'prefix' para evitar que el campo se bloquee.
+            // Script del teléfono
             var phoneInput = document.getElementById('telefono');
             if (phoneInput) {
                 new Cleave(phoneInput, {
