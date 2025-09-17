@@ -94,21 +94,21 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // PRUEBA DEFINITIVA: Verificamos si este bloque de script se está ejecutando.
+            console.log('--- SCRIPT v5 CORREGIDO CARGADO CORRECTAMENTE ---');
+
             var rutVisibleInput = document.getElementById('rut_visible');
             var rutHiddenInput = document.getElementById('rut');
 
             if (rutVisibleInput && rutHiddenInput) {
-                // We store the Cleave instance in the 'cleaveRut' variable
                 var cleaveRut = new Cleave(rutVisibleInput, {
                     onValueChanged: function (e) {
                         rutHiddenInput.value = e.target.rawValue;
                         
                         var body = e.target.rawValue.slice(0, -1);
                         if (body.length <= 7) {
-                            // CORRECCIÓN AQUÍ: Usamos la variable 'cleaveRut' en lugar de 'this'
                             cleaveRut.setBlocks([1, 3, 3, 1]);
                         } else {
-                            // CORRECCIÓN AQUÍ: Usamos la variable 'cleaveRut' en lugar de 'this'
                             cleaveRut.setBlocks([2, 3, 3, 1]);
                         }
                     }
