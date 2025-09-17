@@ -114,10 +114,10 @@
                         
                         var body = e.target.rawValue.slice(0, -1);
                         if (body.length <= 7) {
-                            // CORRECCIÓN: Usar 'cleaveRut' en lugar de 'this'
+                            // CORRECCIÓN AQUÍ: Usamos la variable 'cleaveRut' en lugar de 'this'
                             cleaveRut.setBlocks([1, 3, 3, 1]);
                         } else {
-                            // CORRECCIÓN: Usar 'cleaveRut' en lugar de 'this'
+                            // CORRECCIÓN AQUÍ: Usamos la variable 'cleaveRut' en lugar de 'this'
                             cleaveRut.setBlocks([2, 3, 3, 1]);
                         }
                     }
@@ -132,7 +132,7 @@
             if (phoneInput) {
                 new Cleave(phoneInput, {
                     delimiters: [' ', ' ', ' '],
-                    blocks: [3, 1, 4, 4], // +56 9 1234 5678
+                    blocks: [3, 1, 4, 4],
                     numericOnly: true
                 });
             }
