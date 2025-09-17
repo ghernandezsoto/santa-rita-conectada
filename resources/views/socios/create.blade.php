@@ -94,28 +94,28 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // === SCRIPT DE RUT DEFINITIVO (con campo oculto) ===
+            // === SCRIPT DE RUT CORREGIDO ===
             var rutVisibleInput = document.getElementById('rut_visible');
             var rutHiddenInput = document.getElementById('rut');
 
             if (rutVisibleInput && rutHiddenInput) {
                 var cleaveRut = new Cleave(rutVisibleInput, {
                     onValueChanged: function (e) {
-                        // El puente: actualiza el campo oculto con el valor limpio (rawValue)
                         rutHiddenInput.value = e.target.rawValue;
-
-                        // Lógica de formato dinámico para 7 u 8 dígitos
+                        
                         var body = e.target.rawValue.slice(0, -1);
                         if (body.length <= 7) {
-                            this.setBlocks([1, 3, 3, 1]);
+                            // CORRECCIÓN: Usar 'cleaveRut' en lugar de 'this'
+                            cleaveRut.setBlocks([1, 3, 3, 1]);
                         } else {
-                            this.setBlocks([2, 3, 3, 1]);
+                            // CORRECCIÓN: Usar 'cleaveRut' en lugar de 'this'
+                            cleaveRut.setBlocks([2, 3, 3, 1]);
                         }
                     }
                 });
             }
 
-            // === SCRIPT DE TELÉFONO DEFINITIVO ===
+            // === SCRIPT DE TELÉFONO (ya estaba bien) ===
             var phoneInput = document.getElementById('telefono');
             if (phoneInput) {
                 new Cleave(phoneInput, {
