@@ -53,14 +53,17 @@ class SocioController extends Controller
                          ->with('success', '¡Socio agregado exitosamente!');
     }
 
-        // --- CÓDIGO AÑADIDO ---
-    // Esta es la función que faltaba. Se encarga de buscar un socio
-    // por su ID y pasarlo a una vista para mostrar sus detalles.
     public function show(Socio $socio)
     {
         return view('socios.show', compact('socio'));
     }
-    // --- FIN DEL CÓDIGO AÑADIDO ---
+
+    public function edit(Socio $socio)
+    {
+        $estadosCiviles = ['Soltero/a', 'Casado/a', 'Viudo/a', 'Divorciado/a', 'Conviviente Civil'];
+        $profesiones = ['Dueña de Casa', 'Estudiante', 'Jubilado/a', 'Obrero/a', 'Técnico/a', 'Profesional', 'Agricultor/a', 'Otro'];
+        return view('socios.edit', compact('socio', 'estadosCiviles', 'profesiones'));
+    }
 
     public function update(Request $request, Socio $socio)
     {
