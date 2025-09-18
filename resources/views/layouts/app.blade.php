@@ -14,7 +14,7 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-slate-100 flex" x-data="{ sidebarOpen: false }">
-            
+
             @include('layouts.partials.sidebar')
 
             <div class="flex-1 flex flex-col">
@@ -34,9 +34,7 @@
                 </main>
             </div>
         </div>
-        
-        {{-- NOTA: Se añade el script de Cleave.js y el @stack para los scripts de las páginas --}}
-        <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
+
         @stack('scripts')
     </body>
 </html>
