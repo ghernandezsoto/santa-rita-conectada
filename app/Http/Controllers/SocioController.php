@@ -53,7 +53,14 @@ class SocioController extends Controller
                          ->with('success', '¡Socio agregado exitosamente!');
     }
 
-    // ... (El resto de los métodos show, edit, etc. no necesitan cambios) ...
+        // --- CÓDIGO AÑADIDO ---
+    // Esta es la función que faltaba. Se encarga de buscar un socio
+    // por su ID y pasarlo a una vista para mostrar sus detalles.
+    public function show(Socio $socio)
+    {
+        return view('socios.show', compact('socio'));
+    }
+    // --- FIN DEL CÓDIGO AÑADIDO ---
 
     public function update(Request $request, Socio $socio)
     {
