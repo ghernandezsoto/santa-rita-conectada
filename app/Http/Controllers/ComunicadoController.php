@@ -95,10 +95,6 @@ class ComunicadoController extends Controller
                          ->with('success', 'Comunicado eliminado exitosamente.');
     }
 
-
-    /**
-     * Pone en cola el envío de un comunicado a todos los socios y usuarios.
-     */
     // public function enviar(Comunicado $comunicado)
     // {
     //     if ($comunicado->fecha_envio) {
@@ -107,20 +103,13 @@ class ComunicadoController extends Controller
 
     //     $comunicado->update(['fecha_envio' => now()]);
 
-    //     // --- SOLUCIÓN FINAL: Usamos una consulta SQL directa ---
-    //     // Obtenemos los IDs de los socios que cumplen la condición.
-    //     $socioIds = DB::select("SELECT id FROM socios WHERE LOWER(estado) = 'activo' AND email IS NOT NULL");
-
-    //     // Convertimos el resultado en una colección de IDs.
-    //     $ids = collect($socioIds)->pluck('id');
-
-    //     if ($ids->isNotEmpty()) {
-    //         // Buscamos los modelos Eloquent usando los IDs que sabemos que son correctos.
-    //         $sociosParaEmail = Socio::find($ids);
+    //     // 1. Enviar por Email a los Socios
+    //     $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
+    //     if ($sociosParaEmail->isNotEmpty()) {
     //         Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
     //     }
 
-    //     // La lógica de Push no cambia y ya funciona.
+    //     // 2. Enviar Notificación Push a los Usuarios de la App
     //     $usuariosParaPush = User::whereNotNull('fcm_token')->get();
     //     if ($usuariosParaPush->isNotEmpty()) {
     //         Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
@@ -138,13 +127,14 @@ class ComunicadoController extends Controller
 
         $comunicado->update(['fecha_envio' => now()]);
 
-        // 1. Enviar por Email a los Socios
-        $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
+        // 1. Enviar por Email a los Socios --- ¡LÍNEA MODIFICADA AQUÍ! ---
+        $sociosParaEmail = Socio::whereRaw("LOWER(estado) = 'activo'")->whereNotNull('email')->get();
+        
         if ($sociosParaEmail->isNotEmpty()) {
             Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
         }
 
-        // 2. Enviar Notificación Push a los Usuarios de la App
+        // 2. Enviar Notificación Push (esto no se toca)
         $usuariosParaPush = User::whereNotNull('fcm_token')->get();
         if ($usuariosParaPush->isNotEmpty()) {
             Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
