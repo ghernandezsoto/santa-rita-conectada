@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Socio;
 use Illuminate\Http\Request;
 use Freshwork\ChileanBundle\Rut;
-// --- IMPORTANTE: Importamos nuestra nueva regla de validación ---
 use App\Rules\ChileanPhone;
+use Illuminate\Database\QueryException; // 1. LÍNEA AÑADIDA
 
 class SocioController extends Controller
 {
@@ -38,7 +38,6 @@ class SocioController extends Controller
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-            // --- CORRECCIÓN AQUÍ: Usamos nuestra nueva regla personalizada ---
             'telefono' => ['nullable', 'string', new ChileanPhone()],
             'email' => 'nullable|email|unique:socios,email',
             'profesion' => 'nullable|string|max:255',
@@ -46,9 +45,7 @@ class SocioController extends Controller
             'estado_civil' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string',
         ]);
-
         Socio::create($validated);
-
         return redirect()->route('socios.index')
                          ->with('success', '¡Socio agregado exitosamente!');
     }
@@ -72,7 +69,6 @@ class SocioController extends Controller
             'nombre' => 'required|string|max:255',
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
-             // --- CORRECCIÓN AQUÍ: Usamos nuestra nueva regla personalizada ---
             'telefono' => ['nullable', 'string', new ChileanPhone()],
             'email' => 'nullable|email|unique:socios,email,' . $socio->id,
             'estado' => 'required|string',
@@ -81,17 +77,31 @@ class SocioController extends Controller
             'estado_civil' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string',
         ]);
-
         $socio->update($validated);
-
         return redirect()->route('socios.index')
                          ->with('success', '¡Socio actualizado exitosamente!');
     }
 
+    // 2. MÉTODO MODIFICADO
     public function destroy(Socio $socio)
     {
-        $socio->delete();
-        return redirect()->route('socios.index')
-                         ->with('success', 'Socio eliminado exitosamente.');
+        try {
+            // Intenta eliminar al socio
+            $socio->delete();
+            // Si tiene éxito, redirige con un mensaje de éxito
+            return redirect()->route('socios.index')
+                             ->with('success', 'Socio eliminado exitosamente.');
+        } catch (QueryException $e) {
+            // Si falla, atrapa la excepción de la base de datos
+            // El código '23000' es el error específico de violación de restricción
+            if ($e->getCode() === '23000') {
+                // Redirige hacia atrás con un mensaje de error específico y amigable
+                return redirect()->back()
+                                 ->with('error', 'No se puede eliminar este socio porque tiene registros asociados (como subsidios o transacciones). Por favor, elimine primero esos registros.');
+            }
+            // Para cualquier otro error de base de datos, mostramos un mensaje genérico
+            return redirect()->back()
+                             ->with('error', 'Ocurrió un error en la base de datos al intentar eliminar al socio.');
+        }
     }
 }
