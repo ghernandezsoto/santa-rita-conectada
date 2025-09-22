@@ -10,7 +10,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log; // <-- AÑADIR
 use Throwable; // <-- AÑADIR
 
-class NuevoComunicadoNotification extends Notification implements ShouldQueue
+#class NuevoComunicadoNotification extends Notification implements ShouldQueue
+class NuevoComunicadoNotification extends Notification
 {
     use Queueable;
 
