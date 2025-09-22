@@ -11,6 +11,9 @@ use App\Models\Comunicado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+// ¡IMPORTANTE! Añadimos el Facade de la Base de Datos
+use Illuminate\Support\Facades\DB;
+
 class ComunicadoController extends Controller
 {
     /**
@@ -104,22 +107,26 @@ class ComunicadoController extends Controller
 
         $comunicado->update(['fecha_envio' => now()]);
 
-        // 1. Enviar por Email a los Socios
-        $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
+        // --- SOLUCIÓN FINAL: Usamos una consulta SQL directa ---
+        // Obtenemos los IDs de los socios que cumplen la condición.
+        $socioIds = DB::select("SELECT id FROM socios WHERE LOWER(estado) = 'activo' AND email IS NOT NULL");
 
-        if ($sociosParaEmail->isNotEmpty()) {
+        // Convertimos el resultado en una colección de IDs.
+        $ids = collect($socioIds)->pluck('id');
+
+        if ($ids->isNotEmpty()) {
+            // Buscamos los modelos Eloquent usando los IDs que sabemos que son correctos.
+            $sociosParaEmail = Socio::find($ids);
             Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
         }
 
-        // 2. Enviar Notificación Push a los Usuarios de la App
+        // La lógica de Push no cambia y ya funciona.
         $usuariosParaPush = User::whereNotNull('fcm_token')->get();
-
         if ($usuariosParaPush->isNotEmpty()) {
-            // Esta es la línea original, que ahora funcionará gracias a nuestro FcmDirectChannel
             Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
         }
 
         return redirect()->route('comunicados.index')
-                         ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
+                        ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
     }
 }
