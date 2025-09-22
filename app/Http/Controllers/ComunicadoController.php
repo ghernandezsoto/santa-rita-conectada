@@ -108,14 +108,16 @@ class ComunicadoController extends Controller
         $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
 
         if ($sociosParaEmail->isNotEmpty()) {
+            // PRUEBA DEFINITIVA: Detenemos la ejecución aquí para ver si llegamos.
+            dd('PUNTO DE CONTROL: El código está a punto de intentar enviar ' . $sociosParaEmail->count() . ' correos.');
+
             Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
         }
 
-        // 2. Enviar Notificación Push a los Usuarios de la App
+        // 2. Enviar Notificación Push a los Usuarios de la App (Este código no se alcanzará durante la prueba)
         $usuariosParaPush = User::whereNotNull('fcm_token')->get();
 
         if ($usuariosParaPush->isNotEmpty()) {
-            // Esta es la línea original, que ahora funcionará gracias a nuestro FcmDirectChannel
             Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
         }
 
