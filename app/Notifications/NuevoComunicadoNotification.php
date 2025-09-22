@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log; // <-- AÑADIR
 use Throwable; // <-- AÑADIR
 
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
-
 {
     use Queueable;
 
@@ -29,6 +28,8 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
+        // DEBUG: log para verificar el ID del socio al que se enviará el correo
+        Log::info('[DEBUG] Preparando email para el Socio ID: ' . $notifiable->id);
 
         try {
             $mailMessage = (new MailMessage)
@@ -41,11 +42,9 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
                 ->salutation('Saludos cordiales,
 Directiva de la Junta de Vecinos N° 4 de Santa Rita');
 
-
             return $mailMessage;
 
         } catch (Throwable $e) {
-
             throw $e;
         }
     }
