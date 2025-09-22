@@ -98,9 +98,9 @@ class ComunicadoController extends Controller
      */
     public function enviar(Comunicado $comunicado)
     {
-        // if ($comunicado->fecha_envio) {
-        //     return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
-        // }
+        if ($comunicado->fecha_envio) {
+            return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
+        }
 
         $comunicado->update(['fecha_envio' => now()]);
 
