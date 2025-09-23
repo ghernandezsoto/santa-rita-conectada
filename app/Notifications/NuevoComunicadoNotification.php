@@ -48,4 +48,12 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
             throw $e;
         }
     }
+
+    public function failed(\Throwable $exception): void
+    {
+        // Logueamos el error exacto para saber por qué falló.
+        Log::error(
+            '[FALLO DE ENVÍO] La notificación por correo falló. Causa: ' . $exception->getMessage()
+        );
+    }
 }
