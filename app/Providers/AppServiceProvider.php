@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\HttpClient\HttpClient; // <-- AÑADE ESTE 'use'
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,12 +23,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // REEMPLAZA tu Mail::extend completo por este bloque
         Mail::extend('brevo', function () {
-            return (new BrevoTransportFactory())->create(
+            $factory = new BrevoTransportFactory(null, HttpClient::create()); // <-- Le pasamos el cliente HTTP
+
+            return $factory->create(
                 new Dsn(
                     'brevo+api',
                     'default',
-                    // LÍNEA CORREGIDA: Apuntamos a la configuración de 'mail', no de 'services'.
                     config('mail.mailers.brevo.key')
                 )
             );
