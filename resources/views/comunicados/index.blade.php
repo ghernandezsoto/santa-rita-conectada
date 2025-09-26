@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Gestión de Comunicados') }}
             </h2>
-            <a href="{{ route('comunicados.create') }}" 
+            <a href="{{ route('comunicados.create') }}"
                class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600">
                 Nuevo Comunicado
             </a>
@@ -49,7 +49,10 @@
                             <tbody class="text-gray-700">
                                 @forelse ($comunicados as $comunicado)
                                     <tr class="border-b hover:bg-slate-50">
-                                        <td class="py-3 px-4 truncate" title="{{ $comunicado->titulo }}">{{ $comunicado->titulo }}</td>
+                                        
+                                        <td class="py-3 px-4">
+                                            <div class="truncate max-w-md" title="{{ $comunicado->titulo }}">{{ $comunicado->titulo }}</div>
+                                        </td>
                                         <td class="py-3 px-4">
                                             @if ($comunicado->fecha_envio)
                                                 <span class="bg-emerald-200 text-emerald-700 py-1 px-3 rounded-full text-xs">Enviado el {{ \Carbon\Carbon::parse($comunicado->fecha_envio)->format('d/m/Y') }}</span>
@@ -92,7 +95,8 @@
                     <div class="space-y-4 md:hidden">
                         @forelse ($comunicados as $comunicado)
                             <div class="bg-white border rounded-lg shadow-sm p-4">
-                                <h3 class="font-semibold text-lg truncate" title="{{ $comunicado->titulo }}">{{ $comunicado->titulo }}</h3>
+                                
+                                <h3 class="font-semibold text-lg truncate max-w-xs" title="{{ $comunicado->titulo }}">{{ $comunicado->titulo }}</h3>
                                 <p class="text-sm mt-1"><span class="font-medium">Estado:</span>
                                     @if ($comunicado->fecha_envio)
                                         <span class="bg-emerald-200 text-emerald-700 py-1 px-2 rounded-full text-xs">Enviado el {{ \Carbon\Carbon::parse($comunicado->fecha_envio)->format('d/m/Y') }}</span>
