@@ -6,7 +6,7 @@ use App\Models\Comunicado;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use App\Channels\FcmDirectChannel; // Mantenemos tu canal personalizado
+use App\Channels\FcmDirectChannel;
 
 class PushComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -26,17 +26,12 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
 
     public function toFcmDirect($notifiable)
     {
-        // NOTA: Inicio de la lógica de limpieza profesional
+        // --- Lógica de preparación del texto ---
         
-        // 1. Aseguramos que el contenido sea una cadena de texto, aunque venga nulo.
-        $rawContent = $this->comunicado->contenido ?? '';
+        // 1. Obtenemos el contenido y quitamos espacios en blanco al inicio/final.
+        $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
 
-        // 2. Quitamos etiquetas HTML y decodificamos entidades como &aacute; -> á
-        $cleanBody = strip_tags($rawContent);
-        $cleanBody = html_entity_decode($cleanBody, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $cleanBody = trim($cleanBody);
-
-        // 3. Cortamos el texto de forma segura para caracteres en español (multibyte)
+        // 2. Cortamos el texto de forma segura para crear un extracto para la notificación.
         $maxLength = 150;
         if (mb_strlen($cleanBody, 'UTF-8') > $maxLength) {
             $excerpt = mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...';
@@ -44,10 +39,10 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
             $excerpt = $cleanBody;
         }
 
-        // 4. Limpiamos también el título por seguridad.
-        $title = strip_tags((string) ($this->comunicado->titulo ?? ''));
+        // 3. Obtenemos el título (ya no necesita limpieza de HTML).
+        $title = (string) ($this->comunicado->titulo ?? '');
         
-        // --- Fin de la lógica de limpieza ---
+        // --- Fin de la lógica ---
 
         return [
             'notification' => [
