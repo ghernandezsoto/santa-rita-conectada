@@ -13,6 +13,11 @@
         <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.0/dist/trix.css">
         <script type="text/javascript" src="https://unpkg.com/trix@2.0.0/dist/trix.umd.min.js" defer></script>
         
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+        <script defer src="https://cdn.jsdelivr.net/npm/@floating-ui/core@1.6.0"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.3"></script>
+
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
