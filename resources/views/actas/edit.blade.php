@@ -27,14 +27,17 @@
 
                             <div>
                                 <x-input-label for="contenido" :value="__('Contenido o Resumen')" />
-                                <textarea id="contenido" name="contenido" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" rows="5">{{ old('contenido', $acta->contenido) }}</textarea>
+                                {{-- ANTES: <textarea> con clases codificadas --}}
+                                <x-textarea-input id="contenido" name="contenido" class="block mt-1 w-full" rows="5">{{ old('contenido', $acta->contenido) }}</x-textarea-input>
                                 <x-input-error :messages="$errors->get('contenido')" class="mt-2" />
                             </div>
 
                             <div>
                                 <x-input-label for="archivo" :value="__('Reemplazar Archivo PDF (Opcional)')" />
-                                <p class="text-sm text-gray-500 mb-2">Archivo actual: <a href="{{ route('actas.show', $acta->id) }}" target="_blank" class="text-blue-600 hover:underline">Ver PDF Actual</a></p>
-                                <input id="archivo" name="archivo" type="file" class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                {{-- ANTES: text-blue-600 --}}
+                                <p class="text-sm text-gray-500 mb-2">Archivo actual: <a href="{{ route('actas.show', $acta->id) }}" target="_blank" class="text-primary-600 hover:underline">Ver PDF Actual</a></p>
+                                {{-- ANTES: <input type="file"> con clases codificadas --}}
+                                <x-file-input id="archivo" name="archivo" class="block mt-1 w-full" />
                                 <x-input-error :messages="$errors->get('archivo')" class="mt-2" />
                             </div>
                         </div>
