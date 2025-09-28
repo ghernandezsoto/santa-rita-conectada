@@ -20,12 +20,13 @@
 
                             <div>
                                 <x-input-label for="contenido" :value="__('Contenido del Mensaje')" />
-                                <textarea 
+                                {{-- AQUÍ USAMOS EL NUEVO COMPONENTE --}}
+                                <x-textarea-input
                                     id="contenido"
                                     name="contenido"
-                                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                    class="block mt-1 w-full"
                                     rows="8"
-                                >{{ old('contenido') }}</textarea>
+                                >{{ old('contenido') }}</x-textarea-input>
                                 <x-input-error :messages="$errors->get('contenido')" class="mt-2" />
                             </div>
                         </div>

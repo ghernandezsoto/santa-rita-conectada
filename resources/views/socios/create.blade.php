@@ -46,23 +46,25 @@
 
                             <div>
                                 <x-input-label for="estado_civil" :value="__('Estado Civil')" />
-                                <select id="estado_civil" name="estado_civil" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
+                                {{-- ANTES: <select> con clases codificadas --}}
+                                <x-select-input id="estado_civil" name="estado_civil" class="block mt-1 w-full">
                                     <option value="">Seleccione...</option>
                                     @foreach ($estadosCiviles as $estado)
                                         <option value="{{ $estado }}" {{ old('estado_civil') == $estado ? 'selected' : '' }}>{{ $estado }}</option>
                                     @endforeach
-                                </select>
+                                </x-select-input>
                                 <x-input-error :messages="$errors->get('estado_civil')" class="mt-2" />
                             </div>
 
                             <div>
                                 <x-input-label for="profesion" :value="__('Profesión / Oficio')" />
-                                <select id="profesion" name="profesion" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
+                                {{-- ANTES: <select> con clases codificadas --}}
+                                <x-select-input id="profesion" name="profesion" class="block mt-1 w-full">
                                     <option value="">Seleccione...</option>
                                     @foreach ($profesiones as $profesion)
                                         <option value="{{ $profesion }}" {{ old('profesion') == $profesion ? 'selected' : '' }}>{{ $profesion }}</option>
                                     @endforeach
-                                </select>
+                                </x-select-input>
                                 <x-input-error :messages="$errors->get('profesion')" class="mt-2" />
                             </div>
 
@@ -77,10 +79,11 @@
                                 <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" />
                                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
                             </div>
-                            
+
                             <div class="md:col-span-2">
                                 <x-input-label for="observaciones" :value="__('Observaciones')" />
-                                <textarea id="observaciones" name="observaciones" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm" rows="3">{{ old('observaciones') }}</textarea>
+                                {{-- ANTES: <textarea> con clases codificadas --}}
+                                <x-textarea-input id="observaciones" name="observaciones" class="block mt-1 w-full" rows="3">{{ old('observaciones') }}</x-textarea-input>
                                 <x-input-error :messages="$errors->get('observaciones')" class="mt-2" />
                             </div>
                         </div>
