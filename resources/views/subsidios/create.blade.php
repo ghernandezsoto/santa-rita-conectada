@@ -9,21 +9,21 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{-- IMPORTANTE: Añadir enctype para permitir la subida de archivos --}}
                     <form method="POST" action="{{ route('subsidios.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="space-y-6">
 
                             <div>
                                 <x-input-label for="socio_id" :value="__('Socio Postulante')" />
-                                <select id="socio_id" name="socio_id" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm" required>
+                                {{-- ANTES: <select> con clases codificadas --}}
+                                <x-select-input id="socio_id" name="socio_id" class="block mt-1 w-full" required>
                                     <option value="">Seleccione un socio</option>
                                     @foreach ($socios as $socio)
                                         <option value="{{ $socio->id }}" {{ old('socio_id') == $socio->id ? 'selected' : '' }}>
                                             {{ $socio->nombre }} (RUT: {{ $socio->rut }})
                                         </option>
                                     @endforeach
-                                </select>
+                                </x-select-input>
                                 <x-input-error :messages="$errors->get('socio_id')" class="mt-2" />
                             </div>
 
@@ -41,21 +41,26 @@
 
                             <div>
                                 <x-input-label for="descripcion" :value="__('Descripción del Proyecto o Necesidad')" />
-                                <textarea id="descripcion" name="descripcion" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm" rows="5">{{ old('descripcion') }}</textarea>
+                                {{-- ANTES: <textarea> con clases codificadas --}}
+                                <x-textarea-input id="descripcion" name="descripcion" class="block mt-1 w-full" rows="5">{{ old('descripcion') }}</x-textarea-input>
                                 <x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
                             </div>
-
-                            {{-- CAMPO NUEVO PARA SUBIR ARCHIVO --}}
+                            
                             <div>
                                 <x-input-label for="archivo" :value="__('Adjuntar Archivo (Opcional)')" />
-                                <input id="archivo" name="archivo" type="file" class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"/>
+                                {{-- ANTES: <input type="file"> con clases codificadas --}}
+                                <x-file-input id="archivo" name="archivo" class="block mt-1 w-full" />
                                 <x-input-error :messages="$errors->get('archivo')" class="mt-2" />
                             </div>
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('subsidios.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">Cancelar</a>
-                            <x-primary-button>
+                            <a href="{{ route('subsidios.index') }}">
+                                <x-secondary-button type="button">
+                                    {{ __('Cancelar') }}
+                                </x-secondary-button>
+                            </a>
+                            <x-primary-button class="ms-4">
                                 {{ __('Guardar Postulación') }}
                             </x-primary-button>
                         </div>
