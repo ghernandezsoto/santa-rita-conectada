@@ -5,29 +5,32 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Gestión de Eventos') }}
             </h2>
+            {{-- ANTES: bg-amber-500, hover:bg-amber-600 --}}
             <a href="{{ route('eventos.create') }}"
-               class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600">
+               class="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600">
                 Agregar Nuevo Evento
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12 bg-slate-100">
+    {{-- ANTES: bg-slate-100 --}}
+    <div class="py-12 bg-base-100">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
                     @if (session('success'))
-                        <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4"
+                        {{-- ANTES: bg-emerald-100 border-emerald-400 text-emerald-700 --}}
+                        <div class="bg-success-100 border border-success-400 text-success-700 px-4 py-3 rounded relative mb-4"
                              role="status" aria-live="polite">
                             <strong class="font-bold">¡Éxito!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
                         </div>
                     @endif
 
-                    {{-- Aviso de copiado (mejor ubicación en móvil y con aria-live) --}}
+                    {{-- ANTES: bg-emerald-600 --}}
                     <div id="copy-notification"
-                         class="hidden fixed bottom-6 right-5 z-50 bg-emerald-600 text-white py-2 px-4 rounded-lg shadow-lg"
+                         class="hidden fixed bottom-6 right-5 z-50 bg-success-600 text-white py-2 px-4 rounded-lg shadow-lg"
                          role="status" aria-live="polite">
                         ¡Texto copiado al portapapeles!
                     </div>
@@ -36,7 +39,8 @@
                     <div class="hidden md:block">
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white table-fixed" role="table" aria-label="Tabla de eventos">
-                                <thead class="bg-emerald-800 text-white">
+                                {{-- ANTES: bg-emerald-800 --}}
+                                <thead class="bg-primary-800 text-white">
                                     <tr>
                                         <th scope="col" class="w-[40%] py-3 px-4 font-semibold text-sm text-left">Título del Evento</th>
                                         <th scope="col" class="w-[26%] py-3 px-4 font-semibold text-sm text-left">Fecha y Hora</th>
@@ -46,32 +50,28 @@
                                 </thead>
                                 <tbody class="text-gray-700">
                                     @forelse ($eventos as $evento)
-                                        <tr class="border-b hover:bg-slate-50">
-                                            {{-- Título: truncado dentro de celda con ancho fijo --}}
+                                        {{-- ANTES: hover:bg-slate-50 --}}
+                                        <tr class="border-b hover:bg-base-50">
                                             <td class="py-3 px-4 max-w-0">
-                                                <div class="font-medium text-emerald-800 truncate"
+                                                {{-- ANTES: text-emerald-800 --}}
+                                                <div class="font-medium text-primary-800 truncate"
                                                      title="{{ $evento->titulo }}">
                                                     {{ $evento->titulo }}
                                                 </div>
                                             </td>
-
-                                            {{-- Fecha: evita saltos raros, formato compacto --}}
                                             <td class="py-3 px-4 whitespace-nowrap">
                                                 {{ \Carbon\Carbon::parse($evento->fecha_evento)->format('d/m/Y H:i') }} hrs
                                             </td>
-
-                                            {{-- Lugar: truncado para no desbordar --}}
                                             <td class="py-3 px-4 max-w-0">
                                                 <div class="truncate"
                                                      title="{{ $evento->lugar ?? 'No especificado' }}">
                                                     {{ $evento->lugar ?? 'No especificado' }}
                                                 </div>
                                             </td>
-
-                                            {{-- Acciones: sin saltos y con botón de copia accesible --}}
                                             <td class="py-3 px-4">
                                                 <div class="flex items-center gap-3 whitespace-nowrap">
-                                                    <button class="copy-btn text-blue-600 hover:text-blue-800"
+                                                    {{-- ANTES: text-blue-600 hover:text-blue-800 -> AHORA: neutral gray --}}
+                                                    <button class="copy-btn text-gray-600 hover:text-gray-800"
                                                             title="Copiar para WhatsApp"
                                                             aria-label="Copiar mensaje del evento para WhatsApp"
                                                             data-titulo="{{ $evento->titulo }}"
@@ -84,9 +84,9 @@
                                                         </svg>
                                                         <span class="sr-only">Copiar texto formateado</span>
                                                     </button>
-
+                                                    {{-- ANTES: text-amber-600 hover:text-amber-700 --}}
                                                     <a href="{{ route('eventos.edit', $evento) }}"
-                                                       class="text-amber-600 hover:text-amber-700 font-medium">
+                                                       class="text-accent-600 hover:text-accent-700 font-medium">
                                                         Editar
                                                     </a>
 
@@ -94,8 +94,9 @@
                                                           method="POST" class="inline">
                                                         @csrf
                                                         @method('DELETE')
+                                                        {{-- ANTES: text-red-600 hover:text-red-700 --}}
                                                         <button type="submit"
-                                                                class="text-red-600 hover:text-red-700 font-medium"
+                                                                class="text-danger-600 hover:text-danger-700 font-medium"
                                                                 onclick="return confirm('¿Estás seguro?')">
                                                             Eliminar
                                                         </button>
@@ -119,24 +120,18 @@
                     <div class="md:hidden space-y-4">
                         @forelse ($eventos as $evento)
                             <div class="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-3">
-                                <h3 class="font-bold text-emerald-800 truncate"
+                                {{-- ANTES: text-emerald-800 --}}
+                                <h3 class="font-bold text-primary-800 truncate"
                                     title="{{ $evento->titulo }}">
                                     {{ $evento->titulo }}
                                 </h3>
-
                                 <div class="text-sm text-gray-600">
-                                    <p>
-                                        <span class="font-semibold">Fecha:</span>
-                                        {{ \Carbon\Carbon::parse($evento->fecha_evento)->format('d/m/Y H:i') }} hrs
-                                    </p>
-                                    <p class="break-words">
-                                        <span class="font-semibold">Lugar:</span>
-                                        {{ $evento->lugar ?? 'No especificado' }}
-                                    </p>
+                                    <p><span class="font-semibold">Fecha:</span> {{ \Carbon\Carbon::parse($evento->fecha_evento)->format('d/m/Y H:i') }} hrs</p>
+                                    <p class="break-words"><span class="font-semibold">Lugar:</span> {{ $evento->lugar ?? 'No especificado' }}</p>
                                 </div>
-
                                 <div class="mt-4 flex items-center gap-4 border-t pt-3">
-                                    <button class="copy-btn text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+                                    {{-- ANTES: text-blue-600 hover:text-blue-800 -> AHORA: neutral gray --}}
+                                    <button class="copy-btn text-gray-600 hover:text-gray-800 flex items-center gap-1 text-sm"
                                             title="Copiar para WhatsApp"
                                             aria-label="Copiar mensaje del evento para WhatsApp"
                                             data-titulo="{{ $evento->titulo }}"
@@ -149,17 +144,17 @@
                                         </svg>
                                         Copiar
                                     </button>
-
+                                    {{-- ANTES: text-amber-600 hover:text-amber-700 --}}
                                     <a href="{{ route('eventos.edit', $evento) }}"
-                                       class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                                       class="text-accent-600 hover:text-accent-700 font-medium text-sm">
                                         Editar
                                     </a>
-
                                     <form action="{{ route('eventos.destroy', $evento) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
+                                        {{-- ANTES: text-red-600 hover:text-red-700 --}}
                                         <button type="submit"
-                                                class="text-red-600 hover:text-red-700 font-medium text-sm"
+                                                class="text-danger-600 hover:text-danger-700 font-medium text-sm"
                                                 onclick="return confirm('¿Estás seguro?')">
                                             Eliminar
                                         </button>
@@ -180,6 +175,7 @@
             </div>
         </div>
     </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
