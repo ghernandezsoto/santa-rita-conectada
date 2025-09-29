@@ -23,7 +23,6 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <x-input-label for="monto" :value="__('Monto ($)')" />
-                                    {{-- CAMBIO 1: Cambiamos type="number" por "text" --}}
                                     <x-text-input id="monto" class="block mt-1 w-full" type="text" name="monto" :value="old('monto', number_format($transaccion->monto, 0, ',', '.'))" required />
                                     <x-input-error :messages="$errors->get('monto')" class="mt-2" />
                                 </div>
@@ -36,32 +35,39 @@
 
                             <div>
                                 <x-input-label for="socio_id" :value="__('Asociar a Socio (Opcional)')" />
-                                <select id="socio_id" name="socio_id" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-md shadow-sm">
+                                {{-- ANTES: <select> con clases codificadas --}}
+                                <x-select-input id="socio_id" name="socio_id" class="block mt-1 w-full">
                                     <option value="">Ninguno</option>
                                     @foreach ($socios as $socio)
                                         <option value="{{ $socio->id }}" {{ old('socio_id', $transaccion->socio_id) == $socio->id ? 'selected' : '' }}>
                                             {{ $socio->nombre }}
                                         </option>
                                     @endforeach
-                                </select>
+                                </x-select-input>
                             </div>
 
                             <div>
                                 <x-input-label for="comprobante" :value="__('Reemplazar Comprobante (Opcional)')" />
                                 @if ($transaccion->comprobante_path)
                                     <p class="text-sm text-gray-500 mt-1 mb-2">
-                                        Comprobante actual: 
-                                        <a href="{{ asset('storage/' . $transaccion->comprobante_path) }}" target="_blank" class="text-blue-600 hover:underline">Ver Comprobante</a>
+                                        Comprobante actual:
+                                        {{-- ANTES: text-blue-600 --}}
+                                        <a href="{{ asset('storage/' . $transaccion->comprobante_path) }}" target="_blank" class="text-primary-600 hover:underline">Ver Comprobante</a>
                                     </p>
                                 @endif
-                                <input id="comprobante" name="comprobante" type="file" class="block mt-1 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"/>
+                                {{-- ANTES: <input type="file"> con clases codificadas --}}
+                                <x-file-input id="comprobante" name="comprobante" class="block mt-1 w-full" />
                                 <x-input-error :messages="$errors->get('comprobante')" class="mt-2" />
                             </div>
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('transacciones.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">Cancelar</a>
-                            <x-primary-button>
+                            <a href="{{ route('transacciones.index') }}">
+                                <x-secondary-button type="button">
+                                    {{ __('Cancelar') }}
+                                </x-secondary-button>
+                            </a>
+                            <x-primary-button class="ms-4">
                                 {{ __('Actualizar Transacción') }}
                             </x-primary-button>
                         </div>
@@ -71,7 +77,7 @@
         </div>
     </div>
 
-    {{-- CAMBIO 2: Añadimos el script de Cleave.js para formatear el campo 'monto' --}}
+    {{-- El script de Cleave.js se mantiene intacto --}}
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
