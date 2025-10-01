@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Portal\ComunicadoController as PortalComunicadoController;
+use App\Http\Controllers\Portal\EventoController as PortalEventoController;
+
 use App\Exports\TransaccionesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ProfileController;
@@ -10,7 +13,7 @@ use App\Http\Controllers\SubsidioController;
 use App\Http\Controllers\TransaccionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventoController;
-use App\Http\Controllers\DocumentoController; // <-- 1. IMPORTAR EL NUEVO CONTROLADOR
+use App\Http\Controllers\DocumentoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -55,8 +58,23 @@ Route::middleware('auth')->group(function () {
         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
         
     // --- NUEVA RUTA PARA ARCHIVO DIGITAL ---
-    Route::resource('documentos', DocumentoController::class) // <-- 2. AÑADIR LA RUTA RESOURCE
+    Route::resource('documentos', DocumentoController::class)
         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Presidente|Secretario|Tesorero');
 });
+
+// --- INICIO: RUTAS DEL PORTAL PARA SOCIOS ---
+// Este grupo entero está protegido para que solo usuarios con el rol 'Socio' puedan acceder.
+Route::middleware(['auth', 'role:Socio'])->prefix('portal')->name('portal.')->group(function () {
+    
+    // Rutas de solo lectura para Comunicados
+    Route::get('/comunicados', [PortalComunicadoController::class, 'index'])->name('comunicados.index');
+    Route::get('/comunicados/{comunicado}', [PortalComunicadoController::class, 'show'])->name('comunicados.show');
+
+    // Rutas de solo lectura para Eventos
+    Route::get('/eventos', [PortalEventoController::class, 'index'])->name('eventos.index');
+    Route::get('/eventos/{evento}', [PortalEventoController::class, 'show'])->name('eventos.show');
+
+});
+// --- FIN: RUTAS DEL PORTAL PARA SOCIOS ---
 
 require __DIR__.'/auth.php';
