@@ -21,7 +21,7 @@ class SocioController extends Controller
             // Se agrupan las condiciones de búsqueda para un comportamiento predecible
             $query->where(function ($q) use ($searchTerm) {
                 // 1. La consulta siempre buscará por el campo 'nombre'.
-                $q->where('nombre', 'like', $searchTerm . '%');
+                $q->where('nombre', 'like', '%' . $searchTerm . '%');
 
                 // 2. Se intenta procesar el término de búsqueda como un RUT.
                 try {
