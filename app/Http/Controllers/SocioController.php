@@ -6,7 +6,8 @@ use App\Models\Socio;
 use Illuminate\Http\Request;
 use Freshwork\ChileanBundle\Rut;
 use App\Rules\ChileanPhone;
-use Illuminate\Database\QueryException; // 1. LÍNEA AÑADIDA
+use Illuminate\Database\QueryException;
+use InvalidArgumentException; // IMPORTANTE: Se añade para manejar el error del RUT
 
 class SocioController extends Controller
 {
@@ -16,11 +17,31 @@ class SocioController extends Controller
         $query = Socio::query();
 
         if ($searchTerm) {
-            $query->where('nombre', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('rut', 'like', '%' . Rut::parse($searchTerm)->normalize() . '%');
+            // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
+            // Se agrupan las condiciones de búsqueda para un comportamiento predecible
+            $query->where(function ($q) use ($searchTerm) {
+                // 1. La consulta siempre buscará por el campo 'nombre'.
+                $q->where('nombre', 'like', $searchTerm . '%');
+
+                // 2. Se intenta procesar el término de búsqueda como un RUT.
+                try {
+                    // Si el texto tiene formato de RUT, se normaliza (ej: 12.345.678-9 -> 123456789)
+                    $normalizedRut = Rut::parse($searchTerm)->normalize();
+                    // Y se añade una condición para buscar también por el RUT normalizado.
+                    $q->orWhere('rut', '=', $normalizedRut);
+                } catch (InvalidArgumentException $e) {
+                    // 3. Si Rut::parse() falla (porque el texto es un nombre),
+                    // la excepción es capturada y no se hace nada. La búsqueda
+                    // continúa de forma segura solo por el nombre.
+                }
+            });
+            // --- FIN DE LA CORRECCIÓN ---
         }
 
-        $socios = $query->orderBy('nombre')->paginate(10);
+        // Se mantiene la paginación y se añade withQueryString() para que el
+        // filtro de búsqueda se mantenga al cambiar de página.
+        $socios = $query->orderBy('nombre')->paginate(10)->withQueryString();
+        
         return view('socios.index', compact('socios'));
     }
 
@@ -81,25 +102,18 @@ class SocioController extends Controller
         return redirect()->route('socios.index')
                          ->with('success', '¡Socio actualizado exitosamente!');
     }
-
-    // 2. MÉTODO MODIFICADO
+    
     public function destroy(Socio $socio)
     {
         try {
-            // Intenta eliminar al socio
             $socio->delete();
-            // Si tiene éxito, redirige con un mensaje de éxito
             return redirect()->route('socios.index')
                              ->with('success', 'Socio eliminado exitosamente.');
         } catch (QueryException $e) {
-            // Si falla, atrapa la excepción de la base de datos
-            // El código '23000' es el error específico de violación de restricción
             if ($e->getCode() === '23000') {
-                // Redirige hacia atrás con un mensaje de error específico y amigable
                 return redirect()->back()
                                  ->with('error', 'No se puede eliminar este socio porque tiene registros asociados (como subsidios o transacciones). Por favor, elimine primero esos registros.');
             }
-            // Para cualquier otro error de base de datos, mostramos un mensaje genérico
             return redirect()->back()
                              ->with('error', 'Ocurrió un error en la base de datos al intentar eliminar al socio.');
         }
