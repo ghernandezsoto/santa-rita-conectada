@@ -21,8 +21,10 @@
                         {!! $comunicado->contenido !!}
                     </div>
                     <div class="mt-8 flex justify-end">
-                        <a href="{{ route('comunicados.index') }}" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">
-                            Volver a la Lista
+                        <a href="{{ route('comunicados.index') }}">
+                            <x-secondary-button type="button">
+                                {{ __('Volver a la Lista') }}
+                            </x-secondary-button>
                         </a>
                     </div>
                 </div>
