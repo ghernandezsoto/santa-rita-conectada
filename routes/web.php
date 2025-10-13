@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('eventos', EventoController::class)
         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Secretario|Presidente');
-        
+
     // --- NUEVA RUTA PARA ARCHIVO DIGITAL ---
     Route::resource('documentos', DocumentoController::class)
         ->middleware(\Spatie\Permission\Middleware\RoleMiddleware::class . ':Presidente|Secretario|Tesorero');
@@ -64,8 +64,10 @@ Route::middleware('auth')->group(function () {
 
 // --- INICIO: RUTAS DEL PORTAL PARA SOCIOS ---
 // Este grupo entero está protegido para que solo usuarios con el rol 'Socio' puedan acceder.
-Route::middleware(['auth', 'role:Socio'])->prefix('portal')->name('portal.')->group(function () {
-    
+// --- INICIO DE LA MODIFICACIÓN ---
+Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')->name('portal.')->group(function () {
+// --- FIN DE LA MODIFICACIÓN ---
+
     // Rutas de solo lectura para Comunicados
     Route::get('/comunicados', [PortalComunicadoController::class, 'index'])->name('comunicados.index');
     Route::get('/comunicados/{comunicado}', [PortalComunicadoController::class, 'show'])->name('comunicados.show');

@@ -20,9 +20,14 @@ class PasswordController extends Controller
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // Al actualizar la contraseña, también se registra la fecha y hora actual
+        // en 'password_changed_at'. Este es el paso clave que "libera" al usuario.
         $request->user()->update([
             'password' => Hash::make($validated['password']),
+            'password_changed_at' => now(),
         ]);
+        // --- FIN DE LA MODIFICACIÓN ---
 
         return back()->with('status', 'password-updated');
     }

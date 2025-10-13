@@ -24,6 +24,16 @@
                     </div>
                 @endif
 
+                {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
+                {{-- Muestra la contraseña temporal si está presente en la sesión --}}
+                @if (session('password_info'))
+                    <div class="mb-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4" role="alert">
+                        <p class="font-bold">Contraseña Temporal Generada:</p>
+                        <p class="text-2xl font-mono tracking-wider">{{ session('password_info') }}</p>
+                    </div>
+                @endif
+                {{-- --- FIN DE LA MODIFICACIÓN --- --}}
+
                 {{-- Mensaje de error --}}
                 @if (session('error'))
                     {{-- ANTES: bg-red-100 border-red-400 text-red-700 --}}

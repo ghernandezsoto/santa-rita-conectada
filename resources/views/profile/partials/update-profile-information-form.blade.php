@@ -9,6 +9,17 @@
         </p>
     </header>
 
+    {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
+    {{-- Se añade un bloque de alerta que solo se muestra si el usuario tiene una contraseña temporal. --}}
+    {{-- También muestra el mensaje 'info' que viene desde el DashboardController. --}}
+    @if (is_null(Auth::user()->password_changed_at) || session('info'))
+        <div class="mt-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4" role="alert">
+            <p class="font-bold">Acción Requerida</p>
+            <p>{{ session('info', 'Por tu seguridad, es obligatorio que actualices tu contraseña temporal antes de continuar.') }}</p>
+        </div>
+    @endif
+    {{-- --- FIN DE LA MODIFICACIÓN --- --}}
+
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>

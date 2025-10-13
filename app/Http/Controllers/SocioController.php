@@ -7,7 +7,15 @@ use Illuminate\Http\Request;
 use Freshwork\ChileanBundle\Rut;
 use App\Rules\ChileanPhone;
 use Illuminate\Database\QueryException;
-use InvalidArgumentException; // IMPORTANTE: Se añade para manejar el error del RUT
+use InvalidArgumentException;
+
+// --- INICIO DE LA MODIFICACIÓN ---
+use App\Models\User;
+// Se elimina la importación de la notificación, ya no se usará.
+// use App\Notifications\WelcomeSocioNotification;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+// --- FIN DE LA MODIFICACIÓN ---
 
 class SocioController extends Controller
 {
@@ -17,31 +25,20 @@ class SocioController extends Controller
         $query = Socio::query();
 
         if ($searchTerm) {
-            // --- INICIO DE LA CORRECCIÓN DEFINITIVA ---
-            // Se agrupan las condiciones de búsqueda para un comportamiento predecible
             $query->where(function ($q) use ($searchTerm) {
-                // 1. La consulta siempre buscará por el campo 'nombre'.
                 $q->where('nombre', 'like', '%' . $searchTerm . '%');
 
-                // 2. Se intenta procesar el término de búsqueda como un RUT.
                 try {
-                    // Si el texto tiene formato de RUT, se normaliza (ej: 12.345.678-9 -> 123456789)
                     $normalizedRut = Rut::parse($searchTerm)->normalize();
-                    // Y se añade una condición para buscar también por el RUT normalizado.
                     $q->orWhere('rut', '=', $normalizedRut);
                 } catch (InvalidArgumentException $e) {
-                    // 3. Si Rut::parse() falla (porque el texto es un nombre),
-                    // la excepción es capturada y no se hace nada. La búsqueda
-                    // continúa de forma segura solo por el nombre.
+                    // La búsqueda continúa de forma segura solo por el nombre.
                 }
             });
-            // --- FIN DE LA CORRECCIÓN ---
         }
 
-        // Se mantiene la paginación y se añade withQueryString() para que el
-        // filtro de búsqueda se mantenga al cambiar de página.
         $socios = $query->orderBy('nombre')->paginate(10)->withQueryString();
-        
+
         return view('socios.index', compact('socios'));
     }
 
@@ -60,15 +57,43 @@ class SocioController extends Controller
             'domicilio' => 'required|string|max:255',
             'fecha_ingreso' => 'required|date',
             'telefono' => ['nullable', 'string', new ChileanPhone()],
-            'email' => 'nullable|email|unique:socios,email',
+            'email' => 'nullable|email|unique:socios,email|unique:users,email',
             'profesion' => 'nullable|string|max:255',
             'edad' => 'nullable|integer|min:0',
             'estado_civil' => 'nullable|string|max:255',
             'observaciones' => 'nullable|string',
         ]);
-        Socio::create($validated);
+
+        $socio = Socio::create($validated);
+
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // Se prepara un mensaje de éxito por defecto.
+        $successMessage = '¡Socio agregado exitosamente!';
+
+        // Si se proporcionó un email, se crea el usuario y se modifica el mensaje.
+        if ($validated['email']) {
+            $temporaryPassword = Str::random(10);
+
+            $user = User::create([
+                'name' => $validated['nombre'],
+                'email' => $validated['email'],
+                'password' => Hash::make($temporaryPassword)
+            ]);
+
+            $user->assignRole('Socio');
+
+            // Se elimina el envío de la notificación por correo.
+            // $user->notify(new WelcomeSocioNotification($temporaryPassword));
+
+            // El mensaje de éxito ahora incluye la contraseña para mostrarla en pantalla.
+            // Se usa 'password_info' para poder darle un estilo diferente en la vista si se desea.
+            session()->flash('password_info', $temporaryPassword);
+            $successMessage = '¡Socio y usuario creados! Entregue la contraseña temporal al socio de forma segura.';
+        }
+
         return redirect()->route('socios.index')
-                         ->with('success', '¡Socio agregado exitosamente!');
+                         ->with('success', $successMessage);
+        // --- FIN DE LA MODIFICACIÓN ---
     }
 
     public function show(Socio $socio)
@@ -102,7 +127,7 @@ class SocioController extends Controller
         return redirect()->route('socios.index')
                          ->with('success', '¡Socio actualizado exitosamente!');
     }
-    
+
     public function destroy(Socio $socio)
     {
         try {
