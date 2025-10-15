@@ -12,16 +12,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // --- INICIO DE LA MODIFICACIÓN ---
-        // Se registran todos los alias necesarios para Spatie Permission
-        // y nuestro nuevo middleware para forzar el cambio de contraseña.
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class, // <-- AÑADIDO
-            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class, // <-- AÑADIDO
-            'password.changed' => \App\Http\Middleware\EnsurePasswordIsChanged::class, // <-- AÑADIDO
+            'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'password.changed' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
         ]);
-        // --- FIN DE LA MODIFICACIÓN ---
+
+
+        // Esta línea activa la autenticación de estado completo (stateful) para la API,
+        // configurando automáticamente CORS y las cookies para que el frontend
+        // y el backend se comuniquen de forma segura. Es la solución para el error 401.
+        $middleware->statefulApi();
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

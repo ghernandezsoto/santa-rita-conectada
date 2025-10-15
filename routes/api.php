@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\ComunicadoController;
 use App\Http\Controllers\Api\EventoController;
 use App\Http\Controllers\Api\FcmController; // <-- Controlador nuevo
 
+use App\Models\Transaccion;
+use Carbon\Carbon;
+
 // --- RUTA DE LOGIN PARA LA API ---
 Route::post('/login', function (Request $request) {
     $request->validate([
@@ -50,4 +53,53 @@ Route::middleware('auth:sanctum')->group(function () {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sesión cerrada exitosamente']);
     });
+
+    Route::get('/charts/finances', function () {
+        $labels = [];
+        $incomeData = [];
+        $expenseData = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            // Se establece el locale a español para los nombres de los meses
+            $date = Carbon::now()->subMonths($i)->locale('es');
+            
+            // Se obtiene el nombre del mes y el año
+            $monthName = $date->translatedFormat('F'); // Ej: "octubre"
+            $year = $date->format('Y');
+
+            // Se añade la etiqueta al array, con la primera letra en mayúscula
+            $labels[] = ucfirst($monthName);
+
+            // Se calcula la suma de ingresos para ese mes y año
+            $income = Transaccion::where('tipo', 'Ingreso')
+                ->whereYear('fecha', $year)
+                ->whereMonth('fecha', $date->month)
+                ->sum('monto');
+            $incomeData[] = $income;
+
+            // Se calcula la suma de egresos para ese mes y año
+            $expense = Transaccion::where('tipo', 'Egreso')
+                ->whereYear('fecha', $year)
+                ->whereMonth('fecha', $date->month)
+                ->sum('monto');
+            $expenseData[] = $expense;
+        }
+
+        // Se devuelve el JSON con el formato que Chart.js espera
+        return response()->json([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Ingresos',
+                    'data' => $incomeData,
+                    'backgroundColor' => '#4ade80', // Verde
+                ],
+                [
+                    'label' => 'Egresos',
+                    'data' => $expenseData,
+                    'backgroundColor' => '#f87171', // Rojo
+                ]
+            ]
+        ]);
+    })->middleware('role:Presidente|Tesorero');
 });

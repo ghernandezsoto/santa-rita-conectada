@@ -20,9 +20,6 @@
             @role('Presidente|Secretario|Tesorero')
                 {{-- WIDGETS DE RESUMEN --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                    {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
-
                     @role('Presidente|Secretario')
                     <a href="{{ route('socios.index') }}" class="block transform hover:scale-105 transition-transform duration-200">
                         <div class="bg-white p-6 rounded-lg shadow-md h-full">
@@ -56,9 +53,20 @@
                             <p class="text-3xl font-bold mt-2 text-gray-800">{{ $comunicadosRecientes }}</p>
                         </div>
                     </a>
-                    {{-- --- FIN DE LA MODIFICACIÓN --- --}}
-
                 </div>
+
+                {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
+                @role('Presidente|Tesorero')
+                <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900">
+                        <h3 class="text-lg font-semibold mb-4">Resumen Financiero (Últimos 6 Meses)</h3>
+                        <div>
+                            <canvas id="financeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                @endrole
+                {{-- --- FIN DE LA MODIFICACIÓN --- --}}
 
                 {{-- ACTIVIDAD RECIENTE --}}
                 @role('Presidente|Secretario')
@@ -175,4 +183,47 @@
 
         </div>
     </div>
+    
+    @push('scripts')
+    @role('Presidente|Tesorero')
+    <script type="module">
+        import { Chart } from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/auto/+esm';
+
+        (async function() {
+            try {
+                const response = await axios.get('/api/charts/finances');
+                const data = response.data;
+
+                const ctx = document.getElementById('financeChart');
+                if (!ctx) return;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Ingresos vs. Egresos'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error al cargar los datos del gráfico:', error);
+            }
+        })();
+    </script>
+    @endrole
+    @endpush
+
 </x-app-layout>
