@@ -14,17 +14,28 @@ class Transaccion extends Model
      *
      * @var string
      */
-    protected $table = 'transacciones'; // <-- AÑADIMOS ESTA LÍNEA
+    protected $table = 'transacciones';
 
     protected $fillable = [
         'fecha',
         'tipo',
         'monto',
         'descripcion',
-        'comprobante_path', // <-- AÑADE ESTA LÍNEA
+        'comprobante_path',
         'user_id',
-        'socio_id', // <-- AÑADE ESTA LÍNEA
+        'socio_id',
     ];
+
+    // --- INICIO DE LA MODIFICACIÓN ---
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'fecha' => 'datetime', // Le dice a Laravel que trate la columna 'fecha' como un objeto de fecha (Carbon).
+    ];
+    // --- FIN DE LA MODIFICACIÓN ---
 
     // Nueva relación: Una transacción puede pertenecer a un socio.
     public function socio()
