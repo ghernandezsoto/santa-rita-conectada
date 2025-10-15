@@ -8,11 +8,14 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            {{-- Bienvenida para la Directiva --}}
+            @unlessrole('Socio')
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900">
                     ¡Bienvenido de nuevo, {{ Auth::user()->name }}!
                 </div>
             </div>
+            @endunlessrole
 
             {{-- ====================================================== --}}
             {{-- SECCIÓN PARA LA DIRECTIVA --}}
@@ -66,7 +69,6 @@
                 </div>
                 @endrole
 
-                {{-- ACTIVIDAD RECIENTE --}}
                 @role('Presidente|Secretario')
                     <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6 text-gray-900">
@@ -90,6 +92,14 @@
             {{-- SECCIÓN PARA SOCIOS --}}
             {{-- ====================================================== --}}
             @role('Socio')
+            
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-2xl font-semibold text-gray-800">¡Bienvenido, {{ Auth::user()->name }}! 👋</h3>
+                    <p class="mt-2 text-gray-600">Este es tu portal personal. Aquí encontrarás un resumen de tus aportes, acceso a documentos importantes y las últimas noticias de nuestra comunidad.</p>
+                </div>
+            </div>
+            
             @isset($balancePersonal)
                 <div class="space-y-6">
                     <div class="bg-white p-6 rounded-lg shadow-md">
@@ -181,7 +191,7 @@
 
         </div>
     </div>
-    
+
     @push('scripts')
     @role('Presidente|Tesorero')
     <script type="module">
