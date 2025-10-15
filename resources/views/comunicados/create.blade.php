@@ -20,7 +20,7 @@
 
                             <div>
                                 <x-input-label for="contenido" :value="__('Contenido del Mensaje')" />
-                                {{-- AQUÍ USAMOS EL NUEVO COMPONENTE --}}
+                                
                                 <x-textarea-input
                                     id="contenido"
                                     name="contenido"

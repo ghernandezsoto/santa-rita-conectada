@@ -19,7 +19,6 @@
 
                         @if ($subsidio->archivo_path)
                             <p class="mt-2"><strong>Archivo Adjunto:</strong>
-                                {{-- ANTES: text-blue-600 --}}
                                 <a href="{{ asset('storage/' . $subsidio->archivo_path) }}" target="_blank" class="text-primary-600 hover:underline">Ver Documento</a>
                             </p>
                         @endif
@@ -32,7 +31,6 @@
 
                             <div>
                                 <x-input-label for="estado" :value="__('Cambiar Estado de la Postulación')" />
-                                {{-- ANTES: <select> con clases codificadas --}}
                                 <x-select-input id="estado" name="estado" class="block mt-1 w-full">
                                     <option value="Postulando" {{ old('estado', $subsidio->estado) == 'Postulando' ? 'selected' : '' }}>Postulando</option>
                                     <option value="Aprobado" {{ old('estado', $subsidio->estado) == 'Aprobado' ? 'selected' : '' }}>Aprobado</option>
@@ -44,14 +42,12 @@
 
                             <div>
                                 <x-input-label for="observaciones_directiva" :value="__('Observaciones de la Directiva (Opcional)')" />
-                                {{-- ANTES: <textarea> con clases codificadas --}}
                                 <x-textarea-input id="observaciones_directiva" name="observaciones_directiva" class="block mt-1 w-full" rows="4">{{ old('observaciones_directiva', $subsidio->observaciones_directiva) }}</x-textarea-input>
                                 <x-input-error :messages="$errors->get('observaciones_directiva')" class="mt-2" />
                             </div>
 
                             <div>
                                 <x-input-label for="archivo" :value="__('Reemplazar Archivo Adjunto (Opcional)')" />
-                                {{-- ANTES: <input type="file"> con clases codificadas --}}
                                 <x-file-input id="archivo" name="archivo" class="block mt-1 w-full" />
                                 <x-input-error :messages="$errors->get('archivo')" class="mt-2" />
                             </div>

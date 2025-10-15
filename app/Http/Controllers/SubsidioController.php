@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Socio;
 use App\Models\Subsidio;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // <-- IMPORTANTE: Añadir Storage
+use Illuminate\Support\Facades\Storage;
 
 class SubsidioController extends Controller
 {

@@ -12,14 +12,6 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    // --- INICIO DE LA MODIFICACIÓN ---
-    // Deshabilitamos el auto-registro público. La creación de usuarios
-    // se hará desde el panel de la directiva al crear un socio.
-    // Route::get('register', [RegisteredUserController::class, 'create'])
-    //             ->name('register');
-
-    // Route::post('register', [RegisteredUserController::class, 'store']);
-    // --- FIN DE LA MODIFICACIÓN ---
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
                 ->name('login');

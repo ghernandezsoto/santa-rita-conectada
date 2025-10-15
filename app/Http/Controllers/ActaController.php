@@ -13,7 +13,7 @@ class ActaController extends Controller
      */
     public function index()
     {
-        // Por ahora, solo obtendremos las actas. Más adelante añadiremos paginación.
+        
         $actas = Acta::orderBy('fecha', 'desc')->get(); // Ordenar por fecha, la más reciente primero
 
         // Pasamos la variable $actas a la vista 'actas.index'

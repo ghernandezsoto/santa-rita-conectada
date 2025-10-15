@@ -13,8 +13,7 @@
                         @csrf
                         @method('PUT') {{-- Importante para la actualización --}}
 
-                        {{-- ANTES: Código HTML manual con clases codificadas --}}
-                        {{-- AHORA: Usando componentes de Blade reutilizables y estandarizados --}}
+
                         <div class="space-y-6">
                             <div>
                                 <x-input-label for="titulo" :value="__('Título del Evento')" />

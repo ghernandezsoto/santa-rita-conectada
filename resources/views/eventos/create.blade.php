@@ -12,8 +12,6 @@
                     <form action="{{ route('eventos.store') }}" method="POST">
                         @csrf
                         
-                        {{-- ANTES: Código HTML manual --}}
-                        {{-- AHORA: Usando componentes de Blade reutilizables --}}
                         <div class="space-y-6">
                             <div>
                                 <x-input-label for="titulo" :value="__('Título del Evento')" />
@@ -41,14 +39,12 @@
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            {{-- ANTES: <a> con clases codificadas --}}
                             <a href="{{ route('eventos.index') }}">
                                 <x-secondary-button type="button">
                                     {{ __('Cancelar') }}
                                 </x-secondary-button>
                             </a>
                             
-                            {{-- ANTES: <button> con clases codificadas --}}
                             <x-primary-button class="ms-4">
                                 {{ __('Guardar Evento') }}
                             </x-primary-button>

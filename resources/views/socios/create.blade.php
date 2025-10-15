@@ -46,7 +46,7 @@
 
                             <div>
                                 <x-input-label for="estado_civil" :value="__('Estado Civil')" />
-                                {{-- ANTES: <select> con clases codificadas --}}
+                                
                                 <x-select-input id="estado_civil" name="estado_civil" class="block mt-1 w-full">
                                     <option value="">Seleccione...</option>
                                     @foreach ($estadosCiviles as $estado)
@@ -58,7 +58,7 @@
 
                             <div>
                                 <x-input-label for="profesion" :value="__('Profesión / Oficio')" />
-                                {{-- ANTES: <select> con clases codificadas --}}
+                                
                                 <x-select-input id="profesion" name="profesion" class="block mt-1 w-full">
                                     <option value="">Seleccione...</option>
                                     @foreach ($profesiones as $profesion)
@@ -82,7 +82,7 @@
 
                             <div class="md:col-span-2">
                                 <x-input-label for="observaciones" :value="__('Observaciones')" />
-                                {{-- ANTES: <textarea> con clases codificadas --}}
+                                
                                 <x-textarea-input id="observaciones" name="observaciones" class="block mt-1 w-full" rows="3">{{ old('observaciones') }}</x-textarea-input>
                                 <x-input-error :messages="$errors->get('observaciones')" class="mt-2" />
                             </div>

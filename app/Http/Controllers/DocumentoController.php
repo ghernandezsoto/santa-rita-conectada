@@ -69,7 +69,7 @@ class DocumentoController extends Controller
                          ->with('success', '¡Documento eliminado exitosamente!');
     }
     
-    // Dejamos estos métodos vacíos ya que no se usarán por ahora
+
     public function edit(Documento $documento){}
     public function update(Request $request, Documento $documento){}
 }

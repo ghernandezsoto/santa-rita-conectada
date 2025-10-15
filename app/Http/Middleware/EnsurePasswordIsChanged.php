@@ -15,7 +15,6 @@ class EnsurePasswordIsChanged
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // --- INICIO DE LA MODIFICACIÓN ---
         // Se comprueba si el usuario está autenticado, tiene el rol 'Socio'
         // y nunca ha cambiado su contraseña (el campo está a null).
         if ($request->user() &&
@@ -30,7 +29,6 @@ class EnsurePasswordIsChanged
                                  ->with('info', 'Por favor, actualiza tu contraseña para continuar.');
             }
         }
-        // --- FIN DE LA MODIFICACIÓN ---
 
         return $next($request);
     }

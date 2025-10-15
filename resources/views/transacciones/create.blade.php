@@ -35,7 +35,6 @@
 
                             <div>
                                 <x-input-label for="socio_id" :value="__('Asociar a Socio (Opcional)')" />
-                                {{-- ANTES: <select> con clases codificadas --}}
                                 <x-select-input id="socio_id" name="socio_id" class="block mt-1 w-full">
                                     <option value="">Ninguno</option>
                                     @foreach ($socios as $socio)
@@ -48,14 +47,12 @@
 
                             <div>
                                 <x-input-label for="comprobante" :value="__('Adjuntar Comprobante (Opcional)')" />
-                                {{-- ANTES: <input type="file"> con clases codificadas --}}
                                 <x-file-input id="comprobante" name="comprobante" class="block mt-1 w-full" />
                                 <x-input-error :messages="$errors->get('comprobante')" class="mt-2" />
                             </div>
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            {{-- ANTES: <a> con estilo de texto simple --}}
                             <a href="{{ route('transacciones.index') }}">
                                 <x-secondary-button type="button">
                                     {{ __('Cancelar') }}

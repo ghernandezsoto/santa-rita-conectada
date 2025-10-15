@@ -22,7 +22,6 @@ class Acta extends Model
         'user_id',
     ];
 
-    // --- INICIO DE LA MODIFICACIÓN ---
     /**
      * The attributes that should be cast.
      *
@@ -31,7 +30,6 @@ class Acta extends Model
     protected $casts = [
         'fecha' => 'datetime', // This tells Laravel to treat 'fecha' as a date object.
     ];
-    // --- FIN DE LA MODIFICACIÓN ---
 
     public function user()
     {

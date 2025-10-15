@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models; // <-- CORREGIDO: Usar barra invertida \
+namespace App\Models; 
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User; // <-- AÑADIDO: Importar el modelo User
+use App\Models\User; 
 
 class Evento extends Model
 {

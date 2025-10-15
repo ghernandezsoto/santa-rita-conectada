@@ -35,7 +35,6 @@
 
                             <div>
                                 <x-input-label for="socio_id" :value="__('Asociar a Socio (Opcional)')" />
-                                {{-- ANTES: <select> con clases codificadas --}}
                                 <x-select-input id="socio_id" name="socio_id" class="block mt-1 w-full">
                                     <option value="">Ninguno</option>
                                     @foreach ($socios as $socio)
@@ -51,11 +50,9 @@
                                 @if ($transaccion->comprobante_path)
                                     <p class="text-sm text-gray-500 mt-1 mb-2">
                                         Comprobante actual:
-                                        {{-- ANTES: text-blue-600 --}}
                                         <a href="{{ asset('storage/' . $transaccion->comprobante_path) }}" target="_blank" class="text-primary-600 hover:underline">Ver Comprobante</a>
                                     </p>
                                 @endif
-                                {{-- ANTES: <input type="file"> con clases codificadas --}}
                                 <x-file-input id="comprobante" name="comprobante" class="block mt-1 w-full" />
                                 <x-input-error :messages="$errors->get('comprobante')" class="mt-2" />
                             </div>
@@ -77,7 +74,6 @@
         </div>
     </div>
 
-    {{-- El script de Cleave.js se mantiene intacto --}}
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {

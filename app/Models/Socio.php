@@ -25,8 +25,6 @@ class Socio extends Model
         'observaciones',
     ];
 
-    // --- LÓGICA DE RUT (YA ESTABA PERFECTA) ---
-
     public function getRutAttribute($value)
     {
         if (empty($value)) return null;
@@ -42,8 +40,6 @@ class Socio extends Model
         $this->attributes['rut'] = Rut::parse($value)->normalize();
     }
 
-    // --- LÓGICA DE TELÉFONO (MEJORADA) ---
-
     // Este accesor ahora es más simple porque confiamos en el formato guardado.
     public function getTelefonoFormattedAttribute()
     {
@@ -56,7 +52,6 @@ class Socio extends Model
         return $tel;
     }
 
-    // Este mutador ahora es más robusto y acepta múltiples formatos de entrada.
     public function setTelefonoAttribute($value)
     {
         if (empty($value)) {

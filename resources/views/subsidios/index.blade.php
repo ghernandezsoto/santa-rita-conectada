@@ -4,21 +4,18 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Gestión de Subsidios') }}
             </h2>
-            {{-- ANTES: bg-amber-500, hover:bg-amber-600 --}}
             <a href="{{ route('subsidios.create') }}" class="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600">
                 Registrar Postulación
             </a>
         </div>
     </x-slot>
 
-    {{-- ANTES: bg-slate-100 --}}
     <div class="py-12 bg-base-100">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
                     @if (session('success'))
-                        {{-- ANTES: bg-emerald-100 border-emerald-400 text-emerald-700 --}}
                         <div class="bg-success-100 border border-success-400 text-success-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <strong class="font-bold">¡Éxito!</strong>
                             <span class="block sm:inline">{{ session('success') }}</span>
@@ -28,7 +25,6 @@
                     {{-- VISTA DE ESCRITORITORIO (TABLA) --}}
                     <div class="hidden md:block overflow-x-auto">
                         <table class="min-w-full bg-white table-fixed">
-                            {{-- ANTES: bg-emerald-800 --}}
                             <thead class="bg-primary-800 text-white">
                                 <tr>
                                     <th class="w-3/12 py-3 px-4 font-semibold text-sm text-left">Socio Postulante</th>
@@ -40,7 +36,6 @@
                             </thead>
                             <tbody class="text-gray-700">
                                 @forelse ($subsidios as $subsidio)
-                                    {{-- ANTES: hover:bg-gray-50 --}}
                                     <tr class="border-b hover:bg-base-50">
                                         <td class="py-3 px-4 truncate" title="{{ $subsidio->socio->nombre }}">{{ $subsidio->socio->nombre }}</td>
                                         <td class="py-3 px-4 truncate" title="{{ $subsidio->nombre_subsidio }}">
@@ -51,7 +46,6 @@
                                         </td>
                                         <td class="py-3 px-4 whitespace-nowrap">${{ number_format($subsidio->monto_solicitado, 0, ',', '.') }}</td>
                                         <td class="py-3 px-4 max-w-0">
-                                            {{-- ANTES: Colores codificados --}}
                                             <span class="inline-block truncate py-1 px-3 rounded-full text-xs font-semibold
                                                 @if($subsidio->estado == 'Aprobado') bg-success-100 text-success-800 @endif
                                                 @if($subsidio->estado == 'Rechazado') bg-danger-200 text-danger-800 @endif
@@ -62,7 +56,6 @@
                                             </span>
                                         </td>
                                         <td class="py-3 px-4">
-                                            {{-- ANTES: text-emerald-800 hover:text-emerald-900 --}}
                                             <a href="{{ route('subsidios.edit', $subsidio->id) }}" class="text-primary-800 hover:text-primary-900 font-medium">Gestionar</a>
                                         </td>
                                     </tr>
@@ -79,12 +72,10 @@
                             <div class="bg-white p-4 rounded-lg shadow border border-gray-200">
                                 <div class="flex justify-between items-start mb-2">
                                     <div class="flex-1 min-w-0">
-                                        {{-- ANTES: text-emerald-800 --}}
                                         <h3 class="font-bold text-primary-800 truncate" title="{{ $subsidio->nombre_subsidio }}">{{ $subsidio->nombre_subsidio }}</h3>
                                         <p class="text-sm text-gray-600 truncate" title="{{ $subsidio->socio->nombre }}">Postulante: {{ $subsidio->socio->nombre }}</p>
                                     </div>
 
-                                    {{-- ANTES: Colores codificados --}}
                                     <span class="ml-2 flex-shrink-0 inline-block truncate py-1 px-2 rounded-full text-xs font-semibold
                                         @if($subsidio->estado == 'Aprobado') bg-success-100 text-success-800 @endif
                                         @if($subsidio->estado == 'Rechazado') bg-danger-200 text-danger-800 @endif
@@ -106,7 +97,6 @@
                                             </span>
                                         @endif
                                     </div>
-                                    {{-- ANTES: bg-emerald-700, hover:bg-emerald-800 --}}
                                     <a href="{{ route('subsidios.edit', $subsidio->id) }}" class="px-4 py-2 bg-primary-700 text-white text-sm font-medium rounded-lg hover:bg-primary-800">Gestionar</a>
                                 </div>
                             </div>

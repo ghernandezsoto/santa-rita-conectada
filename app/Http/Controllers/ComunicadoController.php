@@ -95,30 +95,6 @@ class ComunicadoController extends Controller
                          ->with('success', 'Comunicado eliminado exitosamente.');
     }
 
-    // public function enviar(Comunicado $comunicado)
-    // {
-    //     if ($comunicado->fecha_envio) {
-    //         return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
-    //     }
-
-    //     $comunicado->update(['fecha_envio' => now()]);
-
-    //     // 1. Enviar por Email a los Socios
-    //     $sociosParaEmail = Socio::where('estado', 'Activo')->whereNotNull('email')->get();
-    //     if ($sociosParaEmail->isNotEmpty()) {
-    //         Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
-    //     }
-
-    //     // 2. Enviar Notificación Push a los Usuarios de la App
-    //     $usuariosParaPush = User::whereNotNull('fcm_token')->get();
-    //     if ($usuariosParaPush->isNotEmpty()) {
-    //         Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
-    //     }
-
-    //     return redirect()->route('comunicados.index')
-    //                     ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
-    // }
-
     public function enviar(Comunicado $comunicado)
     {
         if ($comunicado->fecha_envio) {

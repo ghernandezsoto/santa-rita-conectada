@@ -70,6 +70,5 @@ class EventoController extends Controller
                          ->with('success', '¡Evento eliminado exitosamente!');
     }
 
-    // El método show lo podemos dejar vacío por ahora
     public function show(Evento $evento){}
 }

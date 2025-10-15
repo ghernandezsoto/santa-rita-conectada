@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 // --- IMPORTAMOS LOS CONTROLADORES DE LA API ---
 use App\Http\Controllers\Api\ComunicadoController;
 use App\Http\Controllers\Api\EventoController;
-use App\Http\Controllers\Api\FcmController; // <-- Controlador nuevo
+use App\Http\Controllers\Api\FcmController; 
 
 use App\Models\Transaccion;
 use Carbon\Carbon;
@@ -40,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     
-    // --- NUEVA RUTA PARA REGISTRAR EL TOKEN DE FCM ---
+    // --- RUTA PARA REGISTRAR EL TOKEN DE FCM ---
     Route::post('/fcm-token', [FcmController::class, 'register']);
 
     Route::get('/comunicados', [ComunicadoController::class, 'index']);

@@ -55,7 +55,6 @@
                     </a>
                 </div>
 
-                {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
                 @role('Presidente|Tesorero')
                 <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
@@ -66,7 +65,6 @@
                     </div>
                 </div>
                 @endrole
-                {{-- --- FIN DE LA MODIFICACIÓN --- --}}
 
                 {{-- ACTIVIDAD RECIENTE --}}
                 @role('Presidente|Secretario')

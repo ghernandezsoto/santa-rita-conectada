@@ -23,9 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'fcm_token',
-        // --- INICIO DE LA MODIFICACIÓN ---
         'password_changed_at', // Se añade para permitir su actualización.
-        // --- FIN DE LA MODIFICACIÓN ---
     ];
 
     /**

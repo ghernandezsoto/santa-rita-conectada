@@ -9,13 +9,10 @@ use App\Rules\ChileanPhone;
 use Illuminate\Database\QueryException;
 use InvalidArgumentException;
 
-// --- INICIO DE LA MODIFICACIÓN ---
 use App\Models\User;
-// Se elimina la importación de la notificación, ya no se usará.
-// use App\Notifications\WelcomeSocioNotification;
+
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-// --- FIN DE LA MODIFICACIÓN ---
 
 class SocioController extends Controller
 {
@@ -66,11 +63,9 @@ class SocioController extends Controller
 
         $socio = Socio::create($validated);
 
-        // --- INICIO DE LA MODIFICACIÓN ---
         // Se prepara un mensaje de éxito por defecto.
         $successMessage = '¡Socio agregado exitosamente!';
 
-        // Si se proporcionó un email, se crea el usuario y se modifica el mensaje.
         if ($validated['email']) {
             $temporaryPassword = Str::random(10);
 
@@ -82,18 +77,13 @@ class SocioController extends Controller
 
             $user->assignRole('Socio');
 
-            // Se elimina el envío de la notificación por correo.
-            // $user->notify(new WelcomeSocioNotification($temporaryPassword));
-
-            // El mensaje de éxito ahora incluye la contraseña para mostrarla en pantalla.
-            // Se usa 'password_info' para poder darle un estilo diferente en la vista si se desea.
             session()->flash('password_info', $temporaryPassword);
             $successMessage = '¡Socio y usuario creados! Entregue la contraseña temporal al socio de forma segura.';
         }
 
         return redirect()->route('socios.index')
                          ->with('success', $successMessage);
-        // --- FIN DE LA MODIFICACIÓN ---
+
     }
 
     public function show(Socio $socio)

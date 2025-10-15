@@ -15,7 +15,6 @@
 
                             <div>
                                 <x-input-label for="socio_id" :value="__('Socio Postulante')" />
-                                {{-- ANTES: <select> con clases codificadas --}}
                                 <x-select-input id="socio_id" name="socio_id" class="block mt-1 w-full" required>
                                     <option value="">Seleccione un socio</option>
                                     @foreach ($socios as $socio)
@@ -41,14 +40,12 @@
 
                             <div>
                                 <x-input-label for="descripcion" :value="__('Descripción del Proyecto o Necesidad')" />
-                                {{-- ANTES: <textarea> con clases codificadas --}}
                                 <x-textarea-input id="descripcion" name="descripcion" class="block mt-1 w-full" rows="5">{{ old('descripcion') }}</x-textarea-input>
                                 <x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
                             </div>
                             
                             <div>
                                 <x-input-label for="archivo" :value="__('Adjuntar Archivo (Opcional)')" />
-                                {{-- ANTES: <input type="file"> con clases codificadas --}}
                                 <x-file-input id="archivo" name="archivo" class="block mt-1 w-full" />
                                 <x-input-error :messages="$errors->get('archivo')" class="mt-2" />
                             </div>

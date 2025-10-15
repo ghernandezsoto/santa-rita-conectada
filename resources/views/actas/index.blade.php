@@ -55,7 +55,7 @@
                                             {{ $acta->user->name ?? 'Usuario no encontrado' }}
                                         </td>
                                         <td class="py-3 px-4">
-                                            {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
+
                                             <div class="flex items-center justify-center gap-4">
                                                 <a href="{{ route('actas.show', $acta->id) }}" target="_blank" title="Ver" class="text-gray-400 hover:text-primary-600 transition-colors duration-200">
                                                     <x-icons.eye class="w-5 h-5" />
@@ -71,7 +71,7 @@
                                                     </button>
                                                 </form>
                                             </div>
-                                            {{-- --- FIN DE LA MODIFICACIÓN --- --}}
+
                                         </td>
                                     </tr>
                                 @empty
@@ -96,7 +96,7 @@
                                 <p class="text-sm text-gray-600 mt-1">
                                     Subida por: <span class="font-medium">{{ $acta->user->name ?? 'Usuario no encontrado' }}</span>
                                 </p>
-                                {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
+
                                 <div class="mt-4 pt-4 border-t border-gray-200 flex items-center justify-end gap-6">
                                     <a href="{{ route('actas.show', $acta->id) }}" target="_blank" title="Ver" class="text-gray-400 hover:text-primary-600 transition-colors duration-200">
                                         <x-icons.eye class="w-6 h-6" />
@@ -112,7 +112,7 @@
                                         </button>
                                     </form>
                                 </div>
-                                {{-- --- FIN DE LA MODIFICACIÓN --- --}}
+
                             </article>
                         @empty
                             <p class="text-center text-gray-500">No hay actas registradas aún.</p>

@@ -7,9 +7,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Log; // <-- AÑADIR
-use Throwable; // <-- AÑADIR
-use App\Channels\BrevoDirectChannel; // <-- AÑADE ESTE 'use'
+use Illuminate\Support\Facades\Log;
+use Throwable; 
+use App\Channels\BrevoDirectChannel; 
 
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -24,7 +24,7 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return [BrevoDirectChannel::class]; // <-- USA TU NUEVO CANAL
+        return [BrevoDirectChannel::class]; 
     }
 
     public function toMail(object $notifiable): MailMessage

@@ -30,18 +30,16 @@ class TransaccionController extends Controller
 
     public function store(Request $request)
     {
-        // --- INICIO DE LA CORRECCIÓN ---
         // 1. Limpiamos el campo 'monto' quitándole los puntos.
         if ($request->has('monto')) {
             $cleanedMonto = preg_replace('/[^0-9]/', '', $request->input('monto'));
             $request->merge(['monto' => $cleanedMonto]);
         }
-        // --- FIN DE LA CORRECCIÓN ---
 
         $request->validate([
             'fecha' => 'required|date',
             'tipo' => 'required|in:Ingreso,Egreso',
-            'monto' => 'required|numeric|min:0', // La validación ahora se hace sobre el número limpio
+            'monto' => 'required|numeric|min:0', 
             'descripcion' => 'required|string|max:255',
             'comprobante' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'socio_id' => 'nullable|exists:socios,id',
@@ -55,7 +53,7 @@ class TransaccionController extends Controller
         Transaccion::create([
             'fecha' => $request->fecha,
             'tipo' => $request->tipo,
-            'monto' => $request->monto, // Se guarda el número limpio
+            'monto' => $request->monto, 
             'descripcion' => $request->descripcion,
             'comprobante_path' => $filePath,
             'user_id' => auth()->id(),
@@ -75,13 +73,11 @@ class TransaccionController extends Controller
 
     public function update(Request $request, Transaccion $transaccion)
     {
-        // --- INICIO DE LA CORRECCIÓN ---
         // 1. Repetimos la misma limpieza para la actualización.
         if ($request->has('monto')) {
             $cleanedMonto = preg_replace('/[^0-9]/', '', $request->input('monto'));
             $request->merge(['monto' => $cleanedMonto]);
         }
-        // --- FIN DE LA CORRECCIÓN ---
 
         $request->validate([
             'fecha' => 'required|date',
@@ -91,7 +87,6 @@ class TransaccionController extends Controller
             'socio_id' => 'nullable|exists:socios,id',
         ]);
 
-        // Usamos $request->all() para obtener todos los datos, incluido el monto ya limpio
         $data = $request->all();
 
         if ($request->hasFile('comprobante')) {

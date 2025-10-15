@@ -26,7 +26,6 @@ class Transaccion extends Model
         'socio_id',
     ];
 
-    // --- INICIO DE LA MODIFICACIÓN ---
     /**
      * The attributes that should be cast.
      *
@@ -35,7 +34,6 @@ class Transaccion extends Model
     protected $casts = [
         'fecha' => 'datetime', // Le dice a Laravel que trate la columna 'fecha' como un objeto de fecha (Carbon).
     ];
-    // --- FIN DE LA MODIFICACIÓN ---
 
     // Nueva relación: Una transacción puede pertenecer a un socio.
     public function socio()

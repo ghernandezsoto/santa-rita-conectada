@@ -6,10 +6,10 @@ use App\Models\Socio;
 use App\Models\Transaccion;
 use App\Models\Comunicado;
 use App\Models\Evento;
-// --- INICIO DE LA MODIFICACIÓN ---
+
 use App\Models\Documento; // Se importa el modelo de Documento.
 use App\Models\Acta;      // Se importa el modelo de Acta.
-// --- FIN DE LA MODIFICACIÓN ---
+
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +29,6 @@ class DashboardController extends Controller
                                  ->with('info', 'Por tu seguridad, por favor actualiza tu contraseña para continuar.');
             }
 
-            // --- INICIO DE LA MODIFICACIÓN ---
             // 1.2. Si es un socio validado, se buscan todos sus datos para el panel.
 
             // Se obtienen los archivos generales para todos los socios.
@@ -51,7 +50,6 @@ class DashboardController extends Controller
             }
 
             return view('dashboard', $datosSocio);
-            // --- FIN DE LA MODIFICACIÓN ---
 
         } else {
             // 2. SI NO ES SOCIO (ES DIRECTIVA), MUESTRA EL PANEL DE ADMINISTRACIÓN

@@ -95,7 +95,6 @@
                                             </td>
                                             <td class="py-3 px-4 whitespace-nowrap">{{ $transaccion->user->name }}</td>
                                             <td class="py-3 px-4">
-                                                {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
                                                 <div class="flex items-center justify-center gap-4">
                                                     <a href="{{ route('transacciones.edit', $transaccion->id) }}" title="Editar" class="text-gray-400 hover:text-accent-600 transition-colors duration-200">
                                                         <x-icons.pencil class="w-5 h-5" />
@@ -108,7 +107,6 @@
                                                         </button>
                                                     </form>
                                                 </div>
-                                                {{-- --- FIN DE LA MODIFICACIÓN --- --}}
                                             </td>
                                         </tr>
                                     @empty
@@ -134,7 +132,6 @@
                                         <p class="font-medium tabular-nums {{ $transaccion->tipo == 'Ingreso' ? 'text-success-600' : 'text-danger-600' }}">
                                             {{ $transaccion->tipo == 'Ingreso' ? '+' : '-' }} ${{ number_format($transaccion->monto, 0, ',', '.') }}
                                         </p>
-                                        {{-- --- INICIO DE LA MODIFICACIÓN --- --}}
                                         <div class="mt-4 flex items-center justify-end gap-5">
                                             <a href="{{ route('transacciones.edit', $transaccion->id) }}" title="Editar" class="text-gray-400 hover:text-accent-600 transition-colors duration-200">
                                                 <x-icons.pencil class="w-6 h-6" />
@@ -147,7 +144,6 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        {{-- --- FIN DE LA MODIFICACIÓN --- --}}
                                     </div>
                                 </div>
                             </article>

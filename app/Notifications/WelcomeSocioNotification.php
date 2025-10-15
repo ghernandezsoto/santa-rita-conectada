@@ -11,7 +11,6 @@ class WelcomeSocioNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    // --- INICIO DE LA MODIFICACIÓN ---
     /**
      * La contraseña temporal que se enviará al nuevo usuario.
      *
@@ -27,7 +26,6 @@ class WelcomeSocioNotification extends Notification implements ShouldQueue
     {
         $this->password = $temporaryPassword;
     }
-    // --- FIN DE LA MODIFICACIÓN ---
 
     /**
      * Get the notification's delivery channels.
@@ -44,7 +42,6 @@ class WelcomeSocioNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        // --- INICIO DE LA MODIFICACIÓN ---
         // Se personaliza completamente el mensaje de correo electrónico.
         return (new MailMessage)
                     ->subject('¡Bienvenido/a a Santa Rita Conectada!')
@@ -57,7 +54,7 @@ class WelcomeSocioNotification extends Notification implements ShouldQueue
                     ->action('Iniciar Sesión', route('login'))
                     ->line('**Importante:** Por tu seguridad, te pedimos que cambies tu contraseña inmediatamente después de iniciar sesión por primera vez.')
                     ->line('¡Gracias por ser parte de nuestra comunidad!');
-        // --- FIN DE LA MODIFICACIÓN ---
+
     }
 
     /**
