@@ -17,6 +17,15 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    <h3 class="text-lg font-semibold mb-4">Resumen de Aportes (Últimos 12 Meses)</h3>
+                    <div>
+                        <canvas id="personalContributionsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
                     <h3 class="text-lg font-semibold mb-4">Historial Completo de Movimientos</h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
@@ -55,4 +64,49 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script type="module">
+        import { Chart } from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/auto/+esm';
+
+        (async function() {
+            try {
+                // Llamamos al nuevo endpoint para los datos personales del socio
+                const response = await axios.get('/api/charts/personal-finances');
+                const data = response.data;
+
+                // Si no hay datos (ej. socio nuevo sin aportes), no dibujamos el gráfico
+                if (data.labels.length === 0) return;
+
+                const ctx = document.getElementById('personalContributionsChart');
+                if (!ctx) return;
+
+                new Chart(ctx, {
+                    type: 'line', // Un gráfico de línea es ideal para mostrar tendencias en el tiempo
+                    data: data,
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // No es necesaria la leyenda para una sola serie de datos
+                            },
+                            title: {
+                                display: true,
+                                text: 'Tus aportes mensuales'
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error al cargar los datos del gráfico personal:', error);
+            }
+        })();
+    </script>
+    @endpush
+
 </x-app-layout>

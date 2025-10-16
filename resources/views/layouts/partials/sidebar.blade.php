@@ -28,7 +28,8 @@
 
         {{-- Enlaces para Socios --}}
         @role('Socio')
-            <div class="pt-2"></div>
+            <div class="my-4 border-t border-primary-700"></div>
+
             <a href="{{ route('portal.aportes.index') }}"
                class="block py-2.5 px-4 rounded transition duration-200 hover:bg-primary-700 {{ request()->routeIs('portal.aportes.index') ? 'bg-primary-900' : '' }}">
                 Mis Aportes

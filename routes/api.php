@@ -5,15 +5,14 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-// --- IMPORTAMOS LOS CONTROLADORES DE LA API ---
 use App\Http\Controllers\Api\ComunicadoController;
 use App\Http\Controllers\Api\EventoController;
-use App\Http\Controllers\Api\FcmController; 
+use App\Http\Controllers\Api\FcmController;
 
 use App\Models\Transaccion;
+use App\Models\Socio;
 use Carbon\Carbon;
 
-// --- RUTA DE LOGIN PARA LA API ---
 Route::post('/login', function (Request $request) {
     $request->validate([
         'email' => 'required|email',
@@ -34,13 +33,11 @@ Route::post('/login', function (Request $request) {
     return response()->json(['token' => $token]);
 });
 
-// --- RUTAS PROTEGIDAS POR SANCTUM ---
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    
-    // --- RUTA PARA REGISTRAR EL TOKEN DE FCM ---
+
     Route::post('/fcm-token', [FcmController::class, 'register']);
 
     Route::get('/comunicados', [ComunicadoController::class, 'index']);
@@ -48,58 +45,83 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/eventos', [EventoController::class, 'index']);
     Route::get('/eventos/{evento}', [EventoController::class, 'show']);
-    
+
     Route::post('/logout', function (Request $request) {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sesión cerrada exitosamente']);
     });
 
+    // --- RUTA PARA EL GRÁFICO DE LA DIRECTIVA ---
     Route::get('/charts/finances', function () {
         $labels = [];
         $incomeData = [];
         $expenseData = [];
 
         for ($i = 5; $i >= 0; $i--) {
-            // Se establece el locale a español para los nombres de los meses
             $date = Carbon::now()->subMonths($i)->locale('es');
-            
-            // Se obtiene el nombre del mes y el año
-            $monthName = $date->translatedFormat('F'); // Ej: "octubre"
+            $monthName = $date->translatedFormat('F');
             $year = $date->format('Y');
-
-            // Se añade la etiqueta al array, con la primera letra en mayúscula
             $labels[] = ucfirst($monthName);
 
-            // Se calcula la suma de ingresos para ese mes y año
-            $income = Transaccion::where('tipo', 'Ingreso')
-                ->whereYear('fecha', $year)
-                ->whereMonth('fecha', $date->month)
-                ->sum('monto');
+            $income = Transaccion::where('tipo', 'Ingreso')->whereYear('fecha', $year)->whereMonth('fecha', $date->month)->sum('monto');
             $incomeData[] = $income;
 
-            // Se calcula la suma de egresos para ese mes y año
-            $expense = Transaccion::where('tipo', 'Egreso')
-                ->whereYear('fecha', $year)
-                ->whereMonth('fecha', $date->month)
-                ->sum('monto');
+            $expense = Transaccion::where('tipo', 'Egreso')->whereYear('fecha', $year)->whereMonth('fecha', $date->month)->sum('monto');
             $expenseData[] = $expense;
         }
 
-        // Se devuelve el JSON con el formato que Chart.js espera
+        return response()->json([
+            'labels' => $labels,
+            'datasets' => [
+                ['label' => 'Ingresos', 'data' => $incomeData, 'backgroundColor' => '#4ade80'],
+                ['label' => 'Egresos', 'data' => $expenseData, 'backgroundColor' => '#f87171']
+            ]
+        ]);
+    })->middleware('role:Presidente|Tesorero');
+
+    // --- RUTA PARA EL GRÁFICO PERSONAL DEL SOCIO ---
+    Route::get('/charts/personal-finances', function (Request $request) {
+        $user = $request->user();
+        $socio = Socio::where('email', $user->email)->first();
+
+        if (!$socio) {
+            return response()->json(['labels' => [], 'datasets' => []], 404);
+        }
+
+        $labels = [];
+        $contributionData = [];
+
+        // Preparamos datos para los últimos 12 meses
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i)->locale('es');
+            $monthName = $date->translatedFormat('F');
+            $year = $date->format('Y');
+
+            $labels[] = ucfirst($monthName);
+
+            // Buscamos solo los aportes (Ingresos) de este socio en específico
+            $contribution = $socio->transacciones()
+                ->where('tipo', 'Ingreso')
+                ->whereYear('fecha', $year)
+                ->whereMonth('fecha', $date->month)
+                ->sum('monto');
+                
+            $contributionData[] = $contribution;
+        }
+
         return response()->json([
             'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => 'Ingresos',
-                    'data' => $incomeData,
-                    'backgroundColor' => '#4ade80', // Verde
-                ],
-                [
-                    'label' => 'Egresos',
-                    'data' => $expenseData,
-                    'backgroundColor' => '#f87171', // Rojo
+                    'label' => 'Mis Aportes',
+                    'data' => $contributionData,
+                    'borderColor' => '#3b82f6', // Azul
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
+                    'fill' => true,
+                    'tension' => 0.1
                 ]
             ]
         ]);
-    })->middleware('role:Presidente|Tesorero');
+    })->middleware('role:Socio');
+
 });
