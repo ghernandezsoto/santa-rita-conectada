@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\ComunicadoController;
 use App\Http\Controllers\Api\EventoController;
 use App\Http\Controllers\Api\FcmController;
 
+use App\Http\Controllers\Api\DocumentoController;
+use App\Http\Controllers\Api\ActaController;
+
 use App\Models\Transaccion;
 use App\Models\Socio;
 use Carbon\Carbon;
@@ -34,8 +37,13 @@ Route::post('/login', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        $user = $request->user();
+        // Cargamos la relación 'roles' para que se incluya en la respuesta JSON.
+        // Esto es crucial para que la app móvil pueda identificar el rol del usuario.
+        $user->load('roles');
+        return $user;
     });
 
     Route::post('/fcm-token', [FcmController::class, 'register']);
@@ -45,6 +53,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/eventos', [EventoController::class, 'index']);
     Route::get('/eventos/{evento}', [EventoController::class, 'show']);
+
+    // Se añaden las nuevas rutas para obtener documentos y actas desde la app.
+    Route::get('/documentos', [DocumentoController::class, 'index']);
+    Route::get('/actas', [ActaController::class, 'index']);
 
     Route::post('/logout', function (Request $request) {
         $request->user()->currentAccessToken()->delete();
@@ -91,15 +103,12 @@ Route::middleware('auth:sanctum')->group(function () {
         $labels = [];
         $contributionData = [];
 
-        // Preparamos datos para los últimos 12 meses
         for ($i = 11; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i)->locale('es');
             $monthName = $date->translatedFormat('F');
             $year = $date->format('Y');
-
             $labels[] = ucfirst($monthName);
 
-            // Buscamos solo los aportes (Ingresos) de este socio en específico
             $contribution = $socio->transacciones()
                 ->where('tipo', 'Ingreso')
                 ->whereYear('fecha', $year)
@@ -115,7 +124,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 [
                     'label' => 'Mis Aportes',
                     'data' => $contributionData,
-                    'borderColor' => '#3b82f6', // Azul
+                    'borderColor' => '#3b82f6',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
                     'fill' => true,
                     'tension' => 0.1

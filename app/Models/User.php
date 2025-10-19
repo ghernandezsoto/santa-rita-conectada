@@ -23,7 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'fcm_token',
-        'password_changed_at', // Se añade para permitir su actualización.
+        'password_changed_at',
     ];
 
     /**
@@ -35,6 +35,15 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    // --- INICIO DE LA MODIFICACIÓN ---
+    /**
+     * The relationships that should always be loaded.
+     *
+     * @var array
+     */
+    protected $with = ['roles']; // <-- ESTA LÍNEA ES LA SOLUCIÓN
+    // --- FIN DE LA MODIFICACIÓN ---
 
     /**
      * Get the attributes that should be cast.
@@ -51,7 +60,6 @@ class User extends Authenticatable
 
     /**
      * Define la ruta para las notificaciones de Firebase Cloud Messaging.
-     * Este método le dice a Laravel explícitamente dónde encontrar el token.
      *
      * @return string|null
      */
