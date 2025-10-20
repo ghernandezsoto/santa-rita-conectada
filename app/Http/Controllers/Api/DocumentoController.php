@@ -13,9 +13,11 @@ class DocumentoController extends Controller
      */
     public function index()
     {
-        // Busca todos los documentos, los ordena por fecha de creación (los más nuevos primero)
-        // y los devuelve en un formato JSON paginado.
-        $documentos = Documento::latest()->paginate(15);
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // Se cambia paginate() por get() para devolver un array simple [ ... ]
+        // en lugar de un objeto de paginación { ... }, solucionando el error en la app.
+        $documentos = Documento::latest()->get();
+        // --- FIN DE LA MODIFICACIÓN ---
 
         return response()->json($documentos);
     }

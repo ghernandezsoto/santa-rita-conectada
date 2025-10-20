@@ -13,9 +13,11 @@ class ActaController extends Controller
      */
     public function index()
     {
-        // Busca todas las actas, las ordena por fecha de creación (las más nuevas primero)
-        // y las devuelve en un formato JSON paginado.
-        $actas = Acta::latest()->paginate(15);
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // Se cambia paginate() por get() para devolver un array simple [ ... ]
+        // que la aplicación móvil pueda interpretar correctamente.
+        $actas = Acta::latest()->get();
+        // --- FIN DE LA MODIFICACIÓN ---
 
         return response()->json($actas);
     }
