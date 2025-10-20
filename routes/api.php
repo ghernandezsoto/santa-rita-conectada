@@ -5,18 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use App\Http\Controllers\Api\ComunicadoController;
-use App\Http\Controllers\Api\EventoController;
-use App\Http\Controllers\Api\FcmController;
-
-use App\Http\Controllers\Api\DocumentoController;
 use App\Http\Controllers\Api\ActaController;
 use App\Http\Controllers\Api\AporteController;
-use App\Models\Transaccion;
+use App\Http\Controllers\Api\ComunicadoController;
+use App\Http\Controllers\Api\DocumentoController;
+use App\Http\Controllers\Api\EventoController;
+use App\Http\Controllers\Api\FcmController;
 use App\Models\Socio;
+use App\Models\Transaccion;
 use Carbon\Carbon;
-
-
 
 Route::post('/login', function (Request $request) {
     $request->validate([
@@ -42,8 +39,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', function (Request $request) {
         $user = $request->user();
-        // Cargamos la relación 'roles' para que se incluya en la respuesta JSON.
-        // Esto es crucial para que la app móvil pueda identificar el rol del usuario.
         $user->load('roles');
         return $user;
     });
@@ -56,17 +51,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/eventos', [EventoController::class, 'index']);
     Route::get('/eventos/{evento}', [EventoController::class, 'show']);
 
-    // Se añaden las nuevas rutas para obtener documentos y actas desde la app.
     Route::get('/documentos', [DocumentoController::class, 'index']);
     Route::get('/actas', [ActaController::class, 'index']);
 
     Route::post('/logout', function (Request $request) {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sesión cerrada exitosamente']);
-
-    // --- RUTAS PARA LA SECCIÓN "MIS APORTES" DEL SOCIO ---
-    Route::get('/aportes', [AporteController::class, 'index'])->middleware('role:Socio');
     });
+    
+    // --- INICIO DE LA MODIFICACIÓN ---
+    // Se mueve la ruta de aportes a su lugar correcto, fuera del closure de logout.
+    Route::get('/aportes', [AporteController::class, 'index'])->middleware('role:Socio');
+    // --- FIN DE LA MODIFICACIÓN ---
 
     // --- RUTA PARA EL GRÁFICO DE LA DIRECTIVA ---
     Route::get('/charts/finances', function () {
@@ -79,10 +75,8 @@ Route::middleware('auth:sanctum')->group(function () {
             $monthName = $date->translatedFormat('F');
             $year = $date->format('Y');
             $labels[] = ucfirst($monthName);
-
             $income = Transaccion::where('tipo', 'Ingreso')->whereYear('fecha', $year)->whereMonth('fecha', $date->month)->sum('monto');
             $incomeData[] = $income;
-
             $expense = Transaccion::where('tipo', 'Egreso')->whereYear('fecha', $year)->whereMonth('fecha', $date->month)->sum('monto');
             $expenseData[] = $expense;
         }
@@ -113,13 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
             $monthName = $date->translatedFormat('F');
             $year = $date->format('Y');
             $labels[] = ucfirst($monthName);
-
-            $contribution = $socio->transacciones()
-                ->where('tipo', 'Ingreso')
-                ->whereYear('fecha', $year)
-                ->whereMonth('fecha', $date->month)
-                ->sum('monto');
-                
+            $contribution = $socio->transacciones()->where('tipo', 'Ingreso')->whereYear('fecha', $year)->whereMonth('fecha', $date->month)->sum('monto');
             $contributionData[] = $contribution;
         }
 
