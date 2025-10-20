@@ -11,10 +11,12 @@ use App\Http\Controllers\Api\FcmController;
 
 use App\Http\Controllers\Api\DocumentoController;
 use App\Http\Controllers\Api\ActaController;
-
+use App\Http\Controllers\Api\AporteController;
 use App\Models\Transaccion;
 use App\Models\Socio;
 use Carbon\Carbon;
+
+
 
 Route::post('/login', function (Request $request) {
     $request->validate([
@@ -61,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', function (Request $request) {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sesión cerrada exitosamente']);
+
+    // --- RUTAS PARA LA SECCIÓN "MIS APORTES" DEL SOCIO ---
+    Route::get('/aportes', [AporteController::class, 'index'])->middleware('role:Socio');
     });
 
     // --- RUTA PARA EL GRÁFICO DE LA DIRECTIVA ---
