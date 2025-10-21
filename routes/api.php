@@ -68,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     // --- RUTA PARA LAS TARJETAS DE RESUMEN DE LA DIRECTIVA ---
+    
     Route::get('/directivo/summary', function () {
         $totalSocios = Socio::count();
         $ingresos = Transaccion::where('tipo', 'Ingreso')->sum('monto');
@@ -84,6 +85,12 @@ Route::middleware('auth:sanctum')->group(function () {
         ]);
     })->middleware('role:Presidente|Secretario|Tesorero');
 
+    // --- RUTA PARA LA LISTA DE SOCIOS (APP MÓVIL) ---
+    Route::get('/directivo/socios', function () {
+        // Obtenemos todos los socios, ordenados alfabéticamente por nombre
+        $socios = Socio::orderBy('nombre')->get();
+        return response()->json($socios);
+    })->middleware('role:Presidente|Secretario|Tesorero');
 
     // --- RUTA PARA EL GRÁFICO DE LA DIRECTIVA ---
     Route::get('/charts/finances', function () {
