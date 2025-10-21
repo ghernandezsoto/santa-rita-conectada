@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\FcmController;
 use App\Models\Socio;
 use App\Models\Transaccion;
 use Carbon\Carbon;
+use App\Models\Comunicado;
+use App\Models\Evento;
 
 Route::post('/login', function (Request $request) {
     $request->validate([
@@ -63,6 +65,25 @@ Route::middleware('auth:sanctum')->group(function () {
     // Se mueve la ruta de aportes a su lugar correcto, fuera del closure de logout.
     Route::get('/aportes', [AporteController::class, 'index'])->middleware('role:Socio');
     // --- FIN DE LA MODIFICACIÓN ---
+
+
+    // --- RUTA PARA LAS TARJETAS DE RESUMEN DE LA DIRECTIVA ---
+    Route::get('/directivo/summary', function () {
+        $totalSocios = Socio::count();
+        $ingresos = Transaccion::where('tipo', 'Ingreso')->sum('monto');
+        $egresos = Transaccion::where('tipo', 'Egreso')->sum('monto');
+        $balance = $ingresos - $egresos;
+        $comunicadosRecientes = Comunicado::where('created_at', '>=', now()->subDays(30))->count();
+        $proximosEventos = Evento::where('fecha_evento', '>=', now())->count();
+
+        return response()->json([
+            'total_socios' => $totalSocios,
+            'balance' => $balance,
+            'comunicados_recientes' => $comunicadosRecientes,
+            'proximos_eventos' => $proximosEventos,
+        ]);
+    })->middleware('role:Presidente|Secretario|Tesorero');
+
 
     // --- RUTA PARA EL GRÁFICO DE LA DIRECTIVA ---
     Route::get('/charts/finances', function () {
