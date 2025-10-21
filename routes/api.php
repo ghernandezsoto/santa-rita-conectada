@@ -92,6 +92,13 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json($socios);
     })->middleware('role:Presidente|Secretario|Tesorero');
 
+    // --- RUTA PARA EL HISTORIAL DE TESORERÍA (APP MÓVIL) ---
+    Route::get('/directivo/transacciones', function () {
+        // Obtenemos todas las transacciones, ordenadas por fecha más reciente
+        $transacciones = Transaccion::latest('fecha')->get();
+        return response()->json($transacciones);
+    })->middleware('role:Presidente|Secretario|Tesorero');
+
     // --- RUTA PARA EL GRÁFICO DE LA DIRECTIVA ---
     Route::get('/charts/finances', function () {
         $labels = [];
