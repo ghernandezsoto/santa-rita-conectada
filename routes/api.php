@@ -17,6 +17,8 @@ use Carbon\Carbon;
 use App\Models\Comunicado;
 use App\Models\Evento;
 
+use Illuminate\Support\Facades\Notification;
+
 Route::post('/login', function (Request $request) {
     $request->validate([
         'email' => 'required|email',
@@ -113,10 +115,14 @@ Route::middleware('auth:sanctum')->group(function () {
             'user_id' => $request->user()->id,
         ]);
 
-        // NOTA: Aquí es donde se podría disparar la notificación FCM
-        // a todos los socios, pero eso lo podemos ver después.
-        // $socios = User::role('Socio')->get();
-        // Notification::send($socios, new App\Notifications\NuevoComunicado($comunicado));
+        // --- INICIO DE LA MODIFICACIÓN: Enviar Notificación FCM ---
+        // Buscamos solo usuarios con rol 'Socio' que tengan un fcm_token registrado
+        $sociosNotificables = User::role('Socio')->whereNotNull('fcm_token')->get();
+
+        if ($sociosNotificables->isNotEmpty()) {
+            Notification::send($sociosNotificables, new \App\Notifications\NuevoComunicadoNotification($comunicado));
+        }
+        // --- FIN DE LA MODIFICACIÓN ---
 
         return response()->json($comunicado, 201); // 201 = Creado Exitosamente
     })->middleware('role:Presidente|Secretario');

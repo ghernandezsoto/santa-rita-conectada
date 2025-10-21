@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Log;
 use Throwable; 
 use App\Channels\BrevoDirectChannel; 
 
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\Notification as FcmNotificationResource;
+
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -24,7 +28,8 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return [BrevoDirectChannel::class]; 
+        // Modificado para incluir ambos canales
+        return [BrevoDirectChannel::class, FcmChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -48,6 +53,22 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
         } catch (Throwable $e) {
             throw $e;
         }
+    }
+
+    /**
+     * Define el contenido de la notificación para Firebase Cloud Messaging.
+     *
+     * @param  object  $notifiable
+     * @return \NotificationChannels\Fcm\FcmMessage
+     */
+    public function toFcm(object $notifiable): FcmMessage
+    {
+        return FcmMessage::create()
+            ->setNotification(FcmNotificationResource::create()
+                ->setTitle('Nuevo Comunicado: ' . $this->comunicado->titulo)
+                ->setBody(substr($this->comunicado->contenido, 0, 100) . '...') // Acorta el cuerpo para la notificación
+            )
+            ->setData(['comunicado_id' => (string)$this->comunicado->id]); // Opcional: envía el ID para abrir la app en el detalle
     }
 
     public function failed(\Throwable $exception): void
