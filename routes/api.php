@@ -99,6 +99,28 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json($transacciones);
     })->middleware('role:Presidente|Secretario|Tesorero');
 
+
+    // --- RUTA PARA CREAR UN COMUNICADO (APP MÓVIL) ---
+    Route::post('/directivo/comunicados', function (Request $request) {
+        $validated = $request->validate([
+            'titulo' => 'required|string|max:255',
+            'contenido' => 'required|string',
+        ]);
+
+        $comunicado = Comunicado::create([
+            'titulo' => $validated['titulo'],
+            'contenido' => $validated['contenido'],
+            'user_id' => $request->user()->id,
+        ]);
+
+        // NOTA: Aquí es donde se podría disparar la notificación FCM
+        // a todos los socios, pero eso lo podemos ver después.
+        // $socios = User::role('Socio')->get();
+        // Notification::send($socios, new App\Notifications\NuevoComunicado($comunicado));
+
+        return response()->json($comunicado, 201); // 201 = Creado Exitosamente
+    })->middleware('role:Presidente|Secretario');
+
     // --- RUTA PARA EL GRÁFICO DE LA DIRECTIVA ---
     Route::get('/charts/finances', function () {
         $labels = [];
