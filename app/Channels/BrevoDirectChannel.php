@@ -14,15 +14,12 @@ class BrevoDirectChannel
 
         // 2. Extract recipient details
         $recipientEmail = $notifiable->routeNotificationFor('mail', $notification);
-        // --- CORRECTION: Use 'name' attribute from the User model ---
-        $recipientName = $notifiable->name ?? ''; // <-- Corrected line
+        $recipientName = $notifiable->name ?? '';
 
-        // --- Fallback if name is still empty (robustness) ---
         if (empty($recipientName)) {
             Log::warning('[BrevoDirectChannel] Recipient name is empty for ' . $recipientEmail . '. Using email as name.');
             $recipientName = $recipientEmail;
         }
-        // --- End Fallback ---
 
         // 3. Get API Key
         $apiKey = config('mail.mailers.brevo.key');
@@ -38,13 +35,15 @@ class BrevoDirectChannel
                 'email' => config('mail.from.address'),
             ],
             'to' => [
-                // Use the extracted (and potentially fallback) name
                 ['email' => $recipientEmail, 'name' => $recipientName],
             ],
             'subject' => $message->subject,
-            // Construct HTML content more reliably
             'htmlContent' => view($message->markdown ?? 'notifications::email', $message->data())->render(),
         ];
+
+        // --- ADDED LOGGING: Log the exact JSON payload ---
+        Log::debug('[BrevoDirectChannel] JSON Payload being sent: ' . json_encode($postData));
+        // --- END ADDED LOGGING ---
 
         // 5. Execute cURL call
         $ch = curl_init();
