@@ -9,35 +9,44 @@ class BrevoDirectChannel
 {
     public function send(object $notifiable, Notification $notification): void
     {
-        // 1. Obtenemos el mensaje de correo construido en la notificación
+        // 1. Get the mail message object
         $message = $notification->toMail($notifiable);
-        
-        // 2. Extraemos el email del destinatario
-        // Laravel puede tener múltiples 'to', pero tomamos el primero.
-        $recipientEmail = $notifiable->routeNotificationFor('mail', $notification);
-        $recipientName = $notifiable->nombre ?? '';
 
-        // 3. Obtenemos la API Key desde el archivo de configuración, como debe ser.
+        // 2. Extract recipient details
+        $recipientEmail = $notifiable->routeNotificationFor('mail', $notification);
+        // --- CORRECTION: Use 'name' attribute from the User model ---
+        $recipientName = $notifiable->name ?? ''; // <-- Corrected line
+
+        // --- Fallback if name is still empty (robustness) ---
+        if (empty($recipientName)) {
+            Log::warning('[BrevoDirectChannel] Recipient name is empty for ' . $recipientEmail . '. Using email as name.');
+            $recipientName = $recipientEmail;
+        }
+        // --- End Fallback ---
+
+        // 3. Get API Key
         $apiKey = config('mail.mailers.brevo.key');
         if (!$apiKey) {
-            Log::error('[BrevoDirectChannel] No se encontró la BREVO_KEY en la configuración.');
+            Log::error('[BrevoDirectChannel] BREVO_KEY not found in configuration.');
             return;
         }
 
-        // 4. Preparamos los datos para la API v3 de Brevo
+        // 4. Prepare Brevo API v3 payload
         $postData = [
             'sender' => [
                 'name' => config('mail.from.name'),
                 'email' => config('mail.from.address'),
             ],
             'to' => [
+                // Use the extracted (and potentially fallback) name
                 ['email' => $recipientEmail, 'name' => $recipientName],
             ],
             'subject' => $message->subject,
-            'htmlContent' => implode("\n", $message->introLines) . "\n" . implode("\n", $message->outroLines),
+            // Construct HTML content more reliably
+            'htmlContent' => view($message->markdown ?? 'notifications::email', $message->data())->render(),
         ];
 
-        // 5. Ejecutamos la llamada cURL que sabemos que funciona
+        // 5. Execute cURL call
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://api.brevo.com/v3/smtp/email');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -54,11 +63,11 @@ class BrevoDirectChannel
         $curlError = curl_error($ch);
         curl_close($ch);
 
-        // 6. Registramos el resultado en el log para saber qué pasó
+        // 6. Log the result
         if ($httpCode >= 200 && $httpCode < 300) {
-            Log::info('[BrevoDirectChannel] Email enviado exitosamente a ' . $recipientEmail . '. Respuesta: ' . $response);
+            Log::info('[BrevoDirectChannel] Email sent successfully to ' . $recipientEmail . '. Response: ' . $response);
         } else {
-            Log::error('[BrevoDirectChannel] Fallo al enviar email a ' . $recipientEmail . '. Código: ' . $httpCode . '. Error cURL: ' . $curlError . '. Respuesta: ' . $response);
+            Log::error('[BrevoDirectChannel] Failed to send email to ' . $recipientEmail . '. Code: ' . $httpCode . '. cURL Error: ' . $curlError . '. Response: ' . $response);
         }
     }
 }
