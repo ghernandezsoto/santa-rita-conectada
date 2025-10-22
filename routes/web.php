@@ -16,6 +16,7 @@ use App\Models\Documento;
 use App\Models\Acta;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\Portal\AporteController as PortalAporteController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -72,6 +73,7 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
     Route::get('/eventos', [PortalEventoController::class, 'index'])->name('eventos.index');
     Route::get('/eventos/{evento}', [PortalEventoController::class, 'show'])->name('eventos.show');
 
+    Route::get('/aportes', [PortalAporteController::class, 'index'])->name('aportes.index');
 
 });
 
