@@ -20,7 +20,6 @@ class ComunicadoController extends Controller
     // Devuelve los detalles de un solo comunicado
     public function show(Comunicado $comunicado)
     {
-        // --- CORRECCIÓN AQUÍ ---
         // Cargamos la relación del usuario antes de enviar la respuesta.
         $comunicado->load('user:id,name');
         

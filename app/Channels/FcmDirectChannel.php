@@ -6,7 +6,6 @@ use Illuminate\Notifications\Notification;
 use Kreait\Laravel\Firebase\Facades\Firebase;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Illuminate\Support\Facades\Log;
-// --- IMPORTANTE: Añadimos la excepción específica de "No Encontrado" ---
 use Kreait\Firebase\Exception\Messaging\NotFound;
 use Throwable;
 
@@ -40,7 +39,6 @@ class FcmDirectChannel
             $notifiable->update(['fcm_token' => null]);
 
         } catch (Throwable $e) {
-            // El bloque para otros errores críticos se mantiene.
             Log::critical('!!!!!!!!!! [FCM DIRECTO ERROR] !!!!!!!!!!!');
             Log::critical('Error al enviar notificación push directa: ' . $e->getMessage());
             Log::critical('Archivo: ' . $e->getFile() . ' Línea: ' . $e->getLine());

@@ -9,9 +9,6 @@ use Illuminate\View\View;
 
 class DocumentoController extends Controller
 {
-    /**
-     * Display the specified resource.
-     */
     public function show(Documento $documento): View
     {
         return view('portal.documentos.show', compact('documento'));

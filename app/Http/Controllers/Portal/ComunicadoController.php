@@ -28,8 +28,6 @@ class ComunicadoController extends Controller
      */
     public function show(Comunicado $comunicado)
     {
-        // Por seguridad, nos aseguramos de que un socio no pueda acceder a un borrador
-        // adivinando la URL. Si no tiene fecha de envío, devolvemos un error 404.
         if (!$comunicado->fecha_envio) {
             abort(404);
         }

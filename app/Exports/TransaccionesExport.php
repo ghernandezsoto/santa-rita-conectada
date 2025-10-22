@@ -14,7 +14,6 @@ class TransaccionesExport implements FromCollection, WithHeadings, WithMapping
     */
     public function collection()
     {
-        // Ahora cargamos también la relación 'socio' para que esté disponible
         return Transaccion::with('user', 'socio')->orderBy('fecha', 'desc')->get();
     }
 
@@ -30,7 +29,7 @@ class TransaccionesExport implements FromCollection, WithHeadings, WithMapping
             'Tipo',
             'Descripción',
             'Monto',
-            'Socio Aportante', // <-- NUEVA COLUMNA
+            'Socio Aportante',
             'Registrado por',
         ];
     }
@@ -48,7 +47,7 @@ class TransaccionesExport implements FromCollection, WithHeadings, WithMapping
             $transaccion->tipo,
             $transaccion->descripcion,
             $transaccion->monto,
-            $transaccion->socio ? $transaccion->socio->nombre : 'N/A', // <-- NUEVO DATO
+            $transaccion->socio ? $transaccion->socio->nombre : 'N/A',
             $transaccion->user->name,
         ];
     }

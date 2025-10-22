@@ -19,16 +19,16 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // 1. VERIFICAR SI EL USUARIO ES UN SOCIO
+        // VERIFICAR SI EL USUARIO ES UN SOCIO
         if ($user->hasRole('Socio')) {
-            // 1.1. Redirección para nuevos socios.
+            // Redirección para nuevos socios.
             if (is_null($user->password_changed_at)) {
                 return redirect()->route('profile.edit')
                                  ->with('info', 'Por tu seguridad, por favor actualiza tu contraseña para continuar.');
             }
 
-            // 1.2. Para socios validados, el Panel Principal ahora solo muestra información general.
-            // Toda la lógica financiera fue movida a AporteController.
+            // Para socios validados, el Panel Principal ahora solo muestra información general.
+
             $datosSocio = [
                 'ultimosDocumentos' => Documento::latest()->take(5)->get(),
                 'ultimasActas' => Acta::latest()->take(5)->get(),
@@ -37,7 +37,7 @@ class DashboardController extends Controller
             return view('dashboard', $datosSocio);
 
         } else {
-            // 2. SI NO ES SOCIO (ES DIRECTIVA), MUESTRA EL PANEL DE ADMINISTRACIÓN COMPLETO.
+            // SI NO ES SOCIO (ES DIRECTIVA), MUESTRA EL PANEL DE ADMINISTRACIÓN COMPLETO.
             $totalSocios = Socio::count();
             $ingresos = Transaccion::where('tipo', 'Ingreso')->sum('monto');
             $egresos = Transaccion::where('tipo', 'Egreso')->sum('monto');

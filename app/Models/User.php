@@ -36,14 +36,12 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // --- INICIO DE LA MODIFICACIÓN ---
     /**
      * The relationships that should always be loaded.
      *
      * @var array
      */
-    protected $with = ['roles']; // <-- ESTA LÍNEA ES LA SOLUCIÓN
-    // --- FIN DE LA MODIFICACIÓN ---
+    protected $with = ['roles']; 
 
     /**
      * Get the attributes that should be cast.

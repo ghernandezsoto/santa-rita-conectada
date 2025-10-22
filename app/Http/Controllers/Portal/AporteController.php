@@ -10,24 +10,21 @@ use Illuminate\View\View;
 
 class AporteController extends Controller
 {
-    /**
-     * Display the partner's financial information.
-     */
     public function index(): View
     {
-        // 1. Obtener el usuario autenticado.
+        // Obtener el usuario autenticado.
         $user = Auth::user();
 
-        // 2. Encontrar el registro de Socio correspondiente.
+        // Encontrar el registro de Socio correspondiente.
         $socio = Socio::where('email', $user->email)->first();
 
-        // 3. Preparar un array para los datos, con valores por defecto.
+        // Preparar un array para los datos, con valores por defecto.
         $datosAportes = [
             'balancePersonal' => 0,
             'transacciones' => collect(), // Una colección vacía por si no hay socio.
         ];
 
-        // 4. Si se encuentra el socio, calcular sus datos financieros.
+        // Si se encuentra el socio, calcular sus datos financieros.
         if ($socio) {
             $ingresosPersonales = $socio->transacciones()->where('tipo', 'Ingreso')->sum('monto');
             $egresosPersonales = $socio->transacciones()->where('tipo', 'Egreso')->sum('monto');
@@ -37,7 +34,7 @@ class AporteController extends Controller
             $datosAportes['transacciones'] = $socio->transacciones()->latest('fecha')->paginate(10);
         }
 
-        // 5. Devolver la nueva vista con los datos calculados.
+        // Devolver la nueva vista con los datos calculados.
         return view('portal.aportes.index', $datosAportes);
     }
 }

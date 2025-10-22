@@ -10,32 +10,23 @@ use Illuminate\Support\Facades\Notification;
 use App\Models\Comunicado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
-// ¡IMPORTANTE! Añadimos el Facade de la Base de Datos
 use Illuminate\Support\Facades\DB;
 
 class ComunicadoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $comunicados = Comunicado::with('user')->orderBy('created_at', 'desc')->paginate(15);
         return view('comunicados.index', compact('comunicados'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         return view('comunicados.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -53,25 +44,18 @@ class ComunicadoController extends Controller
                          ->with('success', '¡Comunicado creado exitosamente!');
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Comunicado $comunicado)
     {
         return view('comunicados.show', compact('comunicado'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(Comunicado $comunicado)
     {
         return view('comunicados.edit', compact('comunicado'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Comunicado $comunicado)
     {
         $request->validate([
@@ -85,9 +69,7 @@ class ComunicadoController extends Controller
                          ->with('success', '¡Comunicado actualizado exitosamente!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Comunicado $comunicado)
     {
         $comunicado->delete();
@@ -103,14 +85,14 @@ class ComunicadoController extends Controller
 
         $comunicado->update(['fecha_envio' => now()]);
 
-        // 1. Enviar por Email a los Socios --- ¡LÍNEA MODIFICADA AQUÍ! ---
+        // Enviar por Email a los Socios --- ¡LÍNEA MODIFICADA AQUÍ! ---
         $sociosParaEmail = Socio::whereRaw("LOWER(estado) = 'activo'")->whereNotNull('email')->get();
         
         if ($sociosParaEmail->isNotEmpty()) {
             Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
         }
 
-        // 2. Enviar Notificación Push (esto no se toca)
+        // Enviar Notificación Push (esto no se toca)
         $usuariosParaPush = User::whereNotNull('fcm_token')->get();
         if ($usuariosParaPush->isNotEmpty()) {
             Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));

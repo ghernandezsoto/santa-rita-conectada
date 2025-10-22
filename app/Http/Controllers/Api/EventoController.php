@@ -13,7 +13,6 @@ class EventoController extends Controller
      */
     public function index()
     {
-        // Añadimos with() para incluir los datos del usuario en la respuesta
         $eventos = Evento::with('user:id,name')
                          ->orderBy('fecha_evento', 'asc')
                          ->get();
@@ -26,7 +25,6 @@ class EventoController extends Controller
      */
     public function show(Evento $evento)
     {
-        // También lo añadimos aquí por consistencia
         $evento->load('user:id,name');
 
         return response()->json($evento);

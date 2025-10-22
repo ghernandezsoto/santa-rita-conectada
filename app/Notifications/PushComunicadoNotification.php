@@ -26,12 +26,11 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
 
     public function toFcmDirect($notifiable)
     {
-        // --- Lógica de preparación del texto ---
         
-        // 1. Obtenemos el contenido y quitamos espacios en blanco al inicio/final.
+        // Obtenemos el contenido y quitamos espacios en blanco al inicio/final.
         $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
 
-        // 2. Cortamos el texto de forma segura para crear un extracto para la notificación.
+        // Cortamos el texto de forma segura para crear un extracto para la notificación.
         $maxLength = 150;
         if (mb_strlen($cleanBody, 'UTF-8') > $maxLength) {
             $excerpt = mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...';
@@ -39,10 +38,9 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
             $excerpt = $cleanBody;
         }
 
-        // 3. Obtenemos el título (ya no necesita limpieza de HTML).
+        // Obtenemos el título (ya no necesita limpieza de HTML).
         $title = (string) ($this->comunicado->titulo ?? '');
         
-        // --- Fin de la lógica ---
 
         return [
             'notification' => [

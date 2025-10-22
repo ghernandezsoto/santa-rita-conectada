@@ -21,15 +21,15 @@ class AporteController extends Controller
             return response()->json(['message' => 'Socio not found.'], 404);
         }
 
-        // 1. Calcula el balance personal
+        // Calcula el balance personal
         $ingresosPersonales = $socio->transacciones()->where('tipo', 'Ingreso')->sum('monto');
         $egresosPersonales = $socio->transacciones()->where('tipo', 'Egreso')->sum('monto');
         $balancePersonal = $ingresosPersonales - $egresosPersonales;
 
-        // 2. Obtiene el historial de transacciones paginado
+        // Obtiene el historial de transacciones paginado
         $transacciones = $socio->transacciones()->latest('fecha')->paginate(20);
 
-        // 3. Devuelve todo en una única respuesta JSON
+        // Devuelve todo en una única respuesta JSON
         return response()->json([
             'balance_personal' => $balancePersonal,
             'transacciones' => $transacciones,

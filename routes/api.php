@@ -63,10 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json(['message' => 'Sesión cerrada exitosamente']);
     });
     
-    // --- INICIO DE LA MODIFICACIÓN ---
     // Se mueve la ruta de aportes a su lugar correcto, fuera del closure de logout.
     Route::get('/aportes', [AporteController::class, 'index'])->middleware('role:Socio');
-    // --- FIN DE LA MODIFICACIÓN ---
 
 
     // --- RUTA PARA LAS TARJETAS DE RESUMEN DE LA DIRECTIVA ---
@@ -115,12 +113,10 @@ Route::middleware('auth:sanctum')->group(function () {
             'user_id' => $request->user()->id,
         ]);
 
-        // --- INICIO DE LA MODIFICACIÓN: Separar Lógica de Email y Push ---
-
-        // 1. Marcar como enviado (igual que en la web)
+        // Marcar como enviado (igual que en la web)
         $comunicado->update(['fecha_envio' => now()]);
 
-        // 2. Enviar por Email a los Socios Activos con Email
+        // Enviar por Email a los Socios Activos con Email
         //    (Usando el modelo Socio y la notificación de Email)
         $sociosParaEmail = Socio::whereRaw("LOWER(estado) = 'activo'")
                                 ->whereNotNull('email')
@@ -134,7 +130,7 @@ Route::middleware('auth:sanctum')->group(function () {
             \Illuminate\Support\Facades\Log::info('[API Envio Email] No se encontraron socios activos con email para notificar.');
         }
 
-        // 3. Enviar Notificación Push a Usuarios con Token FCM
+        // Enviar Notificación Push a Usuarios con Token FCM
         //    (Usando el modelo User y la notificación Push dedicada)
         $usuariosParaPush = User::role('Socio')
                                 ->whereNotNull('fcm_token')
@@ -147,7 +143,6 @@ Route::middleware('auth:sanctum')->group(function () {
         } else {
             \Illuminate\Support\Facades\Log::info('[API Envio Push] No se encontraron usuarios socios con fcm_token para notificar.');
         }
-        // --- FIN DE LA MODIFICACIÓN ---
 
 
         return response()->json($comunicado, 201); // 201 = Creado Exitosamente

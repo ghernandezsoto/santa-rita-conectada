@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 use App\Channels\BrevoDirectChannel;
 use NotificationChannels\Fcm\FcmChannel;
-use App\Models\User; // Import User model if needed for type hinting or checks
-use App\Models\Socio; // Import Socio model if needed for type hinting or checks
+use App\Models\User; 
+use App\Models\Socio; 
 
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -25,22 +25,13 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
         $this->comunicado = $comunicado;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     * Use both your custom Brevo channel and the standard FCM channel.
-     */
     public function via(object $notifiable): array
     {
-        // Esta parte se mantiene igual
         return [BrevoDirectChannel::class, FcmChannel::class];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
-        // --- INICIO DE LA MODIFICACIÓN: Lógica Mejorada para Obtener Nombre ---
 
         // Log básico inicial
         $notifiableId = $notifiable->id ?? 'N/A';
@@ -49,24 +40,22 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
         $userName = ''; // Inicializar
 
-        // 1. Intentar obtener nombre desde el atributo 'name' (típico de User)
+        // Intentar obtener nombre desde el atributo 'name' (típico de User)
         if (property_exists($notifiable, 'name') && !empty($notifiable->name)) {
             $userName = $notifiable->name;
             Log::info('[DEBUG toMail] Nombre obtenido desde atributo "name": "' . $userName . '"');
         }
-        // 2. Si no se encontró, intentar obtener desde 'nombre' (típico de Socio)
+        // Si no se encontró, intentar obtener desde 'nombre' (típico de Socio)
         elseif (property_exists($notifiable, 'nombre') && !empty($notifiable->nombre)) {
             $userName = $notifiable->nombre;
             Log::info('[DEBUG toMail] Nombre obtenido desde atributo "nombre": "' . $userName . '"');
         }
 
-        // 3. Fallback si el nombre sigue vacío
         if (empty($userName)) {
             $fallbackName = $notifiableEmail !== 'N/A' ? $notifiableEmail : 'Estimado/a Socio/a';
             Log::warning('[WARN toMail] Notifiable ID: ' . $notifiableId . ' tiene nombre vacío o no encontrado en atributos esperados. Usando fallback: "' . $fallbackName . '" para Brevo.');
             $userName = $fallbackName;
         }
-        // --- FIN DE LA MODIFICACIÓN ---
 
         try {
             // Construir el mensaje usando el $userName obtenido
@@ -76,7 +65,7 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
                 ->line('La directiva ha publicado un nuevo comunicado:')
                 ->line('**' . $this->comunicado->titulo . '**')
                 ->line(substr($this->comunicado->contenido, 0, 200) . '...')
-                ->action('Leer Comunicado Completo', url('/')) // Idealmente, enlace directo si es posible
+                ->action('Leer Comunicado Completo', url('/')) 
                 ->salutation('Saludos cordiales,
 Directiva de la Junta de Vecinos N° 4 de Santa Rita');
 
@@ -89,10 +78,6 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
         }
     }
 
-    /**
-     * Define the content for Firebase Cloud Messaging (FCM).
-     * Esta parte se mantiene igual, usando el formato de array.
-     */
     public function toFcm(object $notifiable): array
     {
         $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
@@ -114,10 +99,6 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
         ];
     }
 
-    /**
-     * Handle a job failure.
-     * Esta parte se mantiene igual.
-     */
     public function failed(\Throwable $exception): void
     {
         Log::error(

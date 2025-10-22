@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ActaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         
@@ -20,21 +17,15 @@ class ActaController extends Controller
         return view('actas.index', compact('actas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         // Muestra la vista con el formulario para subir una nueva acta.
         return view('actas.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        // 1. Validar los datos del formulario, incluyendo el archivo.
+        // Validar los datos del formulario, incluyendo el archivo.
         $request->validate([
             'titulo' => 'required|string|max:255',
             'fecha' => 'required|date',
@@ -42,10 +33,10 @@ class ActaController extends Controller
             'archivo' => 'required|file|mimes:pdf|max:2048', // Requerido, debe ser PDF, máx 2MB
         ]);
 
-        // 2. Manejar la subida del archivo PDF.
+        // Manejar la subida del archivo PDF.
         $filePath = $request->file('archivo')->store('actas', 'public');
 
-        // 3. Crear el registro en la base de datos.
+        // Crear el registro en la base de datos.
         Acta::create([
             'titulo' => $request->titulo,
             'fecha' => $request->fecha,
@@ -54,14 +45,11 @@ class ActaController extends Controller
             'user_id' => auth()->id(), // Asigna el ID del usuario autenticado
         ]);
 
-        // 4. Redirigir a la lista de actas con un mensaje de éxito.
+        // Redirigir a la lista de actas con un mensaje de éxito.
         return redirect()->route('actas.index')
                         ->with('success', '¡Acta subida y registrada exitosamente!');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Acta $acta)
     {
         // Verifica si el archivo existe en el almacenamiento
@@ -74,21 +62,17 @@ class ActaController extends Controller
         return Storage::disk('public')->response($acta->archivo_path);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit(Acta $acta)
     {
         // Muestra el formulario de edición con los datos del acta seleccionada.
         return view('actas.edit', compact('acta'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, Acta $acta)
     {
-        // 1. Validamos los datos. El título es único pero ignorando el acta actual.
+        // Validamos los datos. El título es único pero ignorando el acta actual.
         // El archivo es opcional, solo se valida si se sube uno nuevo.
         $request->validate([
             'titulo' => 'required|string|max:255',
@@ -97,10 +81,10 @@ class ActaController extends Controller
             'archivo' => 'nullable|file|mimes:pdf|max:2048', // El archivo es opcional al editar
         ]);
 
-        // 2. Preparamos los datos para actualizar.
+        // Preparamos los datos para actualizar.
         $data = $request->only(['titulo', 'fecha', 'contenido']);
 
-        // 3. Si se subió un nuevo archivo...
+        // Si se subió un nuevo archivo...
         if ($request->hasFile('archivo')) {
             // ...borramos el archivo antiguo.
             if (Storage::disk('public')->exists($acta->archivo_path)) {
@@ -110,28 +94,25 @@ class ActaController extends Controller
             $data['archivo_path'] = $request->file('archivo')->store('actas', 'public');
         }
 
-        // 4. Actualizamos el registro en la base de datos.
+        // Actualizamos el registro en la base de datos.
         $acta->update($data);
 
-        // 5. Redirigimos con un mensaje de éxito.
+        // Redirigimos con un mensaje de éxito.
         return redirect()->route('actas.index')
                         ->with('success', '¡Acta actualizada exitosamente!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Acta $acta)
     {
-        // 1. Eliminar el archivo físico del almacenamiento.
+        // Eliminar el archivo físico del almacenamiento.
         if (Storage::disk('public')->exists($acta->archivo_path)) {
             Storage::disk('public')->delete($acta->archivo_path);
         }
 
-        // 2. Eliminar el registro del acta de la base de datos.
+        // Eliminar el registro del acta de la base de datos.
         $acta->delete();
 
-        // 3. Redirigir con un mensaje de éxito.
+        // Redirigir con un mensaje de éxito.
         return redirect()->route('actas.index')
                         ->with('success', 'Acta eliminada exitosamente.');
     }
