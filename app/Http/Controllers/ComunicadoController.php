@@ -11,6 +11,7 @@ use App\Models\Comunicado;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Services\ComunicadoService;
 
 class ComunicadoController extends Controller
 {
@@ -77,28 +78,18 @@ class ComunicadoController extends Controller
                          ->with('success', 'Comunicado eliminado exitosamente.');
     }
 
-    public function enviar(Comunicado $comunicado)
+    // --- Se inyecta ComunicadoService y se usa ---
+    public function enviar(Comunicado $comunicado, ComunicadoService $comunicadoService)
     {
         if ($comunicado->fecha_envio) {
             return redirect()->route('comunicados.index')->with('error', 'Este comunicado ya fue enviado.');
         }
 
-        $comunicado->update(['fecha_envio' => now()]);
-
-        // Enviar por Email a los Socios --- ¡LÍNEA MODIFICADA AQUÍ! ---
-        $sociosParaEmail = Socio::whereRaw("LOWER(estado) = 'activo'")->whereNotNull('email')->get();
-        
-        if ($sociosParaEmail->isNotEmpty()) {
-            Notification::send($sociosParaEmail, new NuevoComunicadoNotification($comunicado));
-        }
-
-        // Enviar Notificación Push (esto no se toca)
-        $usuariosParaPush = User::whereNotNull('fcm_token')->get();
-        if ($usuariosParaPush->isNotEmpty()) {
-            Notification::send($usuariosParaPush, new PushComunicadoNotification($comunicado));
-        }
+        // Se reemplaza toda la lógica de envío por el servicio.
+        // El servicio ya se encarga de marcar la 'fecha_envio'.
+        $comunicadoService->enviar($comunicado);
 
         return redirect()->route('comunicados.index')
-                        ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
+                         ->with('success', '¡El comunicado se ha puesto en la cola para ser enviado!');
     }
 }

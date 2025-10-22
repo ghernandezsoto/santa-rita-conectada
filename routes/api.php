@@ -18,6 +18,7 @@ use App\Models\Comunicado;
 use App\Models\Evento;
 
 use Illuminate\Support\Facades\Notification;
+use App\Services\ComunicadoService; 
 
 Route::post('/login', function (Request $request) {
     $request->validate([
@@ -101,7 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     // --- RUTA PARA CREAR UN COMUNICADO (APP MÓVIL) ---
-    Route::post('/directivo/comunicados', function (Request $request) {
+    Route::post('/directivo/comunicados', function (Request $request, ComunicadoService $comunicadoService) {
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'contenido' => 'required|string',
@@ -113,37 +114,8 @@ Route::middleware('auth:sanctum')->group(function () {
             'user_id' => $request->user()->id,
         ]);
 
-        // Marcar como enviado (igual que en la web)
-        $comunicado->update(['fecha_envio' => now()]);
-
-        // Enviar por Email a los Socios Activos con Email
-        //    (Usando el modelo Socio y la notificación de Email)
-        $sociosParaEmail = Socio::whereRaw("LOWER(estado) = 'activo'")
-                                ->whereNotNull('email')
-                                ->get();
-
-        if ($sociosParaEmail->isNotEmpty()) {
-            // Usamos NuevoComunicadoNotification (modificada para solo enviar email)
-            Notification::send($sociosParaEmail, new \App\Notifications\NuevoComunicadoNotification($comunicado));
-            \Illuminate\Support\Facades\Log::info('[API Envio Email] Intentando enviar email a ' . $sociosParaEmail->count() . ' socios.');
-        } else {
-            \Illuminate\Support\Facades\Log::info('[API Envio Email] No se encontraron socios activos con email para notificar.');
-        }
-
-        // Enviar Notificación Push a Usuarios con Token FCM
-        //    (Usando el modelo User y la notificación Push dedicada)
-        $usuariosParaPush = User::role('Socio')
-                                ->whereNotNull('fcm_token')
-                                ->get();
-
-        if ($usuariosParaPush->isNotEmpty()) {
-            // Usamos PushComunicadoNotification (la que funciona desde la web)
-            Notification::send($usuariosParaPush, new \App\Notifications\PushComunicadoNotification($comunicado));
-            \Illuminate\Support\Facades\Log::info('[API Envio Push] Intentando enviar push a ' . $usuariosParaPush->count() . ' usuarios.');
-        } else {
-            \Illuminate\Support\Facades\Log::info('[API Envio Push] No se encontraron usuarios socios con fcm_token para notificar.');
-        }
-
+        // Toda la lógica de envío se reemplaza por el servicio ---
+        $comunicadoService->enviar($comunicado);
 
         return response()->json($comunicado, 201); // 201 = Creado Exitosamente
     })->middleware('role:Presidente|Secretario');
