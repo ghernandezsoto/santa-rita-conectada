@@ -8,7 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsurePasswordIsChanged
 {
-
+    /** // <-- MODIFICATION: Added missing /** to start the docblock
+     * Handle an incoming request.
+     *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
@@ -22,7 +24,8 @@ class EnsurePasswordIsChanged
             // Si además está intentando acceder a cualquier ruta que no sea
             // la de editar su perfil o la de cerrar sesión, lo redirigimos.
             // Esto evita un bucle de redirección infinito.
-            if (! $request->routeIs('profile.edit') && ! $request->routeIs('profile.update')) {
+            // We also need to allow the logout route
+            if (! $request->routeIs('profile.edit') && ! $request->routeIs('profile.update') && ! $request->routeIs('logout')) {
                 return redirect()->route('profile.edit')
                                  ->with('info', 'Por favor, actualiza tu contraseña para continuar.');
             }
