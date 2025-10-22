@@ -10,9 +10,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use App\Channels\BrevoDirectChannel;
-// Use the standard FcmChannel for consistency
 use NotificationChannels\Fcm\FcmChannel;
-// We no longer need FcmMessage or FcmNotificationResource if returning an array
 
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -27,7 +25,6 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's delivery channels.
-     * Use both your custom Brevo channel and the standard FCM channel.
      */
     public function via(object $notifiable): array
     {
@@ -35,20 +32,19 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get the mail representation (Unchanged).
+     * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
     {
-        // ... (your existing toMail logic remains unchanged) ...
-        Log::info('[DEBUG] Preparando email para el Socio ID: ' . $notifiable->id); // Assuming $notifiable is User linked to Socio
+        Log::info('[DEBUG] Preparando email para User ID: ' . $notifiable->id . ' Email: ' . $notifiable->email);
 
         try {
-            // Attempt to get Socio name if $notifiable is User
-            $socioName = $notifiable->name; // Default to user name
+            // --- CORRECTION: Use $notifiable->name as $notifiable is the User model ---
+            $userName = $notifiable->name;
 
             $mailMessage = (new MailMessage)
                 ->subject('Nuevo Comunicado de la Junta de Vecinos')
-                ->greeting('¡Hola ' . $socioName . '!')
+                ->greeting('¡Hola ' . $userName . '!') // <-- Corrected line
                 ->line('La directiva ha publicado un nuevo comunicado:')
                 ->line('**' . $this->comunicado->titulo . '**')
                 ->line(substr($this->comunicado->contenido, 0, 200) . '...')
@@ -59,32 +55,25 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
             return $mailMessage;
 
         } catch (Throwable $e) {
-            Log::error('[ERROR toMail] Fallo al construir MailMessage: ' . $e->getMessage());
+            Log::error('[ERROR toMail] Fallo al construir MailMessage para User ID: ' . $notifiable->id . ' Error: ' . $e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Define the content for Firebase Cloud Messaging (FCM).
-     *
-     * IMPORTANT: This now returns a PHP array, mirroring the structure
-     * used in your working PushComunicadoNotification::toFcmDirect method.
-     *
-     * @param  object  $notifiable
-     * @return array The payload structure FCM expects.
      */
     public function toFcm(object $notifiable): array
     {
         // Re-use the same excerpt logic as PushComunicadoNotification
         $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
-        $maxLength = 150; // Or match PushComunicadoNotification's length
+        $maxLength = 150;
         $excerpt = (mb_strlen($cleanBody, 'UTF-8') > $maxLength)
                    ? mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...'
                    : $cleanBody;
 
         $title = (string) ($this->comunicado->titulo ?? '');
 
-        // Return the array payload
         return [
             'notification' => [
                 'title' => $title,
@@ -92,23 +81,21 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
             ],
             'data' => [
                 'comunicado_id' => (string) $this->comunicado->id,
-                 // You might want 'type' => 'comunicado' here too, like in PushComunicadoNotification
                 'type' => 'comunicado',
             ],
         ];
     }
 
     /**
-     * Handle a job failure (Unchanged).
+     * Handle a job failure.
      */
     public function failed(\Throwable $exception): void
     {
-        // ... (your existing failed logic remains unchanged) ...
         Log::error(
             '[FALLO DE ENVÍO NOTIFICACIÓN] User ID: ' . ($this->comunicado->user_id ?? 'N/A') .
             ' Comunicado ID: ' . $this->comunicado->id .
             ' Causa: ' . $exception->getMessage() .
-            ' Trace: ' . $exception->getTraceAsString()
+            ' Trace: ' . $exception->getTraceAsString() // More detailed trace if needed
         );
     }
 }
