@@ -10,11 +10,9 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use App\Channels\BrevoDirectChannel;
-// --- Asegúrate de que estas líneas estén presentes ---
+// Use the standard FcmChannel for consistency
 use NotificationChannels\Fcm\FcmChannel;
-use NotificationChannels\Fcm\FcmMessage;
-use NotificationChannels\Fcm\Resources\Notification as FcmNotificationResource;
-// --- Fin de las líneas a asegurar ---
+// We no longer need FcmMessage or FcmNotificationResource if returning an array
 
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -29,71 +27,88 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     /**
      * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
+     * Use both your custom Brevo channel and the standard FCM channel.
      */
     public function via(object $notifiable): array
     {
-        // --- Asegúrate de que FcmChannel::class esté aquí ---
         return [BrevoDirectChannel::class, FcmChannel::class];
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Get the mail representation (Unchanged).
      */
     public function toMail(object $notifiable): MailMessage
     {
-        // Esta lógica se mantiene intacta
-        Log::info('[DEBUG] Preparando email para el Socio ID: ' . $notifiable->id);
+        // ... (your existing toMail logic remains unchanged) ...
+        Log::info('[DEBUG] Preparando email para el Socio ID: ' . $notifiable->id); // Assuming $notifiable is User linked to Socio
 
         try {
+            // Attempt to get Socio name if $notifiable is User
+            $socioName = $notifiable->name; // Default to user name
+
             $mailMessage = (new MailMessage)
                 ->subject('Nuevo Comunicado de la Junta de Vecinos')
-                ->greeting('¡Hola ' . $notifiable->nombre . '!') // Asumiendo que $notifiable (User) tiene acceso al nombre del Socio
+                ->greeting('¡Hola ' . $socioName . '!')
                 ->line('La directiva ha publicado un nuevo comunicado:')
                 ->line('**' . $this->comunicado->titulo . '**')
                 ->line(substr($this->comunicado->contenido, 0, 200) . '...')
-                ->action('Leer Comunicado Completo', url('/')) // Idealmente, un enlace directo al comunicado si es posible
+                ->action('Leer Comunicado Completo', url('/')) // Consider a direct link if feasible
                 ->salutation('Saludos cordiales,
 Directiva de la Junta de Vecinos N° 4 de Santa Rita');
 
             return $mailMessage;
 
         } catch (Throwable $e) {
-            // Loguear el error específico puede ser útil aquí también
             Log::error('[ERROR toMail] Fallo al construir MailMessage: ' . $e->getMessage());
             throw $e;
         }
     }
 
-    // --- Asegúrate de que este método completo exista ---
     /**
-     * Define el contenido de la notificación para Firebase Cloud Messaging.
+     * Define the content for Firebase Cloud Messaging (FCM).
+     *
+     * IMPORTANT: This now returns a PHP array, mirroring the structure
+     * used in your working PushComunicadoNotification::toFcmDirect method.
      *
      * @param  object  $notifiable
-     * @return \NotificationChannels\Fcm\FcmMessage
+     * @return array The payload structure FCM expects.
      */
-    public function toFcm(object $notifiable): FcmMessage
+    public function toFcm(object $notifiable): array
     {
-        return FcmMessage::create()
-            ->setNotification(FcmNotificationResource::create()
-                ->setTitle('Nuevo Comunicado: ' . $this->comunicado->titulo)
-                ->setBody(substr($this->comunicado->contenido, 0, 100) . '...') // Cuerpo corto para push
-            )
-            ->setData(['comunicado_id' => (string)$this->comunicado->id]); // Dato extra para la app
+        // Re-use the same excerpt logic as PushComunicadoNotification
+        $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
+        $maxLength = 150; // Or match PushComunicadoNotification's length
+        $excerpt = (mb_strlen($cleanBody, 'UTF-8') > $maxLength)
+                   ? mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...'
+                   : $cleanBody;
+
+        $title = (string) ($this->comunicado->titulo ?? '');
+
+        // Return the array payload
+        return [
+            'notification' => [
+                'title' => $title,
+                'body'  => $excerpt,
+            ],
+            'data' => [
+                'comunicado_id' => (string) $this->comunicado->id,
+                 // You might want 'type' => 'comunicado' here too, like in PushComunicadoNotification
+                'type' => 'comunicado',
+            ],
+        ];
     }
-    // --- Fin del método toFcm ---
 
-
+    /**
+     * Handle a job failure (Unchanged).
+     */
     public function failed(\Throwable $exception): void
     {
-        // Esta lógica se mantiene intacta
-        // Añadimos más contexto al log de error
+        // ... (your existing failed logic remains unchanged) ...
         Log::error(
             '[FALLO DE ENVÍO NOTIFICACIÓN] User ID: ' . ($this->comunicado->user_id ?? 'N/A') .
             ' Comunicado ID: ' . $this->comunicado->id .
             ' Causa: ' . $exception->getMessage() .
-            ' Trace: ' . $exception->getTraceAsString() // Opcional: traza completa si necesitas depurar más
+            ' Trace: ' . $exception->getTraceAsString()
         );
     }
 }
