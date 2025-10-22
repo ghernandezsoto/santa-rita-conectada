@@ -18,7 +18,7 @@ use App\Models\Comunicado;
 use App\Models\Evento;
 
 use Illuminate\Support\Facades\Notification;
-use App\Services\ComunicadoService; 
+use App\Services\ComunicadoService;
 
 Route::post('/login', function (Request $request) {
     $request->validate([
@@ -63,13 +63,13 @@ Route::middleware('auth:sanctum')->group(function () {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Sesión cerrada exitosamente']);
     });
-    
+
     // Se mueve la ruta de aportes a su lugar correcto, fuera del closure de logout.
     Route::get('/aportes', [AporteController::class, 'index'])->middleware('role:Socio');
 
 
     // --- RUTA PARA LAS TARJETAS DE RESUMEN DE LA DIRECTIVA ---
-    
+
     Route::get('/directivo/summary', function () {
         $totalSocios = Socio::count();
         $ingresos = Transaccion::where('tipo', 'Ingreso')->sum('monto');
@@ -149,9 +149,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- RUTA PARA EL GRÁFICO PERSONAL DEL SOCIO ---
     Route::get('/charts/personal-finances', function (Request $request) {
         $user = $request->user();
-        $socio = Socio::where('email', $user->email)->first();
+        
+        // Se usa la relación directa ---
+        $socio = $user->socio;
 
         if (!$socio) {
+            // Usuario no tiene socio asociado (es directivo o no vinculado)
             return response()->json(['labels' => [], 'datasets' => []], 404);
         }
 

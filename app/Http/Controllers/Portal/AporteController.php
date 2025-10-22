@@ -15,26 +15,27 @@ class AporteController extends Controller
         // Obtener el usuario autenticado.
         $user = Auth::user();
 
-        // Encontrar el registro de Socio correspondiente.
-        $socio = Socio::where('email', $user->email)->first();
+        // Usa la relación directa ---
 
-        // Preparar un array para los datos, con valores por defecto.
+        $socio = $user->socio;
+
+
+        // Prepara un arreglo para los datos
         $datosAportes = [
             'balancePersonal' => 0,
-            'transacciones' => collect(), // Una colección vacía por si no hay socio.
+            'transacciones' => collect(), // una colección vacía en caso de que no existan socios
         ];
 
-        // Si se encuentra el socio, calcular sus datos financieros.
+        // Si el socio existe, calcular la información financiera.
         if ($socio) {
             $ingresosPersonales = $socio->transacciones()->where('tipo', 'Ingreso')->sum('monto');
             $egresosPersonales = $socio->transacciones()->where('tipo', 'Egreso')->sum('monto');
 
             $datosAportes['balancePersonal'] = $ingresosPersonales - $egresosPersonales;
-            // Obtenemos todas las transacciones, paginadas, para un historial completo.
+            // Get all transactions, paginated, for a complete history.
             $datosAportes['transacciones'] = $socio->transacciones()->latest('fecha')->paginate(10);
         }
 
-        // Devolver la nueva vista con los datos calculados.
         return view('portal.aportes.index', $datosAportes);
     }
 }

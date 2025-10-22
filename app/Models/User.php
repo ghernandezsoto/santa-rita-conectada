@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -41,7 +40,8 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $with = ['roles']; 
+    // Se añade 'socio' para que se cargue automáticamente ---
+    protected $with = ['roles', 'socio'];
 
     /**
      * Get the attributes that should be cast.
@@ -65,4 +65,14 @@ class User extends Authenticatable
     {
         return $this->fcm_token;
     }
+
+    /**
+     * Define la relación: Un Usuario (de login) pertenece a un Socio (de datos).
+     */
+    public function socio()
+    {
+        // La clave foránea 'socio_id' está en esta tabla (users)
+        return $this->belongsTo(Socio::class);
+    }
+
 }

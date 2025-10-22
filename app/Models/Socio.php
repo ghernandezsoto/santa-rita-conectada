@@ -83,4 +83,15 @@ class Socio extends Model
     {
         return $this->hasMany(Transaccion::class);
     }
+
+    // Se añade la nueva relación ---
+    /**
+     * Define la relación: Un Socio (de datos) puede tener un Usuario (de login).
+     */
+    public function user()
+    {
+        // La clave foránea 'socio_id' está en la tabla 'users'.
+        // El id local (de esta tabla 'socios') se vincula a esa clave.
+        return $this->hasOne(User::class, 'socio_id', 'id');
+    }
 }

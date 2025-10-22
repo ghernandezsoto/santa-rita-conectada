@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http/Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Socio;
@@ -15,10 +15,15 @@ class AporteController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $socio = Socio::where('email', $user->email)->first();
+        
+        // Se usa la relación directa ---
+        // Ya no buscamos por email, usamos la relación que ya está cargada
+        $socio = $user->socio;
 
         if (!$socio) {
-            return response()->json(['message' => 'Socio not found.'], 404);
+            // Esto ahora solo debería ocurrir si el usuario es de la directiva
+            // o si un socio recién creado aún no tiene su 'socio_id' asignado.
+            return response()->json(['message' => 'No se encontró un perfil de socio asociado.'], 404);
         }
 
         // Calcula el balance personal
