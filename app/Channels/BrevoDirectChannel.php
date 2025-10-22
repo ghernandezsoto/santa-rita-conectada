@@ -1,60 +1,89 @@
 <?php
 
-namespace App\Notifications;
+namespace App\Channels;
 
-use App\Models\Comunicado;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
-use Throwable; 
-use App\Channels\BrevoDirectChannel; 
 
-class NuevoComunicadoNotification extends Notification implements ShouldQueue
+class BrevoDirectChannel
 {
-    use Queueable;
-
-    protected $comunicado;
-
-    public function __construct(Comunicado $comunicado)
+    public function send(object $notifiable, Notification $notification): void
     {
-        $this->comunicado = $comunicado;
-    }
+        // 1. Get the mail message object
+        $message = $notification->toMail($notifiable);
 
-    public function via(object $notifiable): array
-    {
-        return [BrevoDirectChannel::class]; 
-    }
+        // 2. Extract recipient details
+        $recipientEmail = $notifiable->routeNotificationFor('mail', $notification);
+        $recipientName = $notifiable->name ?? '';
 
-    public function toMail(object $notifiable): MailMessage
-    {
-        // DEBUG: log para verificar el ID del socio al que se enviará el correo
-        Log::info('[DEBUG] Preparando email para el Socio ID: ' . $notifiable->id);
-
-        try {
-            $mailMessage = (new MailMessage)
-                ->subject('Nuevo Comunicado de la Junta de Vecinos')
-                ->greeting('¡Hola ' . $notifiable->nombre . '!')
-                ->line('La directiva ha publicado un nuevo comunicado:')
-                ->line('**' . $this->comunicado->titulo . '**')
-                ->line(substr($this->comunicado->contenido, 0, 200) . '...')
-                ->action('Leer Comunicado Completo', url('/')) // Usamos url('/') para evitar errores de ruta en CLI
-                ->salutation('Saludos cordiales,
-Directiva de la Junta de Vecinos N° 4 de Santa Rita');
-
-            return $mailMessage;
-
-        } catch (Throwable $e) {
-            throw $e;
+        if (empty($recipientName)) {
+            Log::warning('[BrevoDirectChannel] Recipient name is empty for ' . $recipientEmail . '. Using email as name.');
+            $recipientName = $recipientEmail;
         }
-    }
 
-    public function failed(\Throwable $exception): void
-    {
-        // Logueamos el error exacto para saber por qué falló.
-        Log::error(
-            '[FALLO DE ENVÍO] La notificación por correo falló. Causa: ' . $exception->getMessage()
-        );
+        // 3. Get API Key
+        $apiKey = config('mail.mailers.brevo.key');
+        if (!$apiKey) {
+            Log::error('[BrevoDirectChannel] BREVO_KEY not found in configuration.');
+            return;
+        }
+
+        // --- REVERTED CHANGE: Go back to simpler HTML construction ---
+        // Build basic HTML from lines. Note: Action button URL won't be included this way.
+        $htmlBody = "";
+        if (!empty($message->greeting)) {
+            $htmlBody .= "<p>" . $message->greeting . "</p>";
+        }
+        foreach ($message->introLines as $line) {
+            $htmlBody .= "<p>" . $line . "</p>"; // Basic paragraph tags
+        }
+        // If you need the action button, you'd have to add it manually here
+        // $htmlBody .= '<p><a href="' . $message->actionUrl . '">' . $message->actionText . '</a></p>';
+        foreach ($message->outroLines as $line) {
+            $htmlBody .= "<p>" . $line . "</p>";
+        }
+         if (!empty($message->salutation)) {
+            // Replace newlines in salutation with <br> for HTML
+            $htmlBody .= "<p>" . nl2br(e($message->salutation)) . "</p>";
+        }
+        // --- END REVERTED CHANGE ---
+
+        // 4. Prepare Brevo API v3 payload
+        $postData = [
+            'sender' => [
+                'name' => config('mail.from.name'),
+                'email' => config('mail.from.address'),
+            ],
+            'to' => [
+                ['email' => $recipientEmail, 'name' => $recipientName],
+            ],
+            'subject' => $message->subject,
+            'htmlContent' => $htmlBody, // Use the manually constructed HTML
+        ];
+
+        Log::debug('[BrevoDirectChannel] JSON Payload being sent: ' . json_encode($postData));
+
+        // 5. Execute cURL call (Unchanged)
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://api.brevo.com/v3/smtp/email');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'accept: application/json',
+            'api-key: ' . $apiKey,
+            'content-type: application/json',
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        // 6. Log the result (Unchanged)
+        if ($httpCode >= 200 && $httpCode < 300) {
+            Log::info('[BrevoDirectChannel] Email sent successfully to ' . $recipientEmail . '. Response: ' . $response);
+        } else {
+            Log::error('[BrevoDirectChannel] Failed to send email to ' . $recipientEmail . '. Code: ' . $httpCode . '. cURL Error: ' . $curlError . '. Response: ' . $response);
+        }
     }
 }
