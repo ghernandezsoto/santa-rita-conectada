@@ -23,32 +23,33 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
         $this->comunicado = $comunicado;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     */
     public function via(object $notifiable): array
     {
         return [BrevoDirectChannel::class, FcmChannel::class];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
-        Log::info('[DEBUG] Preparando email para User ID: ' . $notifiable->id . ' Email: ' . $notifiable->email);
+        // --- ADDED LOGGING ---
+        Log::info('[DEBUG toMail] Intentando enviar a User ID: ' . $notifiable->id . ' Email: ' . $notifiable->email . ' Nombre Obtenido: "' . $notifiable->name . '"');
+        // --- END ADDED LOGGING ---
 
         try {
-            // --- CORRECTION: Use $notifiable->name as $notifiable is the User model ---
-            $userName = $notifiable->name;
+            $userName = $notifiable->name; // Use the name attribute from the User model
+
+            // If name is unexpectedly empty, provide a default to avoid Brevo error
+            if (empty($userName)) {
+                Log::warning('[WARN toMail] User ID: ' . $notifiable->id . ' tiene nombre vacío. Usando email como nombre para Brevo.');
+                $userName = $notifiable->email; // Fallback to email
+            }
 
             $mailMessage = (new MailMessage)
                 ->subject('Nuevo Comunicado de la Junta de Vecinos')
-                ->greeting('¡Hola ' . $userName . '!') // <-- Corrected line
+                ->greeting('¡Hola ' . $userName . '!') // Use the potentially corrected $userName
                 ->line('La directiva ha publicado un nuevo comunicado:')
                 ->line('**' . $this->comunicado->titulo . '**')
                 ->line(substr($this->comunicado->contenido, 0, 200) . '...')
-                ->action('Leer Comunicado Completo', url('/')) // Consider a direct link if feasible
+                ->action('Leer Comunicado Completo', url('/'))
                 ->salutation('Saludos cordiales,
 Directiva de la Junta de Vecinos N° 4 de Santa Rita');
 
@@ -60,18 +61,13 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
         }
     }
 
-    /**
-     * Define the content for Firebase Cloud Messaging (FCM).
-     */
     public function toFcm(object $notifiable): array
     {
-        // Re-use the same excerpt logic as PushComunicadoNotification
         $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
         $maxLength = 150;
         $excerpt = (mb_strlen($cleanBody, 'UTF-8') > $maxLength)
                    ? mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...'
                    : $cleanBody;
-
         $title = (string) ($this->comunicado->titulo ?? '');
 
         return [
@@ -86,16 +82,13 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
         ];
     }
 
-    /**
-     * Handle a job failure.
-     */
     public function failed(\Throwable $exception): void
     {
         Log::error(
             '[FALLO DE ENVÍO NOTIFICACIÓN] User ID: ' . ($this->comunicado->user_id ?? 'N/A') .
             ' Comunicado ID: ' . $this->comunicado->id .
             ' Causa: ' . $exception->getMessage() .
-            ' Trace: ' . $exception->getTraceAsString() // More detailed trace if needed
+            ' Trace: ' . $exception->getTraceAsString()
         );
     }
 }
