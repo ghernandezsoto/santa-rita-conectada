@@ -8,9 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
-use Throwable;
-use App\Channels\BrevoDirectChannel;
-use NotificationChannels\Fcm\FcmChannel;
+use Throwable; 
+use App\Channels\BrevoDirectChannel; 
 
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -25,70 +24,37 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return [BrevoDirectChannel::class, FcmChannel::class];
+        return [BrevoDirectChannel::class]; 
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        // --- ADDED LOGGING ---
-        Log::info('[DEBUG toMail] Intentando enviar a User ID: ' . $notifiable->id . ' Email: ' . $notifiable->email . ' Nombre Obtenido: "' . $notifiable->name . '"');
-        // --- END ADDED LOGGING ---
+        // DEBUG: log para verificar el ID del socio al que se enviará el correo
+        Log::info('[DEBUG] Preparando email para el Socio ID: ' . $notifiable->id);
 
         try {
-            $userName = $notifiable->name; // Use the name attribute from the User model
-
-            // If name is unexpectedly empty, provide a default to avoid Brevo error
-            if (empty($userName)) {
-                Log::warning('[WARN toMail] User ID: ' . $notifiable->id . ' tiene nombre vacío. Usando email como nombre para Brevo.');
-                $userName = $notifiable->email; // Fallback to email
-            }
-
             $mailMessage = (new MailMessage)
                 ->subject('Nuevo Comunicado de la Junta de Vecinos')
-                ->greeting('¡Hola ' . $userName . '!') // Use the potentially corrected $userName
+                ->greeting('¡Hola ' . $notifiable->nombre . '!')
                 ->line('La directiva ha publicado un nuevo comunicado:')
                 ->line('**' . $this->comunicado->titulo . '**')
                 ->line(substr($this->comunicado->contenido, 0, 200) . '...')
-                ->action('Leer Comunicado Completo', url('/'))
+                ->action('Leer Comunicado Completo', url('/')) // Usamos url('/') para evitar errores de ruta en CLI
                 ->salutation('Saludos cordiales,
 Directiva de la Junta de Vecinos N° 4 de Santa Rita');
 
             return $mailMessage;
 
         } catch (Throwable $e) {
-            Log::error('[ERROR toMail] Fallo al construir MailMessage para User ID: ' . $notifiable->id . ' Error: ' . $e->getMessage());
             throw $e;
         }
     }
 
-    public function toFcm(object $notifiable): array
-    {
-        $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
-        $maxLength = 150;
-        $excerpt = (mb_strlen($cleanBody, 'UTF-8') > $maxLength)
-                   ? mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...'
-                   : $cleanBody;
-        $title = (string) ($this->comunicado->titulo ?? '');
-
-        return [
-            'notification' => [
-                'title' => $title,
-                'body'  => $excerpt,
-            ],
-            'data' => [
-                'comunicado_id' => (string) $this->comunicado->id,
-                'type' => 'comunicado',
-            ],
-        ];
-    }
-
     public function failed(\Throwable $exception): void
     {
+        // Logueamos el error exacto para saber por qué falló.
         Log::error(
-            '[FALLO DE ENVÍO NOTIFICACIÓN] User ID: ' . ($this->comunicado->user_id ?? 'N/A') .
-            ' Comunicado ID: ' . $this->comunicado->id .
-            ' Causa: ' . $exception->getMessage() .
-            ' Trace: ' . $exception->getTraceAsString()
+            '[FALLO DE ENVÍO] La notificación por correo falló. Causa: ' . $exception->getMessage()
         );
     }
 }
