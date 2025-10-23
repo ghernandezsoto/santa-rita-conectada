@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http/Controllers\Api;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Socio;
@@ -15,10 +15,10 @@ class AporteController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        
-        // Se usa la relación directa ---
+
         // Ya no buscamos por email, usamos la relación que ya está cargada
         $socio = $user->socio;
+
 
         if (!$socio) {
             // Esto ahora solo debería ocurrir si el usuario es de la directiva
