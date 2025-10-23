@@ -57,9 +57,15 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-4">
-                        {{ $transacciones->links() }}
-                    </div>
+
+                    {{-- --- MODIFICATION: Added @if check --- --}}
+                    @if ($transacciones instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                        <div class="mt-4">
+                            {{ $transacciones->links() }}
+                        </div>
+                    @endif
+                    {{-- --- END OF MODIFICATION --- --}}
+
                 </div>
             </div>
         </div>
