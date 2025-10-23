@@ -72,47 +72,62 @@
     </div>
 
     @push('scripts')
-    <script type="module">
-        import { Chart } from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/auto/+esm';
+        <script type="module">
+            import { Chart } from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/auto/+esm';
 
-        (async function() {
-            try {
-                // Llamamos al nuevo endpoint para los datos personales del socio
-                const response = await axios.get('/api/charts/personal-finances');
-                const data = response.data;
+            (async function() {
+                const chartElement = document.getElementById('personalContributionsChart');
+                if (!chartElement) return; 
 
-                // Si no hay datos (ej. socio nuevo sin aportes), no dibujamos el gráfico
-                if (data.labels.length === 0) return;
+                try {
+                    // Llamamos al nuevo endpoint para los datos personales del socio
+                    const response = await axios.get('/api/charts/personal-finances');
+                    const data = response.data;
 
-                const ctx = document.getElementById('personalContributionsChart');
-                if (!ctx) return;
+                    // Si no hay datos (ej. socio nuevo sin aportes), no dibujamos el gráfico
 
-                new Chart(ctx, {
-                    type: 'line', // Un gráfico de línea es ideal para mostrar tendencias en el tiempo
-                    data: data,
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false // No es necesaria la leyenda para una sola serie de datos
+                    if (!data || !data.labels || data.labels.length === 0 || !data.datasets || data.datasets.length === 0 || data.datasets[0].data.length === 0) {
+                        chartElement.parentElement.innerHTML = '<p class="text-center text-gray-500 py-4">No hay datos suficientes para mostrar el gráfico.</p>';
+                        return;
+                    }
+
+
+                    new Chart(chartElement.getContext('2d'), { 
+                        type: 'line', // Un gráfico de línea es ideal para mostrar tendencias en el tiempo
+                        data: data,
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
                             },
-                            title: {
-                                display: true,
-                                text: 'Tus aportes mensuales'
+                            plugins: {
+                                legend: {
+                                    display: false // No es necesaria la leyenda para una sola serie de datos
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Tus aportes mensuales'
+                                }
                             }
                         }
+                    });
+                } catch (error) {
+
+                    if (error.response && error.response.status === 404) {
+
+                        chartElement.parentElement.innerHTML = '<p class="text-center text-gray-500 py-4">No se encontró un perfil de socio asociado para mostrar el gráfico.</p>';
+                    } else {
+
+                        console.error('Error al cargar los datos del gráfico personal:', error);
+
+                        chartElement.parentElement.innerHTML = '<p class="text-center text-red-500 py-4">Error al cargar el gráfico.</p>';
                     }
-                });
-            } catch (error) {
-                console.error('Error al cargar los datos del gráfico personal:', error);
-            }
-        })();
-    </script>
-    @endpush
+
+                }
+            })();
+        </script>
+        @endpush
 
 </x-app-layout>
