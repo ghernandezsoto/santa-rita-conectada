@@ -10,7 +10,6 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 use Illuminate\Notifications\Channels\MailChannel;
-use NotificationChannels\Fcm\FcmChannel;
 use App\Models\User;
 use App\Models\Socio;
 
@@ -27,14 +26,12 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        // Laravel automáticamente usará el mailer 'brevo' (definido en .env)
-        // y el driver 'brevo' (definido en config/mail.php).
-        return [MailChannel::class, FcmChannel::class];
+        // Esta notificación ahora SOLO maneja emails.
+        return [MailChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-
         // Log básico inicial
         $notifiableId = $notifiable->id ?? 'N/A';
         $notifiableEmail = $notifiable->email ?? 'N/A';
@@ -81,26 +78,9 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
         }
     }
 
-    public function toFcm(object $notifiable): array
-    {
-        $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
-        $maxLength = 150;
-        $excerpt = (mb_strlen($cleanBody, 'UTF-8') > $maxLength)
-            ? mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...'
-            : $cleanBody;
-        $title = (string) ($this->comunicado->titulo ?? '');
-
-        return [
-            'notification' => [
-                'title' => $title,
-                'body'  => $excerpt,
-            ],
-            'data' => [
-                'comunicado_id' => (string) $this->comunicado->id,
-                'type' => 'comunicado',
-            ],
-        ];
-    }
+    // --- Eliminado el método toFcm() ---
+    // Este método ya no es necesario aquí, ya que el Push
+    // se maneja en PushComunicadoNotification.
 
     public function failed(\Throwable $exception): void
     {
@@ -108,7 +88,7 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
             '[FALLO DE ENVÍO NOTIFICACIÓN] User ID del creador: ' . ($this->comunicado->user_id ?? 'N/A') . // Aclarar que es el user_id del comunicado
             ' Comunicado ID: ' . $this->comunicado->id .
             ' Causa: ' . $exception->getMessage() .
-            ' Trace: ' . $exception->getTraceAsString() // Dejar la traza completa es útil para depurar fallos de cola
+            ' Trace: ' . $exception->getTraceAsString()
         );
     }
 }

@@ -6,7 +6,7 @@ use App\Models\Comunicado;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use App\Channels\FcmDirectChannel;
+use NotificationChannels\Fcm\FcmChannel;
 
 class PushComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -21,12 +21,14 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
 
     public function via($notifiable)
     {
-        return [FcmDirectChannel::class];
+        // Se usa el canal nativo de FCM
+        return [FcmChannel::class];
     }
 
-    public function toFcmDirect($notifiable)
+    // Renombrado de 'toFcmDirect' a 'toFcm'
+    // Esta es la función que FcmChannel busca por defecto.
+    public function toFcm(object $notifiable): array
     {
-        
         // Obtenemos el contenido y quitamos espacios en blanco al inicio/final.
         $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
 
@@ -40,8 +42,8 @@ class PushComunicadoNotification extends Notification implements ShouldQueue
 
         // Obtenemos el título (ya no necesita limpieza de HTML).
         $title = (string) ($this->comunicado->titulo ?? '');
-        
 
+        // Este es el payload que FcmChannel espera.
         return [
             'notification' => [
                 'title' => $title,
