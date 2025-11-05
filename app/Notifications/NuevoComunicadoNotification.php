@@ -9,10 +9,10 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Throwable;
-use App\Channels\BrevoDirectChannel;
+use Illuminate\Notifications\Channels\MailChannel;
 use NotificationChannels\Fcm\FcmChannel;
-use App\Models\User; 
-use App\Models\Socio; 
+use App\Models\User;
+use App\Models\Socio;
 
 class NuevoComunicadoNotification extends Notification implements ShouldQueue
 {
@@ -27,7 +27,9 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return [BrevoDirectChannel::class, FcmChannel::class];
+        // Laravel automáticamente usará el mailer 'brevo' (definido en .env)
+        // y el driver 'brevo' (definido en config/mail.php).
+        return [MailChannel::class, FcmChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -59,13 +61,14 @@ class NuevoComunicadoNotification extends Notification implements ShouldQueue
 
         try {
             // Construir el mensaje usando el $userName obtenido
+            // Este MailMessage ahora es enviado por el driver nativo de Brevo.
             $mailMessage = (new MailMessage)
                 ->subject('Nuevo Comunicado de la Junta de Vecinos')
                 ->greeting('¡Hola ' . $userName . '!') // Usar el $userName que ahora siempre tendrá un valor
                 ->line('La directiva ha publicado un nuevo comunicado:')
                 ->line('**' . $this->comunicado->titulo . '**')
                 ->line(substr($this->comunicado->contenido, 0, 200) . '...')
-                ->action('Leer Comunicado Completo', url('/')) 
+                ->action('Leer Comunicado Completo', url('/'))
                 ->salutation('Saludos cordiales,
 Directiva de la Junta de Vecinos N° 4 de Santa Rita');
 
@@ -83,8 +86,8 @@ Directiva de la Junta de Vecinos N° 4 de Santa Rita');
         $cleanBody = trim((string) ($this->comunicado->contenido ?? ''));
         $maxLength = 150;
         $excerpt = (mb_strlen($cleanBody, 'UTF-8') > $maxLength)
-                   ? mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...'
-                   : $cleanBody;
+            ? mb_substr($cleanBody, 0, $maxLength, 'UTF-8') . '...'
+            : $cleanBody;
         $title = (string) ($this->comunicado->titulo ?? '');
 
         return [
