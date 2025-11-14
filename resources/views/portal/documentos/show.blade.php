@@ -11,7 +11,8 @@
                 <div class="p-6 text-gray-900">
                     <p class="text-sm text-gray-500 mb-4">Subido el {{ $documento->created_at->format('d/m/Y') }}</p>
                     <p class="mb-6">{{ $documento->descripcion ?: 'Este documento no tiene una descripción adicional.' }}</p>
-                    <a href="{{ route('documentos.show', $documento->id) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                    
+                    <a href="{{ route('portal.documentos.descargar', $documento->id) }}" target="_blank" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                         Descargar Documento
                     </a>
                 </div>

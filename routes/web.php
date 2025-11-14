@@ -57,6 +57,12 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
         return view('portal.documentos.show', compact('documento'));
     })->name('documentos.show');
 
+    // --- RUTA DE DESCARGA AÑADIDA ---
+    // Esta ruta está protegida por 'role:Socio' y reutiliza la lógica de
+    // descarga segura del DocumentoController@show.
+    Route::get('/documentos/{documento}/descargar', [DocumentoController::class, 'show'])
+         ->name('documentos.descargar');
+
     Route::get('/actas', function () {
         $actas = Acta::latest()->paginate(10);
         return view('portal.actas.index', compact('actas'));
