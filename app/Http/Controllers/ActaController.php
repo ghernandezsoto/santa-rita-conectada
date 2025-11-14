@@ -116,4 +116,20 @@ class ActaController extends Controller
         return redirect()->route('actas.index')
                         ->with('success', 'Acta eliminada exitosamente.');
     }
+
+    /**
+     * Permite la descarga del archivo del acta para un Socio.
+     * Esta ruta está aislada del 'show' de la Directiva.
+     */
+    public function descargarParaSocio(Acta $acta)
+    {
+        // Verifica si el archivo existe en el almacenamiento
+        if (!Storage::disk('public')->exists($acta->archivo_path)) {
+            // Si no existe, redirige de vuelta al ÍNDICE DEL PORTAL (que el Socio SÍ puede ver).
+            return redirect()->route('portal.actas.index')->with('error', 'El archivo del acta no fue encontrado.');
+        }
+
+        // Si existe, devuelve el archivo para forzar la descarga.
+        return Storage::disk('public')->download($acta->archivo_path);
+    }
 }
