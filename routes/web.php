@@ -73,6 +73,10 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
         return view('portal.actas.show', compact('acta'));
     })->name('actas.show');
 
+    // descarga segura del ActaController@show.
+    Route::get('/actas/{acta}/descargar', [ActaController::class, 'show'])
+         ->name('actas.descargar');
+
     Route::get('/comunicados', [PortalComunicadoController::class, 'index'])->name('comunicados.index');
     Route::get('/comunicados/{comunicado}', [PortalComunicadoController::class, 'show'])->name('comunicados.show');
 
