@@ -13,7 +13,7 @@
                     <ul class="divide-y divide-gray-200">
                         @forelse ($actas as $acta)
                             <li class="py-3 flex justify-between items-center">
-                                <a href="{{ route('actas.show', $acta->id) }}" target="_blank" class="text-primary-600 hover:underline hover:text-primary-800">
+                                <a href="{{ route('portal.actas.show', $acta->id) }}" class="text-primary-600 hover:underline hover:text-primary-800">
                                     {{ $acta->titulo }}
                                 </a>
                                 <span class="text-sm text-gray-500 flex-shrink-0 ml-4">{{ $acta->fecha->format('d/m/Y') }}</span>
