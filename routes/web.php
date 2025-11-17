@@ -57,9 +57,7 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
         return view('portal.documentos.show', compact('documento'));
     })->name('documentos.show');
 
-    // --- RUTA DE DESCARGA AÑADIDA ---
-    // Esta ruta está protegida por 'role:Socio' y reutiliza la lógica de
-    // descarga segura del DocumentoController@show.
+    // --- RUTA DE DESCARGA DE DOCUMENTOS ---
     Route::get('/documentos/{documento}/descargar', [DocumentoController::class, 'show'])
          ->name('documentos.descargar');
 
@@ -73,9 +71,11 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
         return view('portal.actas.show', compact('acta'));
     })->name('actas.show');
 
-    // descarga segura del ActaController@show.
+    // --- CORRECCIÓN AQUÍ ---
+    // Antes apuntaba a 'show' (que redirige mal si hay error).
+    // Ahora apunta a 'descargarParaSocio' (que redirige bien al portal).
     Route::get('/actas/{acta}/descargar', [ActaController::class, 'descargarParaSocio'])
-    ->name('actas.descargar');
+         ->name('actas.descargar');
 
     Route::get('/comunicados', [PortalComunicadoController::class, 'index'])->name('comunicados.index');
     Route::get('/comunicados/{comunicado}', [PortalComunicadoController::class, 'show'])->name('comunicados.show');
