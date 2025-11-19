@@ -38,4 +38,21 @@ class AporteController extends Controller
 
         return view('portal.aportes.index', $datosAportes);
     }
+
+    public function descargarComprobante(Transaccion $transaccion)
+    {
+        // 1. Seguridad: Verificar que la transacción pertenezca al socio logueado
+        $user = Auth::user();
+        if ($transaccion->socio_id !== $user->socio->id) {
+            abort(403, 'No tienes permiso para ver este comprobante.');
+        }
+
+        // 2. Verificar si tiene comprobante adjunto
+        if (!$transaccion->comprobante_path || !Storage::disk('public')->exists($transaccion->comprobante_path)) {
+            return back()->with('error', 'Esta transacción no tiene un comprobante adjunto.');
+        }
+
+        // 3. Descargar
+        return Storage::disk('public')->download($transaccion->comprobante_path);
+    }
 }

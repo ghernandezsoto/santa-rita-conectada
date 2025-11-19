@@ -71,7 +71,6 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
         return view('portal.actas.show', compact('acta'));
     })->name('actas.show');
 
-    // --- CORRECCIÓN AQUÍ ---
     // Antes apuntaba a 'show' (que redirige mal si hay error).
     // Ahora apunta a 'descargarParaSocio' (que redirige bien al portal).
     Route::get('/actas/{acta}/descargar', [ActaController::class, 'descargarParaSocio'])
@@ -84,6 +83,9 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
     Route::get('/eventos/{evento}', [PortalEventoController::class, 'show'])->name('eventos.show');
 
     Route::get('/aportes', [PortalAporteController::class, 'index'])->name('aportes.index');
+
+    Route::get('/transacciones/{transaccion}/comprobante', [PortalAporteController::class, 'descargarComprobante'])
+         ->name('portal.comprobantes.descargar');
 
 });
 
