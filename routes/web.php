@@ -85,7 +85,7 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
     Route::get('/aportes', [PortalAporteController::class, 'index'])->name('aportes.index');
 
     Route::get('/transacciones/{transaccion}/comprobante', [PortalAporteController::class, 'descargarComprobante'])
-         ->name('portal.comprobantes.descargar');
+         ->name('comprobantes.descargar');
 
 });
 
