@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Transaccion; 
 use App\Models\Socio;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class AporteController extends Controller
 {
