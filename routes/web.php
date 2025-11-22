@@ -89,4 +89,11 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
 
 });
 
+
+// --- RUTA FIRMADA PARA DESCARGAS DESDE ANDROID ---
+// Esta ruta valida la firma criptográfica en la URL. No pide login.
+Route::get('/descargas/publicas/comprobante/{transaccion}', [PortalAporteController::class, 'descargarPublico'])
+    ->name('comprobantes.publico')
+    ->middleware('signed');
+
 require __DIR__.'/auth.php';

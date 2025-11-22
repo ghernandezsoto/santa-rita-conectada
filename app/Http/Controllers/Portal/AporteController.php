@@ -57,4 +57,20 @@ class AporteController extends Controller
         // 3. Descargar
         return Storage::disk('public')->download($transaccion->comprobante_path);
     }
+
+    /**
+     * Descarga para URLs firmadas (Android/External).
+     * No requiere Auth::user(), solo valida que la firma sea correcta (middleware 'signed').
+     */
+    public function descargarPublico(Transaccion $transaccion)
+    {
+        // Como la URL está firmada criptográficamente, sabemos que fue generada por nuestra API.
+        // Solo validamos que el archivo físico exista.
+        
+        if (!$transaccion->comprobante_path || !Storage::disk('public')->exists($transaccion->comprobante_path)) {
+            abort(404, 'El archivo ya no existe o fue movido.');
+        }
+
+        return Storage::disk('public')->download($transaccion->comprobante_path);
+    }
 }

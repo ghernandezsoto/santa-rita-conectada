@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Socio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL; 
 
 class AporteController extends Controller
 {
@@ -18,7 +19,6 @@ class AporteController extends Controller
 
         // Ya no buscamos por email, usamos la relación que ya está cargada
         $socio = $user->socio;
-
 
         if (!$socio) {
             // Esto ahora solo debería ocurrir si el usuario es de la directiva
@@ -33,6 +33,20 @@ class AporteController extends Controller
 
         // Obtiene el historial de transacciones paginado
         $transacciones = $socio->transacciones()->latest('fecha')->paginate(20);
+
+        // --- Transformamos la colección para inyectar la URL firmada ---
+        $transacciones->getCollection()->transform(function ($transaccion) {
+            if ($transaccion->comprobante_path) {
+                // Generamos una URL temporal válida por 30 minutos.
+                // Apunta a una ruta NUEVA que crearemos llamada 'comprobantes.publico'
+                $transaccion->comprobante_path = URL::temporarySignedRoute(
+                    'comprobantes.publico', 
+                    now()->addMinutes(30),
+                    ['transaccion' => $transaccion->id]
+                );
+            }
+            return $transaccion;
+        });
 
         // Devuelve todo en una única respuesta JSON
         return response()->json([
