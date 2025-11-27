@@ -16,6 +16,7 @@ use App\Models\Transaccion;
 use Carbon\Carbon;
 use App\Models\Comunicado;
 use App\Models\Evento;
+use Illuminate\Support\Facades\URL; 
 
 use Illuminate\Support\Facades\Notification;
 use App\Services\ComunicadoService;
@@ -94,10 +95,25 @@ Route::middleware('auth:sanctum')->group(function () {
     })->middleware('role:Presidente|Secretario|Tesorero');
 
     // --- RUTA PARA EL HISTORIAL DE TESORERÍA (APP MÓVIL) ---
+    // Ahora inyectamos la URL firmada para evitar el crash en Android
     Route::get('/directivo/transacciones', function () {
-        // Obtenemos todas las transacciones, ordenadas por fecha más reciente
+        
         $transacciones = Transaccion::latest('fecha')->get();
+
+        // Transformamos la colección para generar la URL pública temporal
+        $transacciones->transform(function ($transaccion) {
+            if ($transaccion->comprobante_path) {
+                $transaccion->comprobante_path = URL::temporarySignedRoute(
+                    'comprobantes.publico', 
+                    now()->addMinutes(30),
+                    ['transaccion' => $transaccion->id]
+                );
+            }
+            return $transaccion;
+        });
+
         return response()->json($transacciones);
+
     })->middleware('role:Presidente|Secretario|Tesorero');
 
 
@@ -149,7 +165,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- RUTA PARA EL GRÁFICO PERSONAL DEL SOCIO ---
     Route::get('/charts/personal-finances', function (Request $request) {
         $user = $request->user();
-        
+
         // Se usa la relación directa ---
         $socio = $user->socio;
 
