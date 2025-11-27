@@ -40,9 +40,9 @@ class ComunicadoService
         }
 
         // --- BLOQUE 2: ENVÍO DE PUSH (vía Users) ---
-        // Se notifica a los modelos User (con rol Socio) que tienen 'fcm_token'.
+        // Buscamos usuarios que tengan CUALQUIER rol (Socio, Presidente, etc.)
         // PushComunicadoNotification AHORA enviará por el FcmChannel nativo.
-        $usuariosParaPush = User::role('Socio')
+        $usuariosParaPush = User::whereHas('roles')
                                 ->whereNotNull('fcm_token')
                                 ->get();
 
