@@ -13,13 +13,12 @@ class DocumentoController extends Controller
     {
         $documentos = Documento::latest()->get();
 
-        // Transformamos cada documento para inyectar la URL firmada
+        // Convertimos la ruta en Link
         $documentos->transform(function ($doc) {
             if ($doc->archivo_path) {
-                // Generamos una URL válida por 30 minutos
                 $doc->archivo_path = URL::temporarySignedRoute(
                     'documentos.publico',
-                    now()->addMinutes(30),
+                    now()->addMinutes(180),
                     ['documento' => $doc->id]
                 );
             }

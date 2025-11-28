@@ -13,13 +13,13 @@ class ActaController extends Controller
     {
         $actas = Acta::latest()->get();
 
-        // Transformamos cada acta para inyectar la URL firmada
+        // Transformamos la respuesta para incluir el link firmado
         $actas->transform(function ($acta) {
             if ($acta->archivo_path) {
-                // Generamos una URL válida por 30 minutos
+                // Generamos una URL válida por 180 minutos (3 horas)
                 $acta->archivo_path = URL::temporarySignedRoute(
                     'actas.publico',
-                    now()->addMinutes(30),
+                    now()->addMinutes(180),
                     ['acta' => $acta->id]
                 );
             }
