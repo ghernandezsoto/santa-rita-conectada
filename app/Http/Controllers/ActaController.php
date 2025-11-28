@@ -132,4 +132,13 @@ class ActaController extends Controller
         // Si existe, devuelve el archivo para forzar la descarga.
         return Storage::disk('public')->download($acta->archivo_path);
     }
+
+    public function descargarPublico(Request $request, Acta $acta)
+    {
+        // No requiere Auth::user() porque la firma valida el acceso.
+        if (!Storage::disk('public')->exists($acta->archivo_path)) {
+            abort(404, 'Archivo no encontrado.');
+        }
+        return Storage::disk('public')->download($acta->archivo_path);
+    }
 }

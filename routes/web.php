@@ -52,12 +52,11 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
         return view('portal.documentos.index', compact('documentos'));
     })->name('documentos.index');
 
-    // Se añade la ruta para ver un documento individual.
     Route::get('/documentos/{documento}', function (Documento $documento) {
         return view('portal.documentos.show', compact('documento'));
     })->name('documentos.show');
 
-    // --- RUTA DE DESCARGA DE DOCUMENTOS ---
+    // Ruta de descarga para el portal web (usa sesión)
     Route::get('/documentos/{documento}/descargar', [DocumentoController::class, 'show'])
          ->name('documentos.descargar');
 
@@ -66,13 +65,11 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
         return view('portal.actas.index', compact('actas'));
     })->name('actas.index');
 
-    // Se añade la ruta para ver un acta individual.
     Route::get('/actas/{acta}', function (Acta $acta) {
         return view('portal.actas.show', compact('acta'));
     })->name('actas.show');
 
-    // Antes apuntaba a 'show' (que redirige mal si hay error).
-    // Ahora apunta a 'descargarParaSocio' (que redirige bien al portal).
+    // Ruta de descarga para el portal web (usa sesión)
     Route::get('/actas/{acta}/descargar', [ActaController::class, 'descargarParaSocio'])
          ->name('actas.descargar');
 
@@ -89,11 +86,21 @@ Route::middleware(['auth', 'role:Socio', 'password.changed'])->prefix('portal')-
 
 });
 
+// --- RUTAS FIRMADAS PARA DESCARGAS DESDE ANDROID (PÚBLICAS PERO SEGURAS) ---
+// Estas rutas validan la firma criptográfica en la URL. No piden login.
 
-// --- RUTA FIRMADA PARA DESCARGAS DESDE ANDROID ---
-// Esta ruta valida la firma criptográfica en la URL. No pide login.
 Route::get('/descargas/publicas/comprobante/{transaccion}', [PortalAporteController::class, 'descargarPublico'])
     ->name('comprobantes.publico')
+    ->middleware('signed');
+
+// NUEVA: Ruta firmada para Actas
+Route::get('/descargas/publicas/acta/{acta}', [ActaController::class, 'descargarPublico'])
+    ->name('actas.publico')
+    ->middleware('signed');
+
+// NUEVA: Ruta firmada para Documentos
+Route::get('/descargas/publicas/documento/{documento}', [DocumentoController::class, 'descargarPublico'])
+    ->name('documentos.publico')
     ->middleware('signed');
 
 require __DIR__.'/auth.php';

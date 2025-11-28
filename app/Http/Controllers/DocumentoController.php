@@ -69,6 +69,14 @@ class DocumentoController extends Controller
                          ->with('success', '¡Documento eliminado exitosamente!');
     }
     
+    // --- NUEVO MÉTODO PARA APP ANDROID (URL Firmada) ---
+    public function descargarPublico(Request $request, Documento $documento)
+    {
+        if (!Storage::disk('public')->exists($documento->archivo_path)) {
+            abort(404, 'Archivo no encontrado.');
+        }
+        return Storage::disk('public')->download($documento->archivo_path);
+    }
 
     public function edit(Documento $documento){}
     public function update(Request $request, Documento $documento){}
