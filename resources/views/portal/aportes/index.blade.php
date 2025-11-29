@@ -5,82 +5,111 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-semibold text-gray-500">Tu Saldo Actual</h3>
-                <p class="text-3xl font-bold mt-2 {{ $balancePersonal >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                    ${{ number_format($balancePersonal, 0, ',', '.') }}
-                </p>
-                <p class="text-sm text-gray-500 mt-1">Este es el balance de todas tus cuotas y aportes registrados.</p>
+    <div class="py-12 bg-base-100">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            
+            {{-- Tarjeta de Saldo (Estilo Widget Dashboard) --}}
+            <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 {{ $balancePersonal >= 0 ? 'border-green-500' : 'border-red-500' }} border-t border-r border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Tu Saldo Actual</h3>
+                        <p class="text-4xl font-bold mt-2 {{ $balancePersonal >= 0 ? 'text-green-600' : 'text-red-600' }} tabular-nums">
+                            ${{ number_format($balancePersonal, 0, ',', '.') }}
+                        </p>
+                        <p class="text-sm text-gray-400 mt-1">Balance total de cuotas y aportes.</p>
+                    </div>
+                    {{-- Icono decorativo de fondo --}}
+                    <div class="{{ $balancePersonal >= 0 ? 'text-green-100' : 'text-red-100' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            {{-- Gráfico --}}
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">Resumen de Aportes (Últimos 12 Meses)</h3>
-                    <div>
+                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                        </svg>
+                        Resumen de Aportes (Últimos 12 Meses)
+                    </h3>
+                    <div class="relative h-64 w-full">
                         <canvas id="personalContributionsChart"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            {{-- Tabla Historial --}}
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-200">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-semibold mb-4">Historial Completo de Movimientos</h3>
-                    <div class="overflow-x-auto">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Historial Completo de Movimientos</h3>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
                         <table class="min-w-full">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-primary-800 text-white uppercase text-xs leading-normal">
                                 <tr>
-                                    <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Fecha</th>
-                                    <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Descripción</th>
-                                    <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Tipo</th>
-                                    {{-- NUEVA COLUMNA: COMPROBANTE --}}
-                                    <th class="py-2 px-4 text-center text-sm font-semibold text-gray-600">Comprobante</th>
-                                    <th class="py-2 px-4 text-right text-sm font-semibold text-gray-600">Monto</th>
+                                    <th class="py-3 px-4 text-left font-semibold w-[15%]">Fecha</th>
+                                    <th class="py-3 px-4 text-left font-semibold w-[40%]">Descripción</th>
+                                    <th class="py-3 px-4 text-center font-semibold w-[15%]">Tipo</th>
+                                    <th class="py-3 px-4 text-center font-semibold w-[15%]">Comprobante</th>
+                                    <th class="py-3 px-4 text-right font-semibold w-[15%]">Monto</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-200 text-gray-600 text-sm font-light">
                                 @forelse ($transacciones as $transaccion)
-                                    <tr>
-                                        {{-- Fecha formateada --}}
-                                        <td class="py-3 px-4 text-sm whitespace-nowrap">{{ $transaccion->fecha->format('d/m/Y') }}</td>
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        {{-- Fecha --}}
+                                        <td class="py-3 px-4 whitespace-nowrap font-medium text-gray-800">
+                                            {{ $transaccion->fecha->format('d/m/Y') }}
+                                        </td>
                                         
                                         {{-- Descripción --}}
-                                        <td class="py-3 px-4 text-sm">{{ $transaccion->descripcion }}</td>
+                                        <td class="py-3 px-4">
+                                            {{ $transaccion->descripcion }}
+                                        </td>
                                         
-                                        {{-- Badge de Tipo --}}
-                                        <td class="py-3 px-4 text-sm">
-                                            <span class="py-1 px-2 rounded-full text-xs font-semibold {{ $transaccion->tipo === 'Ingreso' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        {{-- Badge Tipo --}}
+                                        <td class="py-3 px-4 text-center">
+                                            <span class="py-1 px-3 rounded-full text-xs font-bold {{ $transaccion->tipo === 'Ingreso' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                                 {{ $transaccion->tipo }}
                                             </span>
                                         </td>
 
-                                        {{-- LOGICA DEL BOTÓN DE COMPROBANTE --}}
-                                        <td class="py-3 px-4 text-center text-sm">
+                                        {{-- Botón Comprobante --}}
+                                        <td class="py-3 px-4 text-center">
                                             @if($transaccion->comprobante_path)
-                                                {{-- Enlace directo a la ruta que ya creamos --}}
                                                 <a href="{{ route('portal.comprobantes.descargar', $transaccion) }}" 
                                                    target="_blank"
-                                                   class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                   class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium transition group"
+                                                   title="Descargar Comprobante">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:scale-110 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                     </svg>
-                                                    Ver
+                                                    <span class="hidden sm:inline">Ver</span>
                                                 </a>
                                             @else
-                                                <span class="text-gray-400 text-xs italic">No adjunto</span>
+                                                <span class="text-gray-300 italic text-xs">N/A</span>
                                             @endif
                                         </td>
 
                                         {{-- Monto --}}
-                                        <td class="py-3 px-4 text-right text-sm font-mono font-bold text-gray-700">
-                                            ${{ number_format($transaccion->monto, 0, ',', '.') }}
+                                        <td class="py-3 px-4 text-right font-mono font-bold text-base {{ $transaccion->tipo === 'Ingreso' ? 'text-green-600' : 'text-red-600' }}">
+                                            {{ $transaccion->tipo === 'Ingreso' ? '+' : '-' }} ${{ number_format($transaccion->monto, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="py-6 text-center text-gray-500">No tienes transacciones registradas.</td>
+                                        <td colspan="5" class="py-8 text-center text-gray-500 bg-gray-50">
+                                            <div class="flex flex-col items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                                </svg>
+                                                No tienes transacciones registradas.
+                                            </div>
+                                        </td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -113,28 +142,38 @@
 
                     // Si no hay datos (ej. socio nuevo sin aportes), no dibujamos el gráfico
                     if (!data || !data.labels || data.labels.length === 0 || !data.datasets || data.datasets.length === 0 || data.datasets[0].data.length === 0) {
-                        chartElement.parentElement.innerHTML = '<p class="text-center text-gray-500 py-4">No hay datos suficientes para mostrar el gráfico.</p>';
+                        chartElement.parentElement.innerHTML = '<div class="text-center text-gray-500 py-10 flex flex-col items-center"><svg class="h-10 w-10 mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/></svg><p>No hay datos suficientes para mostrar el gráfico.</p></div>';
                         return;
                     }
 
                     new Chart(chartElement.getContext('2d'), { 
-                        type: 'line', // Un gráfico de línea es ideal para mostrar tendencias en el tiempo
+                        type: 'line', 
                         data: data,
                         options: {
                             responsive: true,
+                            maintainAspectRatio: false, // Permite que se adapte al contenedor padre
                             scales: {
                                 y: {
-                                    beginAtZero: true
+                                    beginAtZero: true,
+                                    grid: { color: '#f3f4f6' }
+                                },
+                                x: {
+                                    grid: { display: false }
                                 }
                             },
                             plugins: {
                                 legend: {
-                                    display: false // No es necesaria la leyenda para una sola serie de datos
+                                    display: false 
                                 },
-                                title: {
-                                    display: true,
-                                    text: 'Tus aportes mensuales'
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
                                 }
+                            },
+                            interaction: {
+                                mode: 'nearest',
+                                axis: 'x',
+                                intersect: false
                             }
                         }
                     });
