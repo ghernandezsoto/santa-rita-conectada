@@ -5,7 +5,8 @@
                 {{ __('Archivo Digital') }}
             </h2>
 
-            <a href="{{ route('documentos.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition shadow-sm">
+            {{-- Botón con color accent-500 --}}
+            <a href="{{ route('documentos.create') }}" class="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 flex items-center gap-2 transition shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                 </svg>
@@ -14,8 +15,8 @@
         </div>
     </x-slot>
 
-
-    <div class="py-12 bg-gray-50">
+    {{-- Fondo base-100 --}}
+    <div class="py-12 bg-base-100">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
@@ -36,7 +37,8 @@
                     {{-- VISTA DE ESCRITORIO (TABLA) --}}
                     <div class="hidden md:block overflow-x-auto rounded-lg border border-gray-200">
                         <table class="min-w-full bg-white">
-                            <thead class="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
+                            {{-- Header primary-800 --}}
+                            <thead class="bg-primary-800 text-white uppercase text-xs leading-normal">
                                 <tr>
                                     <th class="py-3 px-4 text-left font-semibold">Nombre del Documento</th>
                                     <th class="py-3 px-4 text-center font-semibold">Fecha</th>
@@ -49,12 +51,14 @@
                                     <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                                         <td class="py-3 px-4 font-medium text-gray-800">
                                             <div class="flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
                                                 {{ $documento->nombre_documento }}
                                             </div>
                                         </td>
                                         <td class="py-3 px-4 text-center">
-                                            <span class="bg-gray-100 text-gray-600 py-1 px-3 rounded-full text-xs">
+                                            <span class="bg-blue-50 text-blue-700 py-1 px-3 rounded-full text-xs font-semibold">
                                                 {{ \Carbon\Carbon::parse($documento->fecha_documento)->format('d/m/Y') }}
                                             </span>
                                         </td>
@@ -87,7 +91,9 @@
                                     <tr>
                                         <td colspan="4" class="py-8 text-center text-gray-500 bg-gray-50">
                                             <div class="flex flex-col items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
                                                 <p>No hay documentos en el archivo digital.</p>
                                             </div>
                                         </td>
@@ -100,13 +106,16 @@
                     {{-- VISTA MÓVIL (TARJETAS) --}}
                     <div class="md:hidden space-y-4">
                         @forelse ($documentos as $documento)
-                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 space-y-3">
+                                {{-- Título con primary-800 --}}
                                 <div class="flex items-start justify-between mb-2">
                                     <div class="flex items-center gap-2 overflow-hidden">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                                        <h3 class="font-bold text-gray-800 truncate text-sm">{{ $documento->nombre_documento }}</h3>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <h3 class="font-bold text-primary-800 truncate text-sm">{{ $documento->nombre_documento }}</h3>
                                     </div>
-                                    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full flex-shrink-0">
+                                    <span class="text-xs text-blue-700 bg-blue-50 px-2 py-1 rounded-full flex-shrink-0 font-semibold">
                                         {{ \Carbon\Carbon::parse($documento->fecha_documento)->format('d/m/Y') }}
                                     </span>
                                 </div>
