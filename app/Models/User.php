@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'fcm_token',
         'password_changed_at',
+        'socio_id',
     ];
 
     /**

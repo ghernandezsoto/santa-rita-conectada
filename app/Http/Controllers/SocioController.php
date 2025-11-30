@@ -72,7 +72,8 @@ class SocioController extends Controller
             $user = User::create([
                 'name' => $validated['nombre'],
                 'email' => $validated['email'],
-                'password' => Hash::make($temporaryPassword)
+                'password' => Hash::make($temporaryPassword),
+                'socio_id' => $socio->id,
             ]);
 
             $user->assignRole('Socio');
