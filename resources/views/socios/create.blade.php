@@ -99,4 +99,35 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const nombreInput = document.getElementById('nombre'); // Asegúrate que el input tenga id="nombre"
+            const edadInput = document.getElementById('edad');     // Asegúrate que el input tenga id="edad"
+            const emailInput = document.getElementById('email');   // Asegúrate que el input tenga id="email"
+
+            function generarEmail() {
+                const nombreCompleto = nombreInput.value.trim().toLowerCase();
+                const edad = edadInput.value.trim();
+
+                if (nombreCompleto && edad) {
+                    // Dividir nombre para sacar inicial y apellido
+                    const partes = nombreCompleto.split(/\s+/);
+                    
+                    if (partes.length >= 2) {
+                        const inicial = partes[0].charAt(0); // Primera letra del nombre
+                        const apellido = partes[1];          // Primer apellido
+                        
+                        // Estructura: k + morales + 53 + .socio@santarita.cl
+                        const emailGenerado = `${inicial}${apellido}${edad}.socio@santarita.cl`;
+                        
+                        emailInput.value = emailGenerado;
+                    }
+                }
+            }
+
+            // Escuchar cambios en los campos
+            nombreInput.addEventListener('input', generarEmail);
+            edadInput.addEventListener('input', generarEmail);
+        });
+    </script>
 </x-app-layout>
