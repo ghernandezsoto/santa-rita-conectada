@@ -121,10 +121,22 @@ class SocioController extends Controller
     public function destroy(Socio $socio)
     {
         try {
+            // 1. NUEVO: Buscar y eliminar la cuenta de usuario vinculada (Login)
+            // Buscamos manualmente para estar 100% seguros
+            $usuarioVinculado = \App\Models\User::where('socio_id', $socio->id)->first();
+            
+            if ($usuarioVinculado) {
+                $usuarioVinculado->delete();
+            }
+
+            // 2. Eliminar la ficha del socio (Tu código original)
             $socio->delete();
+
             return redirect()->route('socios.index')
-                             ->with('success', 'Socio eliminado exitosamente.');
-        } catch (QueryException $e) {
+                             ->with('success', 'Socio y su cuenta de acceso eliminados exitosamente.');
+
+        } catch (\Illuminate\Database\QueryException $e) { // Asegúrate de importar o usar la barra invertida
+            // Tu manejo de errores original (INTACTO)
             if ($e->getCode() === '23000') {
                 return redirect()->back()
                                  ->with('error', 'No se puede eliminar este socio porque tiene registros asociados (como subsidios o transacciones). Por favor, elimine primero esos registros.');
