@@ -12,15 +12,13 @@
 </head>
 <body class="antialiased bg-gray-50 font-sans text-gray-900">
 
-    {{-- SECCIÓN 1: HÉROE --}}
+    {{-- ====================================================== --}}
+    {{-- SECCIÓN 1: HÉROE (PORTADA) --}}
+    {{-- ====================================================== --}}
     <div class="relative h-screen flex items-center justify-center">
-        {{-- 
-            TODO: CAMBIAR ESTA IMAGEN POR UNA FOTO REAL DE LA SEDE O LA ZONA.
-            Puedes subir tu foto a 'public/img/portada.jpg' y cambiar la línea de abajo por:
-            style="background-image: url('{{ asset('img/portada.jpg') }}');"
-        --}}
+        {{-- Imagen de fondo --}}
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832&auto=format&fit=crop');"></div>
-        
+
         {{-- Overlay oscuro para mejorar lectura --}}
         <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-gray-900/90"></div>
 
@@ -43,21 +41,15 @@
                         <a href="{{ route('login') }}" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                             Ingresar (Socios y Directiva)
                         </a>
-                        {{-- El registro suele ser cerrado en estos sistemas, pero si lo necesitas, descomenta: --}}
-                        {{-- 
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-lg font-semibold transition">
-                                Solicitar Acceso
-                            </a>
-                        @endif
-                        --}}
                     @endauth
                 @endif
             </div>
         </div>
     </div>
 
-    {{-- SECCIÓN 2: CARACTERÍSTICAS (Grid) --}}
+    {{-- ====================================================== --}}
+    {{-- SECCIÓN 2: CARACTERÍSTICAS (GRID) --}}
+    {{-- ====================================================== --}}
     <div class="bg-white py-24 sm:py-32">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-16">
@@ -110,11 +102,92 @@
         </div>
     </div>
 
-    {{-- SECCIÓN 3: FOOTER PROFESIONAL --}}
+    {{-- ====================================================== --}}
+    {{-- SECCIÓN 3: PREGUNTAS FRECUENTES (NUEVO) --}}
+    {{-- ====================================================== --}}
+    <div class="bg-gray-50 py-24 sm:py-32 border-t border-gray-200">
+        <div class="max-w-4xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-base font-semibold leading-7 text-blue-600 uppercase tracking-wide">Ayuda y Soporte</h2>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                    Preguntas Frecuentes
+                </p>
+                <p class="mt-4 text-lg text-gray-600">
+                    Resolvemos las principales dudas sobre el uso de la plataforma.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                {{-- FAQ 1 --}}
+                <div x-data="{ open: false }" class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <button @click="open = !open" class="flex w-full items-center justify-between px-6 py-5 text-left focus:outline-none">
+                        <span class="text-lg font-medium text-gray-900">¿Cómo puedo obtener mi contraseña?</span>
+                        <span class="ml-6 flex-shrink-0">
+                            <svg :class="{'rotate-180': open}" class="h-6 w-6 text-gray-400 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div x-show="open" style="display: none;" class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        Debes estar inscrito oficialmente en el libro de socios. Acércate a la directiva para que registren tu correo electrónico en el sistema. Una vez hecho esto, recibirás una clave de acceso temporal que podrás cambiar después.
+                    </div>
+                </div>
+
+                {{-- FAQ 2 --}}
+                <div x-data="{ open: false }" class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <button @click="open = !open" class="flex w-full items-center justify-between px-6 py-5 text-left focus:outline-none">
+                        <span class="text-lg font-medium text-gray-900">¿Puedo pagar las cuotas a través de la web?</span>
+                        <span class="ml-6 flex-shrink-0">
+                            <svg :class="{'rotate-180': open}" class="h-6 w-6 text-gray-400 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div x-show="open" style="display: none;" class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        Actualmente, la plataforma funciona como un <strong>visualizador de transparencia</strong>. Puedes ver tu historial de pagos y descargar comprobantes, pero los pagos se siguen realizando de forma presencial o por transferencia directa a la cuenta de la Junta de Vecinos.
+                    </div>
+                </div>
+
+                {{-- FAQ 3 --}}
+                <div x-data="{ open: false }" class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <button @click="open = !open" class="flex w-full items-center justify-between px-6 py-5 text-left focus:outline-none">
+                        <span class="text-lg font-medium text-gray-900">¿Cómo descargo un certificado de residencia?</span>
+                        <span class="ml-6 flex-shrink-0">
+                            <svg :class="{'rotate-180': open}" class="h-6 w-6 text-gray-400 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div x-show="open" style="display: none;" class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        Ingresa a tu portal de socio con tu RUT y clave. Dirígete a la sección <strong>"Documentos"</strong>. Allí podrás encontrar certificados generales. Si necesitas uno específico firmado por la presidenta, contáctanos directamente a través de los datos al pie de página.
+                    </div>
+                </div>
+
+                {{-- FAQ 4 --}}
+                <div x-data="{ open: false }" class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <button @click="open = !open" class="flex w-full items-center justify-between px-6 py-5 text-left focus:outline-none">
+                        <span class="text-lg font-medium text-gray-900">¿Cómo me entero de las reuniones?</span>
+                        <span class="ml-6 flex-shrink-0">
+                            <svg :class="{'rotate-180': open}" class="h-6 w-6 text-gray-400 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </span>
+                    </button>
+                    <div x-show="open" style="display: none;" class="px-6 pb-6 text-gray-600 leading-relaxed">
+                        ¡Descarga nuestra aplicación móvil! Recibirás notificaciones "Push" instantáneas cada vez que haya una citación a reunión, un corte de agua programado o cualquier noticia urgente de la comunidad. También puedes revisar la sección "Comunicados" en esta web.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ====================================================== --}}
+    {{-- SECCIÓN 4: FOOTER --}}
+    {{-- ====================================================== --}}
     <footer class="bg-gray-900 text-white pt-16 pb-8 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-                
+
                 {{-- Columna 1: Branding --}}
                 <div>
                     <h4 class="text-2xl font-bold mb-4 text-blue-500">Santa Rita Conectada</h4>
@@ -123,7 +196,7 @@
                     </p>
                 </div>
 
-                {{-- Columna 2: Contacto (LO QUE PIDIÓ EL PROFESOR) --}}
+                {{-- Columna 2: Contacto --}}
                 <div>
                     <h4 class="text-lg font-semibold mb-4 uppercase tracking-wider border-b border-gray-700 pb-2 inline-block">Contacto Directiva</h4>
                     <ul class="space-y-3 text-gray-300 text-sm">
