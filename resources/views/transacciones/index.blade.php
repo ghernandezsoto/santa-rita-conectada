@@ -50,7 +50,7 @@
                     Registrar Egreso
                 </a>
 
-                {{-- CORRECCIÓN SEMÁNTICA: <a> con clases de botón, sin <button> anidado --}}
+                {{-- Botón Exportar corregido semánticamente --}}
                 <a href="{{ route('transacciones.exportar') }}" 
                    class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-2 shadow-sm transition sm:ml-auto" 
                    role="button">
@@ -88,12 +88,13 @@
                                 {{-- Header primary-800 uppercase --}}
                                 <thead class="bg-primary-800 text-white uppercase text-xs leading-normal">
                                     <tr>
-                                        <th scope="col" class="py-3 px-4 font-semibold text-left w-[14%]">Fecha</th>
-                                        <th scope="col" class="py-3 px-4 font-semibold text-left w-[34%]">Descripción</th>
+                                        {{-- AJUSTE DE PORCENTAJES PARA EVITAR SCROLLBAR --}}
+                                        <th scope="col" class="py-3 px-4 font-semibold text-left w-[15%]">Fecha</th>
+                                        <th scope="col" class="py-3 px-4 font-semibold text-left w-[25%]">Descripción</th>
                                         <th scope="col" class="py-3 px-4 font-semibold text-left w-[20%]">Socio Aportante</th>
-                                        <th scope="col" class="py-3 px-4 font-semibold text-right w-[14%]">Monto</th>
+                                        <th scope="col" class="py-3 px-4 font-semibold text-right w-[15%]">Monto</th>
                                         <th scope="col" class="py-3 px-4 font-semibold text-left w-[10%]">Registro</th>
-                                        <th scope="col" class="py-3 px-4 font-semibold text-center w-[8%]">Acciones</th>
+                                        <th scope="col" class="py-3 px-4 font-semibold text-center w-[15%]">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-gray-600 text-sm font-light">
