@@ -7,7 +7,7 @@
 
     <div class="py-12 bg-base-100">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
+
             {{-- Resumen (cards) --}}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
                 <div class="bg-white p-5 sm:p-6 rounded-lg shadow-md border border-gray-100">
@@ -62,7 +62,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-4 sm:p-6 text-gray-900">
-                    
+
                     {{-- Alertas Estandarizadas --}}
                     @if (session('success'))
                         <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r" role="alert">
@@ -101,7 +101,15 @@
                                                 {{ $transaccion->fecha->format('d/m/Y') }}
                                             </td>
                                             <td class="py-3 px-4">
-                                                <div class="truncate" title="{{ $transaccion->descripcion }}">{{ $transaccion->descripcion }}</div>
+                                                {{-- CAMBIO A: Indicador visual de clip --}}
+                                                <div class="flex items-center gap-2">
+                                                    @if($transaccion->comprobante_path)
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" title="Comprobante adjunto">
+                                                            <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    @endif
+                                                    <div class="truncate" title="{{ $transaccion->descripcion }}">{{ $transaccion->descripcion }}</div>
+                                                </div>
                                             </td>
                                             <td class="py-3 px-4">
                                                 <div class="truncate text-sm text-gray-600" title="{{ $transaccion->socio->nombre ?? '' }}">{{ $transaccion->socio->nombre ?? 'N/A' }}</div>
@@ -116,6 +124,15 @@
                                             <td class="py-3 px-4 whitespace-nowrap text-xs">{{ $transaccion->user->name }}</td>
                                             <td class="py-3 px-4">
                                                 <div class="flex items-center justify-center gap-3">
+                                                    
+                                                    {{-- CAMBIO B: Botón Ver Detalle --}}
+                                                    <a href="{{ route('transacciones.show', $transaccion->id) }}" title="Ver Detalle" class="text-blue-500 hover:text-blue-700 transform hover:scale-110 transition">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                    </a>
+
                                                     {{-- Editar --}}
                                                     <a href="{{ route('transacciones.edit', $transaccion->id) }}" title="Editar" class="text-yellow-500 hover:text-yellow-700 transform hover:scale-110 transition">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,11 +168,11 @@
                                     <div class="min-w-0">
                                         <p class="text-sm font-bold text-primary-800">{{ $transaccion->fecha->format('d/m/Y') }}</p>
                                         <p class="mt-1 text-sm text-gray-700 break-words font-medium" title="{{ $transaccion->descripcion }}">{{ $transaccion->descripcion }}</p>
-                                        
+
                                         @if($transaccion->socio)
                                             <p class="mt-2 text-xs text-gray-500">Aporte de: <span class="font-medium text-gray-700">{{ $transaccion->socio->nombre }}</span></p>
                                         @endif
-                                        
+
                                         <p class="text-xs text-gray-500 mt-1">Por: <span class="font-medium">{{ $transaccion->user->name }}</span></p>
                                     </div>
                                     <div class="text-right ml-2 flex-shrink-0">
@@ -164,8 +181,14 @@
                                         </p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-end gap-4">
+                                    {{-- Botón Ver (Mobile) --}}
+                                    <a href="{{ route('transacciones.show', $transaccion->id) }}" class="text-blue-600 font-medium text-sm flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                        Ver
+                                    </a>
+
                                     <a href="{{ route('transacciones.edit', $transaccion->id) }}" class="text-yellow-600 font-medium text-sm flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                         Editar

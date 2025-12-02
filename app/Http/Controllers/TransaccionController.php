@@ -64,6 +64,11 @@ class TransaccionController extends Controller
                          ->with('success', '¡Transacción registrada exitosamente!');
     }
 
+    public function show(Transaccion $transaccion)
+    {
+        return view('transacciones.show', compact('transaccion'));
+    }
+
     public function edit(Transaccion $transaccion)
     {
         $tipo = $transaccion->tipo;

@@ -28,7 +28,7 @@
                                 </div>
                                 <div>
                                     <x-input-label for="fecha" :value="__('Fecha de la Transacción')" />
-                                    <x-text-input id="fecha" class="block mt-1 w-full" type="date" name="fecha" :value="old('fecha', $transaccion->fecha)" required />
+                                    <x-text-input id="fecha" class="block mt-1 w-full" type="date" name="fecha" :value="old('fecha', $transaccion->fecha->format('Y-m-d'))" required />
                                     <x-input-error :messages="$errors->get('fecha')" class="mt-2" />
                                 </div>
                             </div>

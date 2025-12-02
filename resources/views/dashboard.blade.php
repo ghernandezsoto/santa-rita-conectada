@@ -8,6 +8,14 @@
     <div class="py-12 bg-base-100 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            {{-- Alertas del Sistema --}}
+            @if (session('status'))
+                <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-r shadow-sm" role="alert">
+                    <strong class="font-bold">¡Información!</strong>
+                    <span class="block sm:inline">{{ session('status') }}</span>
+                </div>
+            @endif
+
             {{-- ====================================================== --}}
             {{-- SECCIÓN PARA LA DIRECTIVA --}}
             {{-- ====================================================== --}}
