@@ -9,7 +9,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    
+
                     {{-- Encabezado con Estado --}}
                     <div class="flex justify-between items-start mb-6 border-b pb-4">
                         <div>
@@ -30,7 +30,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Fecha</p>
-                            <p class="text-lg">{{ $transaccion->fecha->format('d de F, Y') }}</p>
+                            {{-- FIX FECHA: translatedFormat con escape correcto para "de" --}}
+                            <p class="text-lg">{{ $transaccion->fecha->translatedFormat('d \d\e F \d\e Y') }}</p>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Registrado por</p>

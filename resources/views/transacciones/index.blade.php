@@ -97,42 +97,48 @@
                                 <tbody class="text-gray-600 text-sm font-light">
                                     @forelse ($transacciones as $transaccion)
                                         <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                                            <td class="py-3 px-4 whitespace-nowrap font-medium text-gray-800">
+                                            <td class="py-3 px-4 whitespace-nowrap font-medium text-gray-800 align-middle">
                                                 {{ $transaccion->fecha->format('d/m/Y') }}
                                             </td>
-                                            <td class="py-3 px-4">
-                                                {{-- CAMBIO A: Indicador visual de clip --}}
+                                            <td class="py-3 px-4 align-middle">
                                                 <div class="flex items-center gap-2">
                                                     @if($transaccion->comprobante_path)
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" title="Comprobante adjunto">
                                                             <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
                                                         </svg>
                                                     @endif
-                                                    <div class="truncate" title="{{ $transaccion->descripcion }}">{{ $transaccion->descripcion }}</div>
+                                                    {{-- TRUNCATE CRÍTICO: min-w-0 permite que el flex container se encoja --}}
+                                                    <div class="truncate min-w-0 flex-1" title="{{ $transaccion->descripcion }}">
+                                                        {{ $transaccion->descripcion }}
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td class="py-3 px-4">
-                                                <div class="truncate text-sm text-gray-600" title="{{ $transaccion->socio->nombre ?? '' }}">{{ $transaccion->socio->nombre ?? 'N/A' }}</div>
+                                            <td class="py-3 px-4 align-middle">
+                                                <div class="truncate" title="{{ $transaccion->socio->nombre ?? '' }}">
+                                                    {{ $transaccion->socio->nombre ?? 'N/A' }}
+                                                </div>
                                             </td>
-                                            <td class="py-3 px-4 font-medium whitespace-nowrap text-right tabular-nums">
+                                            <td class="py-3 px-4 font-medium whitespace-nowrap text-right tabular-nums align-middle">
                                                 @if($transaccion->tipo == 'Ingreso')
                                                     <span class="text-green-600">+ ${{ number_format($transaccion->monto, 0, ',', '.') }}</span>
                                                 @else
                                                     <span class="text-red-600">- ${{ number_format($transaccion->monto, 0, ',', '.') }}</span>
                                                 @endif
                                             </td>
-                                            <td class="py-3 px-4 whitespace-nowrap text-xs">{{ $transaccion->user->name }}</td>
-                                            <td class="py-3 px-4">
+                                            <td class="py-3 px-4 text-xs align-middle">
+                                                <div class="truncate" title="{{ $transaccion->user->name }}">
+                                                    {{ $transaccion->user->name }}
+                                                </div>
+                                            </td>
+                                            <td class="py-3 px-4 align-middle">
                                                 <div class="flex items-center justify-center gap-3">
-                                                    
-                                                    {{-- CAMBIO B: Botón Ver Detalle --}}
+                                                    {{-- Ver Detalle --}}
                                                     <a href="{{ route('transacciones.show', $transaccion->id) }}" title="Ver Detalle" class="text-blue-500 hover:text-blue-700 transform hover:scale-110 transition">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                         </svg>
                                                     </a>
-
                                                     {{-- Editar --}}
                                                     <a href="{{ route('transacciones.edit', $transaccion->id) }}" title="Editar" class="text-yellow-500 hover:text-yellow-700 transform hover:scale-110 transition">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,9 +171,12 @@
                         @forelse ($transacciones as $transaccion)
                             <article class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                                 <div class="flex items-start justify-between gap-3">
-                                    <div class="min-w-0">
+                                    <div class="min-w-0 flex-1">
                                         <p class="text-sm font-bold text-primary-800">{{ $transaccion->fecha->format('d/m/Y') }}</p>
-                                        <p class="mt-1 text-sm text-gray-700 break-words font-medium" title="{{ $transaccion->descripcion }}">{{ $transaccion->descripcion }}</p>
+                                        {{-- FIX MOBILE: break-words evita que una palabra larga rompa el ancho --}}
+                                        <p class="mt-1 text-sm text-gray-700 font-medium break-words" title="{{ $transaccion->descripcion }}">
+                                            {{ $transaccion->descripcion }}
+                                        </p>
 
                                         @if($transaccion->socio)
                                             <p class="mt-2 text-xs text-gray-500">Aporte de: <span class="font-medium text-gray-700">{{ $transaccion->socio->nombre }}</span></p>
@@ -183,12 +192,10 @@
                                 </div>
 
                                 <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-end gap-4">
-                                    {{-- Botón Ver (Mobile) --}}
                                     <a href="{{ route('transacciones.show', $transaccion->id) }}" class="text-blue-600 font-medium text-sm flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                         Ver
                                     </a>
-
                                     <a href="{{ route('transacciones.edit', $transaccion->id) }}" class="text-yellow-600 font-medium text-sm flex items-center gap-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                         Editar

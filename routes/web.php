@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('socios', SocioController::class)->middleware('role:Secretario|Presidente');
     
-    Route::resource('actas', ActaController::class)->middleware('role:Secretario|Presidente');
+    Route::resource('actas', ActaController::class)->middleware('role:Secretario|Presidente|Tesorero');
     Route::resource('comunicados', ComunicadoController::class)->middleware('role:Secretario|Presidente|Tesorero');
     Route::post('/comunicados/{comunicado}/enviar', [ComunicadoController::class, 'enviar'])->name('comunicados.enviar')->middleware('role:Secretario|Presidente|Tesorero');
     
