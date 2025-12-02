@@ -50,13 +50,14 @@
                     Registrar Egreso
                 </a>
 
-                <a href="{{ route('transacciones.exportar') }}" role="button" class="sm:ml-auto">
-                    <button type="button" class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-2 shadow-sm transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-green-600">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
-                        Exportar a Excel
-                    </button>
+                {{-- CORRECCIÓN SEMÁNTICA: <a> con clases de botón, sin <button> anidado --}}
+                <a href="{{ route('transacciones.exportar') }}" 
+                   class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-2 shadow-sm transition sm:ml-auto" 
+                   role="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-green-600">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Exportar a Excel
                 </a>
             </div>
 
@@ -82,7 +83,8 @@
                     {{-- Tabla (solo md+) --}}
                     <div class="hidden md:block">
                         <div class="overflow-x-auto rounded-lg border border-gray-200">
-                            <table class="min-w-full bg-white table-fixed">
+                            {{-- table-fixed es CLAVE para que max-w-0 funcione --}}
+                            <table class="min-w-full bg-white table-fixed w-full">
                                 {{-- Header primary-800 uppercase --}}
                                 <thead class="bg-primary-800 text-white uppercase text-xs leading-normal">
                                     <tr>
@@ -100,24 +102,28 @@
                                             <td class="py-3 px-4 whitespace-nowrap font-medium text-gray-800 align-middle">
                                                 {{ $transaccion->fecha->format('d/m/Y') }}
                                             </td>
-                                            <td class="py-3 px-4 align-middle">
+                                            
+                                            {{-- CELDA DESCRIPCIÓN: max-w-0 fuerza el ancho, truncate corta el texto --}}
+                                            <td class="py-3 px-4 align-middle max-w-0">
                                                 <div class="flex items-center gap-2">
                                                     @if($transaccion->comprobante_path)
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" title="Comprobante adjunto">
                                                             <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 11-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
                                                         </svg>
                                                     @endif
-                                                    {{-- TRUNCATE CRÍTICO: min-w-0 permite que el flex container se encoja --}}
-                                                    <div class="truncate min-w-0 flex-1" title="{{ $transaccion->descripcion }}">
+                                                    <div class="truncate w-full" title="{{ $transaccion->descripcion }}">
                                                         {{ $transaccion->descripcion }}
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="py-3 px-4 align-middle">
-                                                <div class="truncate" title="{{ $transaccion->socio->nombre ?? '' }}">
+
+                                            {{-- CELDA SOCIO: max-w-0 y truncate --}}
+                                            <td class="py-3 px-4 align-middle max-w-0">
+                                                <div class="truncate w-full" title="{{ $transaccion->socio->nombre ?? '' }}">
                                                     {{ $transaccion->socio->nombre ?? 'N/A' }}
                                                 </div>
                                             </td>
+
                                             <td class="py-3 px-4 font-medium whitespace-nowrap text-right tabular-nums align-middle">
                                                 @if($transaccion->tipo == 'Ingreso')
                                                     <span class="text-green-600">+ ${{ number_format($transaccion->monto, 0, ',', '.') }}</span>
@@ -125,22 +131,25 @@
                                                     <span class="text-red-600">- ${{ number_format($transaccion->monto, 0, ',', '.') }}</span>
                                                 @endif
                                             </td>
-                                            <td class="py-3 px-4 text-xs align-middle">
-                                                <div class="truncate" title="{{ $transaccion->user->name }}">
+
+                                            {{-- CELDA REGISTRO: max-w-0 y truncate --}}
+                                            <td class="py-3 px-4 text-xs align-middle max-w-0">
+                                                <div class="truncate w-full" title="{{ $transaccion->user->name }}">
                                                     {{ $transaccion->user->name }}
                                                 </div>
                                             </td>
+
                                             <td class="py-3 px-4 align-middle">
                                                 <div class="flex items-center justify-center gap-3">
                                                     {{-- Ver Detalle --}}
-                                                    <a href="{{ route('transacciones.show', $transaccion->id) }}" title="Ver Detalle" class="text-blue-500 hover:text-blue-700 transform hover:scale-110 transition">
+                                                    <a href="{{ route('transacciones.show', $transaccion->id) }}" title="Ver Detalle" aria-label="Ver transacción {{ $transaccion->id }}" class="text-blue-500 hover:text-blue-700 transform hover:scale-110 transition">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                         </svg>
                                                     </a>
                                                     {{-- Editar --}}
-                                                    <a href="{{ route('transacciones.edit', $transaccion->id) }}" title="Editar" class="text-yellow-500 hover:text-yellow-700 transform hover:scale-110 transition">
+                                                    <a href="{{ route('transacciones.edit', $transaccion->id) }}" title="Editar" aria-label="Editar transacción {{ $transaccion->id }}" class="text-yellow-500 hover:text-yellow-700 transform hover:scale-110 transition">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                         </svg>
@@ -149,7 +158,7 @@
                                                     <form action="{{ route('transacciones.destroy', $transaccion->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta transacción?')" class="inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" title="Eliminar" class="text-red-500 hover:text-red-700 transform hover:scale-110 transition">
+                                                        <button type="submit" title="Eliminar" aria-label="Eliminar transacción {{ $transaccion->id }}" class="text-red-500 hover:text-red-700 transform hover:scale-110 transition">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                             </svg>
@@ -192,18 +201,18 @@
                                 </div>
 
                                 <div class="mt-4 pt-3 border-t border-gray-200 flex items-center justify-end gap-4">
-                                    <a href="{{ route('transacciones.show', $transaccion->id) }}" class="text-blue-600 font-medium text-sm flex items-center gap-1">
+                                    <a href="{{ route('transacciones.show', $transaccion->id) }}" class="text-blue-600 font-medium text-sm flex items-center gap-1" aria-label="Ver detalle de transacción">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                         Ver
                                     </a>
-                                    <a href="{{ route('transacciones.edit', $transaccion->id) }}" class="text-yellow-600 font-medium text-sm flex items-center gap-1">
+                                    <a href="{{ route('transacciones.edit', $transaccion->id) }}" class="text-yellow-600 font-medium text-sm flex items-center gap-1" aria-label="Editar transacción">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                         Editar
                                     </a>
                                     <form action="{{ route('transacciones.destroy', $transaccion->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta transacción?')" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 font-medium text-sm flex items-center gap-1">
+                                        <button type="submit" class="text-red-600 font-medium text-sm flex items-center gap-1" aria-label="Eliminar transacción">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                             Eliminar
                                         </button>
