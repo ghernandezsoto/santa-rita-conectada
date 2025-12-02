@@ -32,15 +32,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('socios', SocioController::class)->middleware('role:Secretario|Presidente');
+    
     Route::resource('actas', ActaController::class)->middleware('role:Secretario|Presidente');
-    Route::resource('comunicados', ComunicadoController::class)->middleware('role:Secretario|Presidente');
-    Route::post('/comunicados/{comunicado}/enviar', [ComunicadoController::class, 'enviar'])->name('comunicados.enviar')->middleware('role:Secretario|Presidente');
+    Route::resource('comunicados', ComunicadoController::class)->middleware('role:Secretario|Presidente|Tesorero');
+    Route::post('/comunicados/{comunicado}/enviar', [ComunicadoController::class, 'enviar'])->name('comunicados.enviar')->middleware('role:Secretario|Presidente|Tesorero');
+    
     Route::get('/transacciones/exportar', function () {
         return Excel::download(new TransaccionesExport, 'balance-tesoreria.xlsx');
     })->name('transacciones.exportar')->middleware('role:Tesorero|Presidente');
     Route::resource('transacciones', TransaccionController::class)->parameters(['transacciones' => 'transaccion'])->middleware('role:Tesorero|Presidente');
     Route::resource('subsidios', SubsidioController::class)->middleware('role:Presidente|Secretario|Tesorero');
-    Route::resource('eventos', EventoController::class)->middleware('role:Secretario|Presidente');
+    Route::resource('eventos', EventoController::class)->middleware('role:Secretario|Presidente|Tesorero');
     Route::resource('documentos', DocumentoController::class)->middleware('role:Presidente|Secretario|Tesorero');
 });
 
