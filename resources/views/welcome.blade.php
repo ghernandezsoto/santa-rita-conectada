@@ -102,6 +102,54 @@
         </div>
     </div>
 
+
+    {{-- ====================================================== --}}
+    {{-- SECCIÓN: DESCARGA APP --}}
+    {{-- ====================================================== --}}
+    <div class="bg-white py-16 sm:py-24">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="relative overflow-hidden rounded-3xl bg-gray-900 px-6 py-20 shadow-2xl sm:px-10 sm:py-24 md:p-20">
+                
+                {{-- Fondo decorativo --}}
+                <svg viewBox="0 0 1024 1024" class="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-y-1/2 [mask-image:radial-gradient(closest-side,white,transparent)] sm:left-full sm:-ml-80 lg:left-1/2 lg:ml-0 lg:-translate-x-1/2 lg:translate-y-0" aria-hidden="true">
+                    <circle cx="512" cy="512" r="512" fill="url(#gradient)" fill-opacity="0.7" />
+                    <defs>
+                        <radialGradient id="gradient">
+                            <stop stop-color="#16a34a" />
+                            <stop offset="1" stop-color="#166534" />
+                        </radialGradient>
+                    </defs>
+                </svg>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="mx-auto max-w-md text-center lg:mx-0 lg:text-left">
+                        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                            Lleva tu comunidad<br>en el bolsillo.
+                        </h2>
+                        <p class="mt-6 text-lg leading-8 text-gray-300">
+                            Descarga la aplicación oficial para Android. Recibe notificaciones al instante, revisa la transparencia financiera y gestiona tus trámites desde cualquier lugar.
+                        </p>
+                        <div class="mt-10 flex items-center justify-center gap-x-6 lg:justify-start">
+                            {{-- Enlace directo al archivo en public/ --}}
+                            <a href="{{ asset('santarita.apk') }}" download class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white flex items-center gap-2">
+                                <svg class="h-6 w-6 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997zm-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997zM7.34 5.5792l-1.669-2.919c-.131-.2237-.4194-.3031-.6469-.176-.2267.127-.3068.4111-.1866.6369L6.657 6.2737C3.4143 8.0532 1.1593 11.2334 1 14.8963h22c-.1593-3.6628-2.4143-6.8431-5.657-8.6226l1.8192-3.1526c.1202-.2258.0401-.5099-.1866-.6369-.2275-.1271-.5159-.0477-.6469.176l-1.669 2.919c-1.3934-.6336-2.9377-.9853-4.5701-.9853-1.6323 0-3.1767.3517-4.5696.9853z"/></svg>
+                                Descargar APK
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="relative flex justify-center lg:justify-end">
+                        <div class="bg-white p-4 rounded-xl shadow-lg transform rotate-2 hover:rotate-0 transition-transform duration-300">
+                            <p class="text-center text-gray-900 mb-2 font-bold text-sm uppercase tracking-wide">Escanea para instalar</p>
+                            {{-- Ruta corregida a images/ --}}
+                            <img src="{{ asset('images/qr-app.png') }}" alt="QR Descarga App" class="w-48 h-48 sm:w-64 sm:h-64 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- ====================================================== --}}
     {{-- SECCIÓN 3: PREGUNTAS FRECUENTES (NUEVO) --}}
     {{-- ====================================================== --}}
