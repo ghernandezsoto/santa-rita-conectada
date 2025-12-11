@@ -30,7 +30,7 @@ class ActaController extends Controller
             'titulo' => 'required|string|max:255',
             'fecha' => 'required|date',
             'contenido' => 'required|string',
-            'archivo' => 'required|file|mimes:pdf|max:2048', // Requerido, debe ser PDF, máx 2MB
+            'archivo' => 'required|file|mimes:pdf|max:20480', // Requerido, debe ser PDF, máx 2MB
         ]);
 
         // Manejar la subida del archivo PDF.
