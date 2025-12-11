@@ -78,7 +78,7 @@ class ActaController extends Controller
             'titulo' => 'required|string|max:255',
             'fecha' => 'required|date',
             'contenido' => 'required|string',
-            'archivo' => 'nullable|file|mimes:pdf|max:2048', // El archivo es opcional al editar
+            'archivo' => 'nullable|file|mimes:pdf|max:20480', // El archivo es opcional al editar
         ]);
 
         // Preparamos los datos para actualizar.
